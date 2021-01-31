@@ -1,5 +1,10 @@
 #include "EventManager.h"
 
+EventManager::EventManager()
+{
+	tutorialEnabled = false;
+}
+
 void EventManager::setup()
 {
 	if (tutorialEnabled) {
@@ -131,7 +136,6 @@ void EventManager::update(Controller* _controller, vector<GameObject*>* _gameobj
 		static bool t;
 		if (!t) {
 			t = true;
-			_controller->setGUIVisible(true);
 			fullInput = true;
 		}
 	}

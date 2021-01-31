@@ -24,6 +24,7 @@ Player::Player(ofVec2f _pos, ofColor _color)
 
 void Player::update()
 {
+	drawParticleTrail();
 	updateForces();
 	updateGUI();
 	resetForces();
@@ -140,7 +141,7 @@ void Player::draw()
 	ofSetColor(255);
 
 	if (aimingBoost) drawBoostDirection();
-	drawParticleTrail();
+	//drawParticleTrail();
 
 	ofSetColor(color);
 	ofFill();
@@ -173,10 +174,18 @@ void Player::drawParticleTrail() // draws particle trail following the player wh
 {
 	if (mouse_down && mouse_button == 0) {
 		// draw new particles
-		float posX = ofMap(pos.x, -ofGetWidth()/2, ofGetWidth()/2, 0, 1);
-		float posY = ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
+		//float posX = ofMap(pos.x, -ofGetWidth()/2, ofGetWidth()/2, 0, 1);
+		//float posY = ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
 		//ofVec2f mouseNorm = ofVec2f(eventPos) / ofGetWindowSize();
 		//ofVec2f mouseVel = ofVec2f(eventPos - pMouse) / ofGetWindowSize();
-		addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
+		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
+
+		ofVec2f newPos;
+		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1);
+		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
+		ofVec2f newVel;
+		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
+		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
+		addToFluid(newPos, newVel, true, true);
 	}
 }

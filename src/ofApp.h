@@ -16,6 +16,8 @@
 #include "ParticleSystem.h"
 #include "ofxSimpleGuiToo.h"
 
+#include "SceneManager.h"
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -40,7 +42,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 
-		// ---> Core setup <--- //
+		// ---> Core Setup <--- //
 
 		vector <GameObject*> vec;
 		vector <GameObject*>* GameObjects = &vec; // the main vector of all objects in the scene
@@ -51,8 +53,10 @@ class ofApp : public ofBaseApp{
 		Collisions CollisionDetector;
 		EventManager Events; // simple system for allowing relevant interactions/gui interfacts - only used for the starting tutorial
 
+		SceneManager Scene_Manager;
 
-		// ---> MSAFluid setup <--- //
+
+		// ---> Fluid Setup <--- //
 
 		float colorMult;
 		float velocityMult;
@@ -60,6 +64,8 @@ class ofApp : public ofBaseApp{
 		bool resizeFluid;
 		bool drawFluid;
 		bool drawParticles;
+
+		bool drawParticleGUI;
 
 		msa::fluid::Solver fluidSolver;
 		msa::fluid::DrawerGl fluidDrawer;

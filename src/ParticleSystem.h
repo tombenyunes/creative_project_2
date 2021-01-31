@@ -11,7 +11,7 @@
 #include "Particle.h"
 //#include "Player.h"
 
-#define MAX_PARTICLES		25000 // 50000
+#define MAX_PARTICLES		12500 // 50000
 
 class ParticleSystem {
 public:	

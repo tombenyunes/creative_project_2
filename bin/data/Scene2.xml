@@ -1,0 +1,25 @@
+<Scene>
+    <GameObject>
+        <type>Object</type>
+        <pos.x>800</pos.x>
+		<pos.y>800</pos.y>
+		<mass>500</mass>
+		<radius>250</radius>
+    </GameObject>
+	<GameObject>
+		<type>Object</type>
+		<pos.x>-800</pos.x>
+		<pos.y>-800</pos.y>
+		<mass>500</mass>
+		<radius>250</radius>
+	</GameObject>
+	<GameObject>
+		<type>Spring</type>
+		<pos.x>0</pos.x>
+		<pos.y>-300</pos.y>
+		<mass1>100</mass1>
+		<radius1>50</radius1>
+		<mass2>50</mass2>
+		<radius2>25</radius2>
+	</GameObject>
+</Scene>

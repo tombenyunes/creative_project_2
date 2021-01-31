@@ -10,6 +10,7 @@ class EventManager
 
 public:
 	
+	EventManager();
 	void setup();
 	void update(Controller* _controller, vector<GameObject*>* _gameobjects);
 	void draw();

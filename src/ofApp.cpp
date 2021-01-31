@@ -18,7 +18,7 @@ void ofApp::setup()
 	Events.setup();
 
 	
-	// ---> MSAFluid SETUP >--- // 
+	// ---> Fluid Update <--- // 
 
 	fluidSolver.setup(100, 100);
 	fluidSolver.enableRGB(true).setFadeSpeed(0.002).setDeltaT(0.5).setVisc(0.00015).setColorDiffusion(0);
@@ -29,10 +29,10 @@ void ofApp::setup()
 	drawFluid = true;
 	drawParticles = true;
 
-	ofBackground(0, 0, 0);
+	drawParticleGUI = false;
+
+	ofBackground(0);
 	ofSetVerticalSync(true);
-
-
 
 	gui.addSlider("fluidCellsX", fluidCellsX, 20, 400);
 	gui.addButton("resizeFluid", resizeFluid);
@@ -103,7 +103,7 @@ void ofApp::update()
 	}
 
 
-	// ---> MSAFluid UPDATE >--- // 
+	// ---> Fluid Update <--- // 
 
 	if (resizeFluid) {
 		fluidSolver.setSize(fluidCellsX, fluidCellsX / msa::getWindowAspectRatio());
@@ -116,10 +116,12 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+
 	if (drawFluid) {
 		ofBackground(0);
 		ofClear(0);
 		glColor3f(1, 1, 1);
+		ofDrawBox(ofGetWidth()/2-100, ofGetHeight()/2-100, -100, 100);
 		fluidDrawer.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
 	if (drawParticles) {
@@ -137,8 +139,7 @@ void ofApp::draw()
 
 	ofPopMatrix();
 
-	//drawRequiredGUI();
-	gui.draw();
+	drawRequiredGUI();
 }
 
 void ofApp::drawRequiredGUI() {
@@ -159,6 +160,9 @@ void ofApp::drawRequiredGUI() {
 	if (GameController->getGUIVisible()) {
 		gui_Controller->world_gui.draw();
 		gui_Controller->create_node_gui.draw();
+	}
+	if (drawParticleGUI) {
+		gui.draw();
 	}
 }
 
@@ -211,7 +215,7 @@ void ofApp::keyPressed(int key)
 		for (int i = 0; i < GameObjects->size(); i++) {
 			(*GameObjects)[i]->root_keyPressed(key);
 		}
-		if (key == 99) {
+		if (key == 'c') {
 			createNode();
 		}
 	}
@@ -226,6 +230,39 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == 'f') {
 		ofToggleFullscreen();
+	}
+	else if (key == '1') {
+		(drawParticleGUI) ? drawParticleGUI = false : drawParticleGUI = true, GameController->setGUIVisible(false);
+	}
+	else if (key == '2') {
+		(GameController->getGUIVisible()) ? GameController->setGUIVisible(false) : GameController->setGUIVisible(true), drawParticleGUI = false;
+	}
+	else if (key == '3') {
+
+		/*for (int i = 0; i < 100; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			//ofVec2f pos = ofVec2f(0.5, 0.5);
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			//ofVec2f vel = ofVec2f(0.5, 0.5);
+			addToFluid(pos, vel, true, true);
+		}*/
+		msa::fluid::Solver* fsp = &fluidSolver;
+		msa::fluid::DrawerGl* fdp = &fluidDrawer;
+		Scene_Manager.loadScene("Scene1", GameObjects, GameController, fsp, fdp);
+	}
+	else if (key == '4') {
+
+		/*for (int i = 0; i < 100; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			//ofVec2f pos = ofVec2f(0.5, 0.5);
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			//ofVec2f vel = ofVec2f(0.5, 0.5);
+			addToFluid(pos, vel, true, true);
+		}*/
+		
+		msa::fluid::Solver* fsp = &fluidSolver;
+		msa::fluid::DrawerGl* fdp = &fluidDrawer;
+		Scene_Manager.loadScene("Scene2", GameObjects, GameController, fsp, fdp);
 	}
 }
 

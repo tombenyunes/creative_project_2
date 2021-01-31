@@ -68,13 +68,14 @@ void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _con
 		prevPos = pos;
 
 		//addToFluid(ofVec2f(ofMap(pos.x, -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1), ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1)), vel / 600, false, true);
-		ofVec2f newPos;
+		/*ofVec2f newPos;
 		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1);
 		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
 		ofVec2f newVel;
 		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
 		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
-		addToFluid(newPos, newVel, true, true);
+		addToFluid(newPos, newVel, true, true);*/
+		
 		update(); // <--- user defined update function for every gameobject
 	}
 	else {		
