@@ -23,6 +23,18 @@ public:
 	void mousePressed(int _x, int _y, int _button) override;
 	void mouseReleased(int _x, int _y, int _button) override;	
 
+	/*ofVec2f nodePos1;
+	ofVec2f nodeVel1;
+	ofVec2f nodeAccel1;
+	float nodeRadius1;
+	float nodeMass1;
+
+	ofVec2f nodePos2;
+	ofVec2f nodeVel2;
+	ofVec2f nodeAccel2;
+	float nodeRadius2;
+	float nodeMass2;*/
+
 
 private:
 
@@ -50,18 +62,6 @@ private:
 	bool mouseDragNode1;
 	bool mouseDragNode2;
 	bool mouseDragAnchor;
-
-	ofVec2f nodePos1;
-	ofVec2f nodeVel1;
-	ofVec2f nodeAccel1;
-	float nodeRadius1;
-	float nodeMass1;
-
-	ofVec2f nodePos2;
-	ofVec2f nodeVel2;
-	ofVec2f nodeAccel2;
-	float nodeRadius2;
-	float nodeMass2;
 
 
 };

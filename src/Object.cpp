@@ -5,6 +5,8 @@ Object::Object(ofVec2f _pos, float _mass, float _radius, Controller* _controller
 	// game controller must be initialized before waiting for root_update, as very occasionally it is required before the first update cycle
 	GameController = _controller;
 
+	type = "Object";
+
 	pos.set(_pos);
 	color = ofColor(255);
 	mass = _mass;

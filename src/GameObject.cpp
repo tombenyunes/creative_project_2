@@ -13,6 +13,19 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	infiniteMass = false;
 	affectedByGravity = false;
 
+
+	/*nodePos1.set(0);
+	nodeVel1.set(0);
+	nodeAccel1.set(0);
+	nodeRadius1 = 0;
+	nodeMass1 = 0;
+	nodePos2.set(0);
+	nodeVel2.set(0);
+	nodeAccel2.set(0);
+	nodeRadius2 = 0;
+	nodeMass2 = 0;*/
+
+
 	needs_to_be_deleted = false;
 	mouseOver = false;
 	mouseOffsetFromCenter.set(0);

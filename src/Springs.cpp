@@ -4,6 +4,8 @@ Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float
 {
 	GameController = _controller;
 	
+	type = "Spring";
+
 	color = ofColor(255);
 
 	mouse_down_triggered = false;

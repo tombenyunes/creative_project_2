@@ -55,6 +55,8 @@ class ofApp : public ofBaseApp{
 
 		SceneManager Scene_Manager;
 
+		ofxSimpleGuiToo gui;
+
 
 		// ---> Fluid Setup <--- //
 

@@ -33,7 +33,7 @@ void ofApp::setup()
 
 	ofBackground(0);
 	ofSetVerticalSync(true);
-
+	
 	gui.addSlider("fluidCellsX", fluidCellsX, 20, 400);
 	gui.addButton("resizeFluid", resizeFluid);
 	gui.addSlider("colorMult", colorMult, 0, 100);
@@ -210,7 +210,7 @@ void ofApp::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, i
 void ofApp::keyPressed(int key)
 {
 	Events.keyPressed(key);
-
+	cout << key << endl;
 	if ((Events.fullInput) || (Events.canKeypress)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
 			(*GameObjects)[i]->root_keyPressed(key);
@@ -231,38 +231,75 @@ void ofApp::keyPressed(int key)
 	else if (key == 'f') {
 		ofToggleFullscreen();
 	}
-	else if (key == '1') {
+	else if (key == 57344) { // f1
 		(drawParticleGUI) ? drawParticleGUI = false : drawParticleGUI = true, GameController->setGUIVisible(false);
 	}
-	else if (key == '2') {
+	else if (key == 57345) { // f2
 		(GameController->getGUIVisible()) ? GameController->setGUIVisible(false) : GameController->setGUIVisible(true), drawParticleGUI = false;
 	}
-	else if (key == '3') {
-
-		/*for (int i = 0; i < 100; i++) {
-			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
-			//ofVec2f pos = ofVec2f(0.5, 0.5);
-			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
-			//ofVec2f vel = ofVec2f(0.5, 0.5);
-			addToFluid(pos, vel, true, true);
-		}*/
+	else if (key == '1') {
+		// load scene 1
 		msa::fluid::Solver* fsp = &fluidSolver;
 		msa::fluid::DrawerGl* fdp = &fluidDrawer;
 		Scene_Manager.loadScene("Scene1", GameObjects, GameController, fsp, fdp);
-	}
-	else if (key == '4') {
-
-		/*for (int i = 0; i < 100; i++) {
-			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
-			//ofVec2f pos = ofVec2f(0.5, 0.5);
-			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
-			//ofVec2f vel = ofVec2f(0.5, 0.5);
-			addToFluid(pos, vel, true, true);
-		}*/
 		
+		for (int i = 0; i < 500; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			addToFluid(pos, vel, true, true);
+		}
+	}
+	else if (key == '2') {
+		// load scene 2
 		msa::fluid::Solver* fsp = &fluidSolver;
 		msa::fluid::DrawerGl* fdp = &fluidDrawer;
 		Scene_Manager.loadScene("Scene2", GameObjects, GameController, fsp, fdp);
+		
+		for (int i = 0; i < 500; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			addToFluid(pos, vel, true, true);
+		}
+	}
+	else if (key == '3') {
+		// load scene 2
+		msa::fluid::Solver* fsp = &fluidSolver;
+		msa::fluid::DrawerGl* fdp = &fluidDrawer;
+		Scene_Manager.loadScene("Scene3", GameObjects, GameController, fsp, fdp);
+
+		for (int i = 0; i < 500; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			addToFluid(pos, vel, true, true);
+		}
+	}
+	else if (key == '4') {
+		// load scene 2
+		msa::fluid::Solver* fsp = &fluidSolver;
+		msa::fluid::DrawerGl* fdp = &fluidDrawer;
+		Scene_Manager.loadScene("Scene4", GameObjects, GameController, fsp, fdp);
+
+		for (int i = 0; i < 500; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			addToFluid(pos, vel, true, true);
+		}
+	}
+	else if (key == '9') {
+		// load saved scene
+		msa::fluid::Solver* fsp = &fluidSolver;
+		msa::fluid::DrawerGl* fdp = &fluidDrawer;
+		Scene_Manager.loadScene("newScene", GameObjects, GameController, fsp, fdp);
+
+		for (int i = 0; i < 500; i++) {
+			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+			ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
+			addToFluid(pos, vel, true, true);
+		}
+	}
+	else if (key == '0') {
+		// save scene
+		Scene_Manager.saveScene(GameObjects);
 	}
 }
 

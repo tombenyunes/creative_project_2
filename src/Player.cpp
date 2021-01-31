@@ -2,6 +2,8 @@
 
 Player::Player(ofVec2f _pos, ofColor _color)
 {
+	type = "Player";
+
 	pos.set(_pos);
 	color.set(_color);
 

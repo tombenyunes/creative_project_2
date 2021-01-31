@@ -37,9 +37,24 @@ public:
 	
 	Collisions CollisionDetector;
 
+	string type;
+
 	ofVec2f pos;
 	ofVec2f prevPos;
+	float mass;
 	float radius;
+
+	ofVec2f nodePos1;
+	ofVec2f nodeVel1;
+	ofVec2f nodeAccel1;
+	float nodeRadius1;
+	float nodeMass1;
+
+	ofVec2f nodePos2;
+	ofVec2f nodeVel2;
+	ofVec2f nodeAccel2;
+	float nodeRadius2;
+	float nodeMass2;
 
 	bool isPlayer;
 	bool isSpring;
@@ -76,7 +91,6 @@ protected:
 	ofVec2f accel;
 	ofColor color;
 	
-	float mass;
 	bool infiniteMass;
 	bool affectedByGravity;
 	
