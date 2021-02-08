@@ -22,9 +22,9 @@ public:
 	void root_keyPressed(int key);
 	void root_keyReleased(int key);
 	
-	virtual void mousePressed(int _x, int _y, int _button);
-	virtual void mouseDragged(int _x, int _y, int _button);
-	virtual void mouseReleased(int _x, int _y, int _button);
+	virtual void mousePressed(float _x, float _y, int _button);
+	virtual void mouseDragged(float _x, float _y, int _button);
+	virtual void mouseReleased(float _x, float _y, int _button);
 
 	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
 

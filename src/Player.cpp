@@ -57,6 +57,7 @@ ofVec2f Player::getMovementVector()
 {
 	ofVec2f movementVec = pos - mouse_pos;
 	movementVec.scale(5);
+	//cout << movementVec << endl;
 	return movementVec;
 }
 
@@ -85,21 +86,21 @@ void Player::resetForces()
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Player::mousePressed(int _x, int _y, int _button)
+void Player::mousePressed(float _x, float _y, int _button)
 {
 	mouse_down = true;
 	mouse_button = _button;
 	mouse_pos = { (float)_x, (float)_y };
 }
 
-void Player::mouseDragged(int _x, int _y, int _button)
+void Player::mouseDragged(float _x, float _y, int _button)
 {
 	mouse_down = true;
 	mouse_button = _button;
 	mouse_pos = { (float)_x, (float)_y };
 }
 
-void Player::mouseReleased(int _x, int _y, int _button)
+void Player::mouseReleased(float _x, float _y, int _button)
 {
 	mouse_down = false;
 }

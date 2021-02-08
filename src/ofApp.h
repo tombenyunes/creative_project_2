@@ -56,6 +56,10 @@ class ofApp : public ofBaseApp{
 		SceneManager Scene_Manager;
 
 		ofxSimpleGuiToo gui;
+		
+		ofEasyCam cam;
+		float zoomDistance;
+		float scale;
 
 
 		// ---> Fluid Setup <--- //

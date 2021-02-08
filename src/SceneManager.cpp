@@ -89,7 +89,8 @@ void SceneManager::destroyCurrentScene(vector<GameObject*>* _gameobjects, Contro
 
 void SceneManager::resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer)
 {
-	_fluidSolver->setup(100, 100);
-	_fluidSolver->enableRGB(true).setFadeSpeed(0.002).setDeltaT(0.5).setVisc(0.00015).setColorDiffusion(0);
-	_fluidDrawer->setup(_fluidSolver);
+	//_fluidSolver->setup(100, 100);
+	//_fluidSolver->enableRGB(true).setFadeSpeed(0.002).setDeltaT(0.5).setVisc(0.00015).setColorDiffusion(0);
+	//_fluidDrawer->setup(_fluidSolver);
+	_fluidSolver->reset();
 }

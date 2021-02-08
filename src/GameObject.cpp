@@ -316,15 +316,15 @@ ofVec2f GameObject::getInterpolatedPosition()
 
 
 // it is necessary for these functions to be declared here, as they are called on every gameobject
-void GameObject::mousePressed(int _x, int _y, int _button)
+void GameObject::mousePressed(float _x, float _y, int _button)
 {
 }
 
-void GameObject::mouseDragged(int _x, int _y, int _button)
+void GameObject::mouseDragged(float _x, float _y, int _button)
 {
 }
 
-void GameObject::mouseReleased(int _x, int _y, int _button)
+void GameObject::mouseReleased(float _x, float _y, int _button)
 {
 }
 

@@ -20,8 +20,8 @@ public:
 	void draw() override;
 	void getNodeColor(int _node);
 
-	void mousePressed(int _x, int _y, int _button) override;
-	void mouseReleased(int _x, int _y, int _button) override;	
+	void mousePressed(float _x, float _y, int _button) override;
+	void mouseReleased(float _x, float _y, int _button) override;
 
 	/*ofVec2f nodePos1;
 	ofVec2f nodeVel1;

@@ -94,7 +94,7 @@ void Object::resetForces()
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Object::mousePressed(int _x, int _y, int _button)
+void Object::mousePressed(float _x, float _y, int _button)
 {
 	if (!mouse_down_triggered) {
 		mouse_down_triggered = true;
@@ -107,7 +107,7 @@ void Object::mousePressed(int _x, int _y, int _button)
 	}
 }
 
-void Object::mouseDragged(int _x, int _y, int _button)
+void Object::mouseDragged(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		if (mouseOver && GameController->getMouseDragged() == false) {			
@@ -120,7 +120,7 @@ void Object::mouseDragged(int _x, int _y, int _button)
 	}
 }
 
-void Object::mouseReleased(int _x, int _y, int _button)
+void Object::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		if (mouse_down_triggered) {

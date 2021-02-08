@@ -71,12 +71,32 @@ void ofApp::setup()
 
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
+
+	//cam.disableMouseInput();
+	cam.setVFlip(true);  // flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked
+	cam.enableOrtho();
+	cam.setScale(1);
+	cam.setPosition(0 + ofGetWidth() / 2, 0 + ofGetHeight() / 2, 0);
+
+	//zoomDistance = 1080.0f; 
+
+	cam.removeAllInteractions();
+	//cam.addInteraction(ofEasyCam::TRANSFORM_SCALE, OF_MOUSE_BUTTON_RIGHT);
+	cam.addInteraction(ofEasyCam::TRANSFORM_TRANSLATE_Z, OF_MOUSE_BUTTON_RIGHT);
+
+	cam.setNearClip(-1000000);
+	cam.setFarClip(1000000);
 }
 
 void ofApp::update()
-{	
+{
+	//cout << cam.getScale() << endl;
+
 	// erase objects that need to be deleted and free memory
 	for (int i = 0; i < GameObjects->size(); i++) {
+		if ((*GameObjects)[i]->isPlayer == true) {
+			cam.setPosition((*GameObjects)[i]->pos.x + ofGetWidth()/2, (*GameObjects)[i]->pos.y + ofGetHeight()/2, cam.getPosition().z);
+		}
 		if ((*GameObjects)[i]->needs_to_be_deleted == true) {
 			if ((*GameObjects)[i] == GameController->getActive()) {
 				GameController->makeActive(nullptr);
@@ -116,6 +136,7 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+	cam.begin();
 
 	if (drawFluid) {
 		ofBackground(0);
@@ -138,6 +159,8 @@ void ofApp::draw()
 	Events.draw();
 
 	ofPopMatrix();
+	
+	cam.end();
 
 	drawRequiredGUI();
 }
@@ -210,7 +233,7 @@ void ofApp::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, i
 void ofApp::keyPressed(int key)
 {
 	Events.keyPressed(key);
-	cout << key << endl;
+	
 	if ((Events.fullInput) || (Events.canKeypress)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
 			(*GameObjects)[i]->root_keyPressed(key);
@@ -321,11 +344,18 @@ void ofApp::mouseDragged(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canDrag)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->mouseDragged(x - ofGetWidth() / 2, y - ofGetHeight() / 2, button);
+			float nx = x;
+			float ny = y;
+			nx *= 1080;
+			ny *= 1080;
+			nx /= 1080 / cam.getScale().x;
+			ny /= 1080 / cam.getScale().y;
+
+			ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
+			ofVec3f newView = cam.screenToWorld(prevView);
+
+			(*GameObjects)[i]->mouseDragged(newView.x, newView.y, button);
 		}
-		//if (button == 1) {
-			//createNode();
-		//}
 	}
 }
 
@@ -333,11 +363,23 @@ void ofApp::mousePressed(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->mousePressed(x - ofGetWidth() / 2, y - ofGetHeight() / 2, button);
+			float nx = x;
+			float ny = y;			
+			nx *= 1080;
+			ny *= 1080;
+			nx /= 1080 / cam.getScale().x;
+			ny /= 1080 / cam.getScale().y;
+			//cout << x << " " << y << endl;
+			//cout << ((ofGetWidth() * cam.getScale().x) / 2) << endl;
+			
+			ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() / cam.getScale().x) / 2), ny - ((ofGetHeight() / cam.getScale().y) / 2), 0);
+			ofVec3f newView = cam.screenToWorld(prevView);
+
+			//cout << "prevView: " << prevView << endl;
+			//cout << "newView: " << newView << endl;
+
+			(*GameObjects)[i]->mousePressed(newView.x, newView.y, button);
 		}
-		//if (button == 1) {
-			//createNode();
-		//}
 	}
 }
 
@@ -361,6 +403,18 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY)
 			}
 		}
 	}
+
+	//cam.setScale(cam.getScale().x + scrollY / 10, cam.getScale().y + scrollY / 10, 1);
+	cout << cam.getScale() << endl;
+	
+	//ofRectangle view = cam.getControlArea();
+	//ofRectangle newView(view.x / (cam.getScale().x / 2), view.y / (cam.getScale().y / 2), view.width / (cam.getScale().x / 2), view.height / (cam.getScale().y / 2));
+	//view.scaleTo(newView);
+	//cam.setControlArea(view);
+
+	//zoomDistance += (scrollY * 25);
+	//cam.setPosition(cam.getPosition().x, cam.getPosition().y, zoomDistance);
+	//cout << zoomDistance << endl;
 }
 
 void ofApp::mouseReleased(int x, int y, int button)

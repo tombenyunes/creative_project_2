@@ -305,7 +305,7 @@ void Springs::mouseHover()
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Springs::mousePressed(int _x, int _y, int _button)
+void Springs::mousePressed(float _x, float _y, int _button)
 {
 	if (!mouse_down_triggered) {
 		mouse_down_triggered = true;
@@ -334,7 +334,7 @@ void Springs::mousePressed(int _x, int _y, int _button)
 	}
 }
 
-void Springs::mouseReleased(int _x, int _y, int _button)
+void Springs::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		if (mouse_down_triggered) {
