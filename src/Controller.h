@@ -25,6 +25,8 @@
 
 class GameObject;
 
+#include "Camera.h"
+
 
 class Controller {
 
@@ -32,7 +34,7 @@ public:
 	
 	Controller();
 
-	ofVec3f getWorldMousePos(ofEasyCam* cam);
+	ofVec3f getWorldMousePos(Camera* cam);
 
 	void makeActive(GameObject* _this);
 	GameObject* getActive();

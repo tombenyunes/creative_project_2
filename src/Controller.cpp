@@ -13,7 +13,7 @@ Controller::Controller()
 	USER_CAN_INPUT = false;
 }
 
-ofVec3f Controller::getWorldMousePos(ofEasyCam* cam)
+ofVec3f Controller::getWorldMousePos(Camera* cam)
 {
 	ofVec3f localPos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
 	ofVec3f worldPos = cam->screenToWorld(localPos);

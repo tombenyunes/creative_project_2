@@ -44,7 +44,7 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 }
 
 // root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
-void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, ofEasyCam* _cam)
+void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, Camera* _cam)
 {
 	cam = _cam; // necessary for calculating mouse positions
 

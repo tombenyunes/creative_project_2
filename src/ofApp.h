@@ -17,6 +17,7 @@
 #include "ofxSimpleGuiToo.h"
 
 #include "SceneManager.h"
+#include "Camera.h"
 
 using namespace glm;
 
@@ -59,11 +60,7 @@ class ofApp : public ofBaseApp{
 
 		ofxSimpleGuiToo gui;
 		
-		ofEasyCam cam;
-		float zoomDistance;
-		float scale;
-		bool ctrlDown = false;
-		bool followPlayer = false;
+		Camera myCam;
 		
 		ofLight keyLight;
 
