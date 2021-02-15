@@ -115,3 +115,51 @@ void SceneManager::resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::Draw
 	//_fluidDrawer->setup(_fluidSolver);
 	_fluidSolver->reset();
 }
+
+void SceneManager::keyPressed(int key, FluidManager& Fluid_Manager, Controller* GameController, vector<GameObject*>* GameObjects)
+{
+	if (key == '1') {
+		// load scene 1
+		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
+		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
+		loadScene("Scene1", GameObjects, GameController, solver, drawer);
+		
+		Fluid_Manager.explosion(500);
+	}
+	else if (key == '2') {
+		// load scene 2
+		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
+		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
+		loadScene("Scene2", GameObjects, GameController, solver, drawer);
+		
+		Fluid_Manager.explosion(500);
+	}
+	else if (key == '3') {
+		// load scene 2
+		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
+		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
+		loadScene("Scene3", GameObjects, GameController, solver, drawer);
+
+		Fluid_Manager.explosion(500);
+	}
+	else if (key == '4') {
+		// load scene 2
+		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
+		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
+		loadScene("Scene4", GameObjects, GameController, solver, drawer);
+
+		Fluid_Manager.explosion(500);
+	}
+	else if (key == '9') {
+		// load saved scene
+		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
+		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
+		loadScene("newScene", GameObjects, GameController, solver, drawer);
+
+		Fluid_Manager.explosion(500);
+	}
+	else if (key == '0') {
+		// save scene
+		saveScene(GameObjects, (int&)(Fluid_Manager.getDrawer()->drawMode), "newScene");
+	}
+}

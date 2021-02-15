@@ -66,7 +66,10 @@ ofVec3f Camera::screenToWorld(ofVec3f _view)
 
 void Camera::keyPressed(int key)
 {
-	if (key == 3682) {
+	if (key == 'z') {
+		toggleZoomMode();
+	}
+	else if (key == 3682) {
 		ctrlDown = true;
 	}
 }

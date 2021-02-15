@@ -19,6 +19,8 @@
 #include "SceneManager.h"
 #include "Camera.h"
 
+#include "FluidManager.h"
+
 using namespace glm;
 
 class ofApp : public ofBaseApp{
@@ -60,29 +62,18 @@ class ofApp : public ofBaseApp{
 
 		ofxSimpleGuiToo gui;
 		
-		Camera myCam;
+		Camera cam;
 		
 		ofLight keyLight;
 
 
 		// ---> Fluid Setup <--- //
 
-		float colorMult;
-		float velocityMult;
-		int fluidCellsX;
-		bool resizeFluid;
-		bool drawFluid;
-		bool drawParticles;
-
+		FluidManager Fluid_Manager;
 		bool drawParticleGUI;
-
-		msa::fluid::Solver fluidSolver;
-		msa::fluid::DrawerGl fluidDrawer;
-
-		ParticleSystem particleSystem;
 		
 		float vectorLength;
 		
-		void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
+		
 
 };

@@ -10,6 +10,7 @@
 #include "Springs.h"
 
 #include "MSAFluid.h"
+#include "FluidManager.h"
 
 class SceneManager {
 	public:
@@ -20,6 +21,8 @@ class SceneManager {
 		void loadScene(string _path, vector<GameObject*>* _gameobjects, Controller* _controller, msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);
 		void destroyCurrentScene(vector<GameObject*>* _gameobjects, Controller* _controller);
 		void resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);
+
+		void keyPressed(int key, FluidManager& Fluid_Manager, Controller* GameController, vector<GameObject*>* _gameobjects);
 
 		ofxXmlSettings xml;
 		ofxXmlSettings xml1;
