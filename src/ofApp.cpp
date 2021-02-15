@@ -66,17 +66,17 @@ void ofApp::setup()
 
 
 
-	windowResized(ofGetWidth(), ofGetHeight());		// force this at start (cos I don't think it is called)
+	windowResized(ofGetWidth(), ofGetHeight());		// force this at start (cause I don't think it is called)
 	resizeFluid = true;
 
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
 
-	//cam.disableMouseInput();
+	cam.disableMouseInput();
 	cam.setVFlip(true);  // flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked
 	cam.enableOrtho();
-	cam.setScale(1);
-	cam.setPosition(0 + ofGetWidth() / 2, 0 + ofGetHeight() / 2, 0);
+	//cam.setScale(1);
+	cam.setPosition(0 + ofGetWidth() / 2, 0 + ofGetHeight() / 2, 1305);
 
 	//zoomDistance = 1080.0f; 
 
@@ -84,8 +84,12 @@ void ofApp::setup()
 	//cam.addInteraction(ofEasyCam::TRANSFORM_SCALE, OF_MOUSE_BUTTON_RIGHT);
 	cam.addInteraction(ofEasyCam::TRANSFORM_TRANSLATE_Z, OF_MOUSE_BUTTON_RIGHT);
 
-	cam.setNearClip(-1000000);
-	cam.setFarClip(1000000);
+	//cam.setNearClip(-1000000);
+	//cam.setFarClip(1000000);
+
+	keyLight.setDiffuseColor(ofFloatColor(1.0, 1.0, 1.0));
+	keyLight.setSpecularColor(keyLight.getDiffuseColor());
+	keyLight.setPosition(vec3(120.0, 100.0, 120.0));
 }
 
 void ofApp::update()
@@ -95,7 +99,12 @@ void ofApp::update()
 	// erase objects that need to be deleted and free memory
 	for (int i = 0; i < GameObjects->size(); i++) {
 		if ((*GameObjects)[i]->isPlayer == true) {
-			cam.setPosition((*GameObjects)[i]->pos.x + ofGetWidth()/2, (*GameObjects)[i]->pos.y + ofGetHeight()/2, cam.getPosition().z);
+			if (followPlayer) {
+				cam.setPosition((*GameObjects)[i]->pos.x + WORLD_WIDTH / 2, (*GameObjects)[i]->pos.y + WORLD_HEIGHT / 2, cam.getPosition().z); // camera follows player
+			}
+			else {
+				cam.setPosition(0 + WORLD_WIDTH / 2, 0 + WORLD_HEIGHT / 2, cam.getPosition().z); // camera follows player
+			}
 		}
 		if ((*GameObjects)[i]->needs_to_be_deleted == true) {
 			if ((*GameObjects)[i] == GameController->getActive()) {
@@ -107,7 +116,7 @@ void ofApp::update()
 	}
 	// update all gameobjects
 	for (int i = 0; i < GameObjects->size(); i++) {
-		(*GameObjects)[i]->root_update(GameObjects, GameController, gui_Controller, &fluidSolver, &particleSystem);
+		(*GameObjects)[i]->root_update(GameObjects, GameController, gui_Controller, &fluidSolver, &particleSystem, &cam);
 	}
 
 	gui_Controller->update(GameController);
@@ -136,6 +145,8 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+	//ofEnableLighting();
+	//keyLight.enable();
 	cam.begin();
 
 	if (drawFluid) {
@@ -143,17 +154,17 @@ void ofApp::draw()
 		ofClear(0);
 		glColor3f(1, 1, 1);
 		ofDrawBox(ofGetWidth()/2-100, ofGetHeight()/2-100, -100, 100);
-		fluidDrawer.draw(0, 0, ofGetWidth(), ofGetHeight());
+		fluidDrawer.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 	}
 	if (drawParticles) {
-		particleSystem.updateAndDraw(fluidSolver, ofGetWindowSize(), drawFluid/*, p*/);
+		particleSystem.updateAndDraw(fluidSolver, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), drawFluid/*, p*/);
 	}
 
 	ofSetCircleResolution(176); // must be a high resolution as the radius is flexible
 
 	ofPushMatrix();
 
-	ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
 
 	for (int i = 0; i < GameObjects->size(); i++) (*GameObjects)[i]->root_draw();
 	Events.draw();
@@ -161,6 +172,7 @@ void ofApp::draw()
 	ofPopMatrix();
 	
 	cam.end();
+	//keyLight.disable();
 
 	drawRequiredGUI();
 }
@@ -192,11 +204,13 @@ void ofApp::drawRequiredGUI() {
 void ofApp::createNode()
 {
 	if (GameController->getNewNodeType() == 0) {
-		GameObject* object = new Object(ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND), GameController);
+		cout << "Mass created" << endl;
+		GameObject* object = new Object(ofVec2f(GameController->getWorldMousePos(&cam).x, GameController->getWorldMousePos(&cam).y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND), GameController);
 		GameObjects->push_back(object);
 	}
 	else if (GameController->getNewNodeType() == 1) {
-		GameObject* spring = new Springs(ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22, GameController);
+		cout << "Spring created" << endl;
+		GameObject* spring = new Springs(ofVec2f(GameController->getWorldMousePos(&cam).x, GameController->getWorldMousePos(&cam).y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22, GameController);
 		GameObjects->push_back(spring);
 	}
 }
@@ -219,7 +233,7 @@ void ofApp::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, i
 			fluidSolver.addColorAtIndex(index, drawColor * colorMult);
 
 			if (drawParticles)
-				particleSystem.addParticles(pos * ofVec2f(ofGetWindowSize()), count);
+				particleSystem.addParticles(pos * ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), count);
 		}
 
 		if (addForce)
@@ -260,11 +274,24 @@ void ofApp::keyPressed(int key)
 	else if (key == 57345) { // f2
 		(GameController->getGUIVisible()) ? GameController->setGUIVisible(false) : GameController->setGUIVisible(true), drawParticleGUI = false;
 	}
+	else if (key == 'z') {
+		// reset scale/zoom
+		cout << "Zoom reset" << endl;
+		if ((cam.getScale().x == 1) && (cam.getScale().y == 1) && (cam.getScale().z == 1)) {
+			cam.setScale(5.5, 5.5, 1);
+			followPlayer = false;
+		}
+		else {
+			cam.setScale(1);
+			followPlayer = true;
+		}
+	}
+
 	else if (key == '1') {
 		// load scene 1
-		msa::fluid::Solver* fsp = &fluidSolver;
-		msa::fluid::DrawerGl* fdp = &fluidDrawer;
-		Scene_Manager.loadScene("Scene1", GameObjects, GameController, fsp, fdp);
+		msa::fluid::Solver* drawer = &fluidSolver;
+		msa::fluid::DrawerGl* solver = &fluidDrawer;
+		Scene_Manager.loadScene("Scene1", GameObjects, GameController, drawer, solver);
 		
 		for (int i = 0; i < 500; i++) {
 			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
@@ -274,9 +301,9 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == '2') {
 		// load scene 2
-		msa::fluid::Solver* fsp = &fluidSolver;
-		msa::fluid::DrawerGl* fdp = &fluidDrawer;
-		Scene_Manager.loadScene("Scene2", GameObjects, GameController, fsp, fdp);
+		msa::fluid::Solver* drawer = &fluidSolver;
+		msa::fluid::DrawerGl* solver = &fluidDrawer;
+		Scene_Manager.loadScene("Scene2", GameObjects, GameController, drawer, solver);
 		
 		for (int i = 0; i < 500; i++) {
 			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
@@ -286,9 +313,9 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == '3') {
 		// load scene 2
-		msa::fluid::Solver* fsp = &fluidSolver;
-		msa::fluid::DrawerGl* fdp = &fluidDrawer;
-		Scene_Manager.loadScene("Scene3", GameObjects, GameController, fsp, fdp);
+		msa::fluid::Solver* drawer = &fluidSolver;
+		msa::fluid::DrawerGl* solver = &fluidDrawer;
+		Scene_Manager.loadScene("Scene3", GameObjects, GameController, drawer, solver);
 
 		for (int i = 0; i < 500; i++) {
 			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
@@ -298,9 +325,9 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == '4') {
 		// load scene 2
-		msa::fluid::Solver* fsp = &fluidSolver;
-		msa::fluid::DrawerGl* fdp = &fluidDrawer;
-		Scene_Manager.loadScene("Scene4", GameObjects, GameController, fsp, fdp);
+		msa::fluid::Solver* drawer = &fluidSolver;
+		msa::fluid::DrawerGl* solver = &fluidDrawer;
+		Scene_Manager.loadScene("Scene4", GameObjects, GameController, drawer, solver);
 
 		for (int i = 0; i < 500; i++) {
 			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
@@ -310,9 +337,9 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == '9') {
 		// load saved scene
-		msa::fluid::Solver* fsp = &fluidSolver;
-		msa::fluid::DrawerGl* fdp = &fluidDrawer;
-		Scene_Manager.loadScene("newScene", GameObjects, GameController, fsp, fdp);
+		msa::fluid::Solver* drawer = &fluidSolver;
+		msa::fluid::DrawerGl* solver = &fluidDrawer;
+		Scene_Manager.loadScene("newScene", GameObjects, GameController, drawer, solver);
 
 		for (int i = 0; i < 500; i++) {
 			ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
@@ -322,7 +349,10 @@ void ofApp::keyPressed(int key)
 	}
 	else if (key == '0') {
 		// save scene
-		Scene_Manager.saveScene(GameObjects);
+		Scene_Manager.saveScene(GameObjects, (int&)fluidDrawer.drawMode, "newScene");
+	}
+	else if (key == 3682) {
+		ctrlDown = true;
 	}
 }
 
@@ -332,6 +362,9 @@ void ofApp::keyReleased(int key)
 		for (int i = 0; i < GameObjects->size(); i++) {
 			(*GameObjects)[i]->root_keyReleased(key);
 		}
+	}
+	if (key == 3682) {
+		ctrlDown = false;
 	}
 }
 
@@ -344,15 +377,16 @@ void ofApp::mouseDragged(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canDrag)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			float nx = x;
-			float ny = y;
-			nx *= 1080;
-			ny *= 1080;
-			nx /= 1080 / cam.getScale().x;
-			ny /= 1080 / cam.getScale().y;
+			//float nx = x;
+			//float ny = y;
+			//nx *= 1080;
+			//ny *= 1080;
+			//nx /= 1080 / cam.getScale().x;
+			//ny /= 1080 / cam.getScale().y;
 
-			ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
-			ofVec3f newView = cam.screenToWorld(prevView);
+			//ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
+			ofVec3f prevView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
+			ofVec3f newView = cam.screenToWorld(prevView);			
 
 			(*GameObjects)[i]->mouseDragged(newView.x, newView.y, button);
 		}
@@ -363,17 +397,21 @@ void ofApp::mousePressed(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			float nx = x;
-			float ny = y;			
-			nx *= 1080;
-			ny *= 1080;
-			nx /= 1080 / cam.getScale().x;
-			ny /= 1080 / cam.getScale().y;
+			//float nx = x;
+			//float ny = y;
+			//nx *= 1080;
+			//ny *= 1080;
+			//nx /= 1080 / cam.getScale().x;
+			//ny /= 1080 / cam.getScale().y;
 			//cout << x << " " << y << endl;
-			//cout << ((ofGetWidth() * cam.getScale().x) / 2) << endl;
-			
-			ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() / cam.getScale().x) / 2), ny - ((ofGetHeight() / cam.getScale().y) / 2), 0);
+			//cout << ((ofGetWidth() * cam.getScale().x) / 2) << endl;					
+
+			//ofVec3f prevView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
+			ofVec3f prevView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
 			ofVec3f newView = cam.screenToWorld(prevView);
+
+			//newView.x += ofGetWidth() / 2;
+			//newView.y += ofGetHeight() / 2;
 
 			//cout << "prevView: " << prevView << endl;
 			//cout << "newView: " << newView << endl;
@@ -402,10 +440,11 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY)
 				GameController->setNewNodeType(1);
 			}
 		}
-	}
-
-	//cam.setScale(cam.getScale().x + scrollY / 10, cam.getScale().y + scrollY / 10, 1);
-	cout << cam.getScale() << endl;
+		if (ctrlDown) {
+			cam.setScale(cam.getScale().x + scrollY / 10, cam.getScale().y + scrollY / 10, 1);
+			cout << "Zoom level: " << cam.getScale() << endl;
+		}
+	}	
 	
 	//ofRectangle view = cam.getControlArea();
 	//ofRectangle newView(view.x / (cam.getScale().x / 2), view.y / (cam.getScale().y / 2), view.width / (cam.getScale().x / 2), view.height / (cam.getScale().y / 2));
@@ -421,7 +460,7 @@ void ofApp::mouseReleased(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->mouseReleased(x - ofGetWidth() / 2, y - ofGetHeight() / 2, button);
+			(*GameObjects)[i]->mouseReleased(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), button);
 		}
 	}
 }

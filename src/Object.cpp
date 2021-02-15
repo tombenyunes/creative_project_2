@@ -25,7 +25,7 @@ Object::Object(ofVec2f _pos, float _mass, float _radius, Controller* _controller
 
 void Object::update()
 {
-	posBeforeDrag.set(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
+	posBeforeDrag.set(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
 	updateForces();
 	dragNodes();
 	updateGUI();
@@ -41,7 +41,7 @@ void Object::dragNodes()
 {
 	static ofVec2f mousePosBeforeDrag;
 	if (mouseDrag) {
-		ofVec2f prevPos2 = ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2) + mouseOffsetFromCenter;
+		ofVec2f prevPos2 = ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y) + mouseOffsetFromCenter;
 
 		ofVec2f newPos;
 		newPos.x = ofLerp(pos.x, prevPos2.x, 0.1);
@@ -52,12 +52,12 @@ void Object::dragNodes()
 		vel.set(0);
 
 		startedDragging = true;
-		mousePosBeforeDrag = ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
+		mousePosBeforeDrag = ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
 	}
 	else {
 		if (startedDragging == true) {
 			startedDragging = false;
-			ofVec2f mousespeed = (ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2) - mousePosBeforeDrag) / 3;
+			ofVec2f mousespeed = (ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y) - mousePosBeforeDrag) / 3;
 			applyForce(accel, mousespeed, false);
 		}
 	}

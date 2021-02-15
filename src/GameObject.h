@@ -13,7 +13,7 @@ public:
 
 	GameObject(ofVec2f _pos = { 0, 0 }, ofColor _color = ofColor(255));
 
-	void root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem);
+	void root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, ofEasyCam* _cam);
 	void root_draw();
 
 	virtual void isColliding(GameObject* _other, ofVec2f _nodePos = { 0, 0 });
@@ -94,6 +94,7 @@ protected:
 	bool infiniteMass;
 	bool affectedByGravity;
 	
+	ofEasyCam* cam;
 	bool mouseOver;
 	bool deleteKeyDown;
 

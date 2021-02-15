@@ -18,6 +18,8 @@
 
 #include "SceneManager.h"
 
+using namespace glm;
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -60,6 +62,10 @@ class ofApp : public ofBaseApp{
 		ofEasyCam cam;
 		float zoomDistance;
 		float scale;
+		bool ctrlDown = false;
+		bool followPlayer = false;
+		
+		ofLight keyLight;
 
 
 		// ---> Fluid Setup <--- //

@@ -20,6 +20,9 @@
 #define FRICTION_FORCE 0.015
 #define GRAVITY_FORCE 0.0001
 
+#define WORLD_WIDTH 2000*5
+#define WORLD_HEIGHT 1500*5
+
 class GameObject;
 
 
@@ -28,6 +31,8 @@ class Controller {
 public:
 	
 	Controller();
+
+	ofVec3f getWorldMousePos(ofEasyCam* cam);
 
 	void makeActive(GameObject* _this);
 	GameObject* getActive();

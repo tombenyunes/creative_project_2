@@ -4,13 +4,20 @@ SceneManager::SceneManager()
 {
 }
 
-void SceneManager::saveScene(vector<GameObject*>* _gameobjects)
+void SceneManager::saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, string _sceneName)
 {
 	xml1.popTag();
 	xml1.clear();
 
 	xml1.addTag("Scene");
 	xml1.pushTag("Scene");
+
+	xml1.addValue("name", _sceneName);
+
+	xml1.addTag("Fluid");
+	xml1.pushTag("Fluid", 0);
+	xml1.addValue("mode", _fluidMode);
+	xml1.popTag();
 
 	for (int i = 0; i < _gameobjects->size(); i++) {
 		xml1.addTag("GameObject");
@@ -41,6 +48,17 @@ void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Co
 
 	if (xml.loadFile(_path + ".xml")) {
 		xml.pushTag("Scene");
+
+		cout << "***** Loading New Scene *****" << endl;
+		cout << "***** Scene Name: " << xml.getValue("name", "N/A") << " *****" << endl;
+
+		int FluidCount = xml.getNumTags("Fluid");
+		for (int i = 0; i < FluidCount; i++) {
+			xml.pushTag("Fluid", i);			
+			(int&)_fluidDrawer->drawMode = xml.getValue("mode", -1);
+			cout << "***** Fluid Mode: " << xml.getValue("mode", -1) << " *****" << endl;
+			xml.popTag();
+		}
 
 		int GameObjectCount = xml.getNumTags("GameObject");
 		for (int i = 0; i < GameObjectCount; i++) {
@@ -73,10 +91,13 @@ void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Co
 
 				GameObject* spring = new Springs(pos, radius1, mass1, radius2, mass2, 2, 2, 22, _controller);
 				_gameobjects->push_back(spring);
-			}
+			}			
 
 			xml.popTag();
 		}
+
+		cout << "***** Scene Loaded Successfully *****" << endl;
+
 	}
 }
 

@@ -1,4 +1,8 @@
 <Scene>
+    <name>Scene1</name>
+    <Fluid>
+        <mode>0</mode>
+    </Fluid>
     <GameObject>
         <type>Player</type>
         <pos.x>0.000000000</pos.x>

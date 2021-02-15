@@ -234,38 +234,38 @@ void Springs::isColliding(GameObject* _other, int _node)
 
 void Springs::screenBounce()
 {
-	if (nodePos1.x > 0 + (ofGetWidth() / 2) - (nodeRadius1) / 2) {
+	if (nodePos1.x > 0 + (WORLD_WIDTH / 2) - (nodeRadius1) / 2) {
 		nodeVel1.x *= -1;
-		nodePos1.x = 0 + (ofGetWidth() / 2) - (nodeRadius1) / 2;
+		nodePos1.x = 0 + (WORLD_WIDTH / 2) - (nodeRadius1) / 2;
 	}
-	if (nodePos1.x < 0 - (ofGetWidth() / 2) + (nodeRadius1) / 2) {
+	if (nodePos1.x < 0 - (WORLD_WIDTH / 2) + (nodeRadius1) / 2) {
 		nodeVel1.x *= -1;
-		nodePos1.x = 0 - (ofGetWidth() / 2) + (nodeRadius1) / 2;
+		nodePos1.x = 0 - (WORLD_WIDTH / 2) + (nodeRadius1) / 2;
 	}
-	if (nodePos1.y < 0 - (ofGetHeight() / 2) + (nodeRadius1) / 2) {
+	if (nodePos1.y < 0 - (WORLD_HEIGHT / 2) + (nodeRadius1) / 2) {
 		nodeVel1.y *= -1;
-		nodePos1.y = 0 - (ofGetHeight() / 2) + (nodeRadius1) / 2;
+		nodePos1.y = 0 - (WORLD_HEIGHT / 2) + (nodeRadius1) / 2;
 	}
-	if (nodePos1.y > 0 + (ofGetHeight() / 2) - (nodeRadius1) / 2) {
+	if (nodePos1.y > 0 + (WORLD_HEIGHT / 2) - (nodeRadius1) / 2) {
 		nodeVel1.y *= -1;
-		nodePos1.y = 0 + (ofGetHeight() / 2) - (nodeRadius1) / 2;
+		nodePos1.y = 0 + (WORLD_HEIGHT / 2) - (nodeRadius1) / 2;
 	}
 
-	if (nodePos2.x > 0 + (ofGetWidth() / 2) - (nodeRadius2) / 2) {
+	if (nodePos2.x > 0 + (WORLD_WIDTH / 2) - (nodeRadius2) / 2) {
 		nodeVel2.x *= -1;
-		nodePos2.x = 0 + (ofGetWidth() / 2) - (nodeRadius2) / 2;
+		nodePos2.x = 0 + (WORLD_WIDTH / 2) - (nodeRadius2) / 2;
 	}
-	if (nodePos2.x < 0 - (ofGetWidth() / 2) + (nodeRadius2) / 2) {
+	if (nodePos2.x < 0 - (WORLD_WIDTH / 2) + (nodeRadius2) / 2) {
 		nodeVel2.x *= -1;
-		nodePos2.x = 0 - (ofGetWidth() / 2) + (nodeRadius2) / 2;
+		nodePos2.x = 0 - (WORLD_WIDTH / 2) + (nodeRadius2) / 2;
 	}
-	if (nodePos2.y < 0 - (ofGetHeight() / 2) + (nodeRadius2) / 2) {
+	if (nodePos2.y < 0 - (WORLD_HEIGHT / 2) + (nodeRadius2) / 2) {
 		nodeVel2.y *= -1;
-		nodePos2.y = 0 - (ofGetHeight() / 2) + (nodeRadius2) / 2;
+		nodePos2.y = 0 - (WORLD_HEIGHT / 2) + (nodeRadius2) / 2;
 	}
-	if (nodePos2.y > 0 + (ofGetHeight() / 2) - (nodeRadius2) / 2) {
+	if (nodePos2.y > 0 + (WORLD_HEIGHT / 2) - (nodeRadius2) / 2) {
 		nodeVel2.y *= -1;
-		nodePos2.y = 0 + (ofGetHeight() / 2) - (nodeRadius2) / 2;
+		nodePos2.y = 0 + (WORLD_HEIGHT / 2) - (nodeRadius2) / 2;
 	}
 }
 

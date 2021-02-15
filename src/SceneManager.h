@@ -16,7 +16,7 @@ class SceneManager {
 
 		SceneManager();
 		
-		void saveScene(vector<GameObject*>* _gameobjects);
+		void saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, string _sceneName);
 		void loadScene(string _path, vector<GameObject*>* _gameobjects, Controller* _controller, msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);
 		void destroyCurrentScene(vector<GameObject*>* _gameobjects, Controller* _controller);
 		void resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);

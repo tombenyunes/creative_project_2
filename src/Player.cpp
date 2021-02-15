@@ -182,10 +182,10 @@ void Player::drawParticleTrail() // draws particle trail following the player wh
 		//ofVec2f mouseNorm = ofVec2f(eventPos) / ofGetWindowSize();
 		//ofVec2f mouseVel = ofVec2f(eventPos - pMouse) / ofGetWindowSize();
 		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
-
+		
 		ofVec2f newPos;
-		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1);
-		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
+		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
 		ofVec2f newVel;
 		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
 		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;

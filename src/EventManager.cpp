@@ -159,7 +159,6 @@ void EventManager::keyPressed(int _key)
 			currentIndex++;
 		}
 	}
-	cout << ofGetMouseX() - ofGetWidth() / 2 << ", " << ofGetMouseY() - ofGetHeight() / 2 << endl;
 }
 
 void EventManager::showTutorial(bool _value)
