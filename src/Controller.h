@@ -20,8 +20,8 @@
 #define FRICTION_FORCE 0.015
 #define GRAVITY_FORCE 0.0001
 
-#define WORLD_WIDTH 2000*5
-#define WORLD_HEIGHT 1500*5
+#define WORLD_WIDTH 2000*1
+#define WORLD_HEIGHT 1500*1
 
 class GameObject;
 
@@ -34,7 +34,9 @@ public:
 	
 	Controller();
 
-	ofVec3f getWorldMousePos(Camera* cam);
+	void update(Camera* cam);
+
+	ofVec3f getWorldMousePos();
 
 	void makeActive(GameObject* _this);
 	GameObject* getActive();
@@ -65,6 +67,7 @@ public:
 
 private:
 
+	ofVec3f MOUSE_POS;
 	GameObject* ACTIVE_OBJECT;
 	bool GRAVITY;
 	bool NEED_TO_DELETE_ALL;

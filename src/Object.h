@@ -30,7 +30,6 @@ private:
 	bool initiai_values_triggered;
 	
 	ofVec2f posBeforeDrag;
-	bool mouseDrag;
 	bool startedDragging = false;
 
 

@@ -42,19 +42,13 @@ public:
 	ofVec2f pos;
 	ofVec2f prevPos;
 	float mass;
-	float radius;
+	float radius;	
 
-	ofVec2f nodePos1;
-	ofVec2f nodeVel1;
-	ofVec2f nodeAccel1;
-	float nodeRadius1;
-	float nodeMass1;
-
-	ofVec2f nodePos2;
-	ofVec2f nodeVel2;
-	ofVec2f nodeAccel2;
-	float nodeRadius2;
-	float nodeMass2;
+	vector<ofVec2f> nodePositions;
+	vector<ofVec2f> nodeVelocities;
+	vector<ofVec2f> nodeAccelerations;
+	vector<float> nodeRadiuses;
+	vector<float> nodeMasses;
 
 	bool isPlayer;
 	bool isSpring;
@@ -96,6 +90,8 @@ protected:
 	
 	Camera* cam;
 	bool mouseOver;
+	int mouseOverIndex;
+	bool mouseDrag;
 	bool deleteKeyDown;
 
 	void AddModule(string _id);

@@ -183,21 +183,43 @@ void GameObject::screenWrap()
 // object 'bounce' when hitting the screen edge
 void GameObject::screenBounce()
 {
-	if (pos.x > 0 + (WORLD_WIDTH / 2) - (radius) / 2) {
-		vel.x *= -1;
-		pos.x = 0 + (WORLD_WIDTH / 2) - (radius) / 2;
+	if (nodePositions.size() == 0) {
+		if (pos.x > 0 + (WORLD_WIDTH / 2) - (radius) / 2) {
+			vel.x *= -1;
+			pos.x = 0 + (WORLD_WIDTH / 2) - (radius) / 2;
+		}
+		if (pos.x < 0 - (WORLD_WIDTH / 2) + (radius) / 2) {
+			vel.x *= -1;
+			pos.x = 0 - (WORLD_WIDTH / 2) + (radius) / 2;
+		}
+		if (pos.y < 0 - (WORLD_HEIGHT / 2) + (radius) / 2) {
+			vel.y *= -1;
+			pos.y = 0 - (WORLD_HEIGHT / 2) + (radius) / 2;
+		}
+		if (pos.y > 0 + (WORLD_HEIGHT / 2) - (radius) / 2) {
+			vel.y *= -1;
+			pos.y = 0 + (WORLD_HEIGHT / 2) - (radius) / 2;
+		}
 	}
-	if (pos.x < 0 - (WORLD_WIDTH / 2) + (radius) / 2) {
-		vel.x *= -1;
-		pos.x = 0 - (WORLD_WIDTH / 2) + (radius) / 2;
-	}
-	if (pos.y < 0 - (WORLD_HEIGHT / 2) + (radius) / 2) {
-		vel.y *= -1;
-		pos.y = 0 - (WORLD_HEIGHT / 2) + (radius) / 2;
-	}
-	if (pos.y > 0 + (WORLD_HEIGHT / 2) - (radius) / 2) {
-		vel.y *= -1;
-		pos.y = 0 + (WORLD_HEIGHT / 2) - (radius) / 2;
+	else {
+		for (int i = 0; i < nodePositions.size(); i++) {
+			if (nodePositions[i].x > 0 + (WORLD_WIDTH / 2) - (nodeRadiuses[i]) / 2) {
+				nodeVelocities[i].x *= -1;
+				nodePositions[i].x = 0 + (WORLD_WIDTH / 2) - (nodeRadiuses[i]) / 2;
+			}
+			if (nodePositions[i].x < 0 - (WORLD_WIDTH / 2) + (nodeRadiuses[i]) / 2) {
+				nodeVelocities[i].x *= -1;
+				nodePositions[i].x = 0 - (WORLD_WIDTH / 2) + (nodeRadiuses[i]) / 2;
+			}
+			if (nodePositions[i].y < 0 - (WORLD_HEIGHT / 2) + (nodeRadiuses[i]) / 2) {
+				nodeVelocities[i].y *= -1;
+				nodePositions[i].y = 0 - (WORLD_HEIGHT / 2) + (nodeRadiuses[i]) / 2;
+			}
+			if (nodePositions[i].y > 0 + (WORLD_HEIGHT / 2) - (nodeRadiuses[i]) / 2) {
+				nodeVelocities[i].y *= -1;
+				nodePositions[i].y = 0 + (WORLD_HEIGHT / 2) - (nodeRadiuses[i]) / 2;
+			}
+		}
 	}
 }
 
@@ -241,27 +263,46 @@ void GameObject::isColliding(GameObject* _other, ofVec2f _nodePos)
 
 void GameObject::gravity()
 {
-	if (GameController->getGravity() == 1 || affectedByGravity) {
-		ofVec2f gravity = { 0, (float)GRAVITY_FORCE * mass };
-		applyForce(accel, gravity, false);
+	if (nodePositions.size() == 0) {
+		if (GameController->getGravity() == 1 || affectedByGravity) {
+			ofVec2f newForce = { 0, (float)GRAVITY_FORCE * mass };
+			applyForce(accel, newForce, false);
+		}
+	}
+	else {
+		for (int i = 0; i < nodePositions.size(); i++) {
+			if (GameController->getGravity() == 1 || affectedByGravity) {
+				ofVec2f newForce = { 0, (float)GRAVITY_FORCE * 400 * nodeMasses[i] };
+				applyForce(nodeAccelerations[i], newForce, false);
+			}
+		}
 	}
 }
 
 void GameObject::friction()
 {
-	ofVec2f friction = vel * -1;
-	friction *= FRICTION_FORCE;
-	applyForce(accel, friction, true);
+	if (nodePositions.size() == 0) {
+		ofVec2f friction = vel * -1;
+		friction *= FRICTION_FORCE;
+		applyForce(accel, friction, true);
+	}
+	else {
+		for (int i = 0; i < nodePositions.size(); i++) {
+			ofVec2f friction = nodeVelocities[i] * -1;
+			friction *= FRICTION_FORCE;
+			applyForce(accel, friction, false);
+		}
+	}
 }
 
 // determines if the mouse is over an object
 void GameObject::mouseHover()
 {
-	if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y), 0)) {
+	if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 0)) {
 		if (GameController->getMouseDragged() == false) {
 			color = ofColor(255, 165, 0);			
 			mouseOver = true;
-			mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
+			mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 		}
 	}
 	else {
@@ -289,13 +330,21 @@ void GameObject::applyForce(ofVec2f& _accel, ofVec2f _force, bool _limit, float 
 
 void GameObject::addForces(bool _interpPos)
 {
-	vel += accel;
-	vel.limit(MAXIMUM_VELOCITY);
-	if (_interpPos) {
-		pos = getInterpolatedPosition();
+	if (nodePositions.size() == 0) {
+		vel += accel;
+		vel.limit(MAXIMUM_VELOCITY);
+		if (_interpPos) {
+			pos = getInterpolatedPosition();
+		}
+		else {
+			pos += vel;
+		}
 	}
 	else {
-		pos += vel;
+		/*for (int i = 0; i < nodePositions.size(); i++) {
+			nodeVelocities[i] += nodeAccelerations[i];
+			nodePositions[i] += nodeVelocities[i] * 0.28;
+		}*/
 	}
 }
 
