@@ -7,6 +7,8 @@ Object::Object(ofVec2f _pos, float _mass, float _radius, Controller* _controller
 
 	type = "Object";
 
+	hasMultipleNodes = false;
+
 	pos.set(_pos);
 	color = ofColor(255);
 	mass = _mass;
@@ -142,7 +144,7 @@ void Object::draw()
 	ofPushStyle();
 
 	if (infiniteMass) {
-	ofSetColor(255, 0, 0);
+		ofSetColor(255, 0, 0);
 	}
 	else if (GameController->getActive() == this) {
 		ofSetColor(255, 165, 0);
@@ -150,6 +152,7 @@ void Object::draw()
 	else {
 		ofSetColor(color);
 	}
+
 	ofNoFill();
 	ofSetLineWidth(ofMap(mass, MINIMUM_MASS, MAXIMUM_MASS, 0.1, 10));
 

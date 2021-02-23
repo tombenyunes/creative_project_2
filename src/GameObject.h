@@ -16,7 +16,7 @@ public:
 	void root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, Camera* _cam);
 	void root_draw();
 
-	virtual void isColliding(GameObject* _other, ofVec2f _nodePos = { 0, 0 });
+	virtual void isColliding(GameObject* _other, ofVec2f _nodePos = { 99999, 99999 }, int _nodeIndex = -1);
 	bool ellipseCollider_enabled;
 
 	void root_keyPressed(int key);
@@ -44,17 +44,13 @@ public:
 	float mass;
 	float radius;
 
-	ofVec2f nodePos1;
-	ofVec2f nodeVel1;
-	ofVec2f nodeAccel1;
-	float nodeRadius1;
-	float nodeMass1;
+	bool hasMultipleNodes;
 
-	ofVec2f nodePos2;
-	ofVec2f nodeVel2;
-	ofVec2f nodeAccel2;
-	float nodeRadius2;
-	float nodeMass2;
+	vector<ofVec2f> nodePositions;
+	vector<ofVec2f> nodeVelocities;
+	vector<ofVec2f> nodeAccelerations;
+	vector<float> nodeRadiuses;
+	vector<float> nodeMasses;
 
 	bool isPlayer;
 	bool isSpring;
@@ -96,6 +92,7 @@ protected:
 	
 	Camera* cam;
 	bool mouseOver;
+	int mouseOverIndex;
 	bool deleteKeyDown;
 
 	void AddModule(string _id);

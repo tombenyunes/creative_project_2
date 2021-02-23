@@ -1,67 +1,41 @@
 <Scene>
     <name>newScene</name>
     <Fluid>
-        <mode>3</mode>
+        <mode>0</mode>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>83.092109680</pos.x>
-        <pos.y>30.447084427</pos.y>
+        <pos.x>68.027969360</pos.x>
+        <pos.y>-165.213699341</pos.y>
         <mass>500.000000000</mass>
         <radius>35.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Object</type>
-        <pos.x>590.000000000</pos.x>
-        <pos.y>-217.000000000</pos.y>
-        <mass>1278.000000000</mass>
-        <radius>98.000000000</radius>
+        <pos.x>-393.000000000</pos.x>
+        <pos.y>-326.000000000</pos.y>
+        <mass>5000.000000000</mass>
+        <radius>500.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Object</type>
-        <pos.x>193.000000000</pos.x>
-        <pos.y>-297.000000000</pos.y>
-        <mass>897.000000000</mass>
-        <radius>195.000000000</radius>
+        <pos.x>148.000000000</pos.x>
+        <pos.y>121.000000000</pos.y>
+        <mass>5000.000000000</mass>
+        <radius>90.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Object</type>
-        <pos.x>-358.000000000</pos.x>
-        <pos.y>-273.000000000</pos.y>
-        <mass>1473.000000000</mass>
-        <radius>112.000000000</radius>
+        <pos.x>736.341918945</pos.x>
+        <pos.y>-393.865661621</pos.y>
+        <mass>1.000000000</mass>
+        <radius>76.000000000</radius>
     </GameObject>
     <GameObject>
-        <type>Spring</type>
-        <pos.x>-449.000000000</pos.x>
-        <pos.y>275.000000000</pos.y>
-        <mass>10.000000000</mass>
-        <radius>8.000000000</radius>
-        <mass1>37.000000000</mass1>
-        <mass2>55.000000000</mass2>
-        <radius1>37.000000000</radius1>
-        <radius2>39.000000000</radius2>
-    </GameObject>
-    <GameObject>
-        <type>Spring</type>
-        <pos.x>-2.000000000</pos.x>
-        <pos.y>334.000000000</pos.y>
-        <mass>10.000000000</mass>
-        <radius>8.000000000</radius>
-        <mass1>68.000000000</mass1>
-        <mass2>61.000000000</mass2>
-        <radius1>34.000000000</radius1>
-        <radius2>25.000000000</radius2>
-    </GameObject>
-    <GameObject>
-        <type>Spring</type>
-        <pos.x>529.000000000</pos.x>
-        <pos.y>242.000000000</pos.y>
-        <mass>10.000000000</mass>
-        <radius>8.000000000</radius>
-        <mass1>70.000000000</mass1>
-        <mass2>33.000000000</mass2>
-        <radius1>41.000000000</radius1>
-        <radius2>48.000000000</radius2>
+        <type>Object</type>
+        <pos.x>-287.000000000</pos.x>
+        <pos.y>251.000000000</pos.y>
+        <mass>1.000000000</mass>
+        <radius>500.000000000</radius>
     </GameObject>
 </Scene>

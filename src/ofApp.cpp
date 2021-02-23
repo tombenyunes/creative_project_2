@@ -168,24 +168,14 @@ void ofApp::keyReleased(int key)
 
 void ofApp::mouseMoved(int x, int y )
 {
-
 }
  
 void ofApp::mouseDragged(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canDrag)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			//float nx = x;
-			//float ny = y;
-			//nx *= 1080;
-			//ny *= 1080;
-			//nx /= 1080 / cam.getScale().x;
-			//ny /= 1080 / cam.getScale().y;
-
-			//ofVec3f localView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
 			ofVec3f localView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
 			ofVec3f worldView = cam.screenToWorld(localView);			
-
 			(*GameObjects)[i]->mouseDragged(worldView.x, worldView.y, button);
 		}
 	}
@@ -195,25 +185,8 @@ void ofApp::mousePressed(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
 		for (int i = 0; i < GameObjects->size(); i++) {
-			//float nx = x;
-			//float ny = y;
-			//nx *= 1080;
-			//ny *= 1080;
-			//nx /= 1080 / cam.getScale().x;
-			//ny /= 1080 / cam.getScale().y;
-			//cout << x << " " << y << endl;
-			//cout << ((ofGetWidth() * cam.getScale().x) / 2) << endl;					
-
-			//ofVec3f localView = ofVec3f(nx - ((ofGetWidth() * cam.getScale().x) / 2), ny - ((ofGetHeight() * cam.getScale().y) / 2), 0);
 			ofVec3f localView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
 			ofVec3f worldView = cam.screenToWorld(localView);
-
-			//worldView.x += ofGetWidth() / 2;
-			//worldView.y += ofGetHeight() / 2;
-
-			//cout << "localView: " << localView << endl;
-			//cout << "worldView: " << worldView << endl;
-
 			(*GameObjects)[i]->mousePressed(worldView.x, worldView.y, button);
 		}
 	}
@@ -223,7 +196,7 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY)
 {
 	cam.mouseScrolled(x, y, scrollX, scrollY);
 
-	if ((Events.fullInput) || (Events.canKeypress)) { // use the scroll wheel to set the type of object you create
+	if ((Events.fullInput) || (Events.canKeypress)) {
 		if (scrollY == 1) {
 			if (GameController->getNewNodeType() < 1) {
 				GameController->setNewNodeType(GameController->getNewNodeType() + 1);
@@ -254,12 +227,10 @@ void ofApp::mouseReleased(int x, int y, int button)
 
 void ofApp::mouseEntered(int x, int y)
 {
-
 }
 
 void ofApp::mouseExited(int x, int y)
 {
-
 }
 
 void ofApp::windowResized(int w, int h)
@@ -269,10 +240,8 @@ void ofApp::windowResized(int w, int h)
 
 void ofApp::gotMessage(ofMessage msg)
 {
-
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo)
 {
-
 }
