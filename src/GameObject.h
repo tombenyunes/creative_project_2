@@ -5,15 +5,16 @@
 #include "guiController.h"
 #include "Collisions.h"
 
-#include "ParticleSystem.h"
+#include "FluidManager.h"
 
 class GameObject {
 	
 public:
 
 	GameObject(ofVec2f _pos = { 0, 0 }, ofColor _color = ofColor(255));
+	void init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager);
 
-	void root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, Camera* _cam);
+	void root_update();
 	void root_draw();
 
 	virtual void isColliding(GameObject* _other, ofVec2f _nodePos = { 0, 0 });
@@ -26,14 +27,11 @@ public:
 	virtual void mouseDragged(float _x, float _y, int _button);
 	virtual void mouseReleased(float _x, float _y, int _button);
 
-	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
-
 	vector<GameObject*>* GameObjects;
 	Controller* GameController;
 	guiController* gui_Controller;
-
-	msa::fluid::Solver* fluidSolver;
-	ParticleSystem* particleSystem;
+	Camera* cam;
+	FluidManager* Fluid_Manager;
 	
 	Collisions CollisionDetector;
 
@@ -76,7 +74,7 @@ protected:
 	virtual ofVec2f getInterpolatedPosition();
 
 	virtual void update();
-	virtual void draw();
+	virtual void draw();	
 
 	virtual void keyPressed(int key);
 	virtual void keyReleased(int key);
@@ -87,11 +85,15 @@ protected:
 	
 	bool infiniteMass;
 	bool affectedByGravity;
-	
-	Camera* cam;
+		
 	bool mouseOver;
 	int mouseOverIndex;
+	int selectedNodeIndex;
 	bool mouseDrag;
+
+	ofColor passiveColor;
+	ofColor selectedColor;
+
 	bool deleteKeyDown;
 
 	void AddModule(string _id);

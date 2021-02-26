@@ -13,6 +13,8 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	infiniteMass = false;
 	affectedByGravity = false;
 
+	passiveColor = ofColor(255);
+	selectedColor = ofColor(255, 165, 0);
 
 	/*nodePos1.set(0);
 	nodeVel1.set(0);
@@ -43,10 +45,18 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	mouseHover_enabled = false;
 }
 
-// root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
-void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, Camera* _cam)
+void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager)
 {
-	cam = _cam; // necessary for calculating mouse positions
+	GameObjects = _gameobjects;
+	GameController = _controller;
+	gui_Controller = _guiController;
+	cam = _cam;
+	Fluid_Manager = _fluidManager;
+}
+
+// root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
+void GameObject::root_update()
+{
 
 	if (deleteKeyDown) {
 		if (mouseOver) {
@@ -55,11 +65,6 @@ void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _con
 	}
 	if (!needs_to_be_deleted) {
 
-		GameObjects = _gameobjects;
-		GameController = _controller;
-		gui_Controller = _guiController;
-		fluidSolver = _fluidSolver;
-		particleSystem = _particleSystem;
 
 		if (screenWrap_enabled) {
 			screenWrap();
@@ -81,44 +86,11 @@ void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _con
 		}
 
 		prevPos = pos;
-
-		//addToFluid(ofVec2f(ofMap(pos.x, -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1), ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1)), vel / 600, false, true);
-		/*ofVec2f newPos;
-		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1);
-		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
-		ofVec2f newVel;
-		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
-		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
-		addToFluid(newPos, newVel, true, true);*/
 		
 		update(); // <--- user defined update function for every gameobject
 	}
 	else {		
 		//cout << "Error: 'Dead' GameObject is still being updated" << endl;
-	}
-}
-
-void GameObject::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count) {
-	float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
-	if (speed > 0) {
-		pos.x = ofClamp(pos.x, 0.0f, 1.0f);
-		pos.y = ofClamp(pos.y, 0.0f, 1.0f);
-
-		int index = fluidSolver->getIndexForPos(pos);
-
-		if (addColor) {
-			//			Color drawColor(CM_HSV, (getElapsedFrames() % 360) / 360.0f, 1, 1);
-			ofColor drawColor;
-			drawColor.setHsb((ofGetFrameNum() % 255), 255, 255);
-
-			fluidSolver->addColorAtIndex(index, drawColor * 1);
-
-			particleSystem->addParticles(pos * ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), count);
-		}
-
-		if (addForce)
-			fluidSolver->addForceAtIndex(index, vel * 1);
-
 	}
 }
 
@@ -298,17 +270,37 @@ void GameObject::friction()
 // determines if the mouse is over an object
 void GameObject::mouseHover()
 {
-	if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 0)) {
+	if (nodePositions.size() == 0) {
 		if (GameController->getMouseDragged() == false) {
-			color = ofColor(255, 165, 0);			
-			mouseOver = true;
-			mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
+			if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 0)) {
+					mouseOver = true;
+					mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
+			}
+			else {
+				mouseOver = false;			
+			}
 		}
 	}
 	else {
-		color = ofColor(255);
-		mouseOver = false;
-		mouseOffsetFromCenter.set(0);
+		if (GameController->getMouseDragged() == false) {
+			for (int i = 0; i < nodePositions.size(); i++) {
+				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], GameController->getWorldMousePos(), 0)) {
+					mouseOver = true;
+					mouseOverIndex = i;
+					mouseOffsetFromCenter = nodePositions[i] - GameController->getWorldMousePos();
+					break;
+				}
+				else if (CollisionDetector.EllipseCompare(pos, radius, GameController->getWorldMousePos(), 0)) {
+					mouseOver = true;
+					mouseOverIndex = -1;
+					mouseOffsetFromCenter = pos - GameController->getWorldMousePos();
+					break;
+				}
+				else {
+					mouseOver = false;
+				}
+			}
+		}
 	}
 }
 

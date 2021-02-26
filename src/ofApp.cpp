@@ -8,10 +8,13 @@ void ofApp::setup()
 	gui_Controller = new guiController;
 
 	GameObject* player = new Player;
+	player->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 	GameObjects->push_back(player);
 
 	Events.showTutorial(false);	// <----- enable or disable tutorial
 	Events.setup();
+
+	Scene_Manager.init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 
 	ofBackground(0);
 	ofSetVerticalSync(true);
@@ -43,7 +46,7 @@ void ofApp::update()
 	}
 	// update all gameobjects
 	for (int i = 0; i < GameObjects->size(); i++) {
-		(*GameObjects)[i]->root_update(GameObjects, GameController, gui_Controller, Fluid_Manager.getSolver(), Fluid_Manager.getParticleSystem(), &cam);
+		(*GameObjects)[i]->root_update();
 	}
 
 	GameController->update(&cam);
@@ -68,18 +71,19 @@ void ofApp::draw()
 	//keyLight.enable();
 	cam.begin();
 
-	Fluid_Manager.draw();
+	Fluid_Manager.renderFluid();
+	Fluid_Manager.renderParticles();
 
 	ofSetCircleResolution(176); // must be a high resolution as the radius is flexible
 
 	ofPushMatrix();
 
 	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-
 	for (int i = 0; i < GameObjects->size(); i++) (*GameObjects)[i]->root_draw();
+
 	Events.draw();
 
-	ofPopMatrix();
+	ofPopMatrix();	
 
 	cam.end();
 	//keyLight.disable();
@@ -92,10 +96,10 @@ void ofApp::drawRequiredGUI() {
 		gui_Controller->player_gui.draw();
 		if (GameController->getActive() != nullptr) {
 			if (GameController->getActive()->isSpring) {	// if an object is a spring then it has multiple gui windows to draw
-				gui_Controller->multi_selection_gui_anchor.draw();
-				gui_Controller->multi_selection_gui_node1.draw();
-				gui_Controller->multi_selection_gui_node2.draw();
 				gui_Controller->multi_selection_gui_spring.draw();
+				if (gui_Controller->multiNodeSelected == true) {
+					gui_Controller->multi_selection_gui_node.draw();
+				}
 			}
 			else {
 				gui_Controller->selected_gui.draw();
@@ -114,12 +118,14 @@ void ofApp::createNode()
 {
 	if (GameController->getNewNodeType() == 0) {
 		cout << "Mass created" << endl;
-		GameObject* object = new Object(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND), GameController);
+		GameObject* object = new Object(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		object->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 		GameObjects->push_back(object);
 	}
 	else if (GameController->getNewNodeType() == 1) {
 		cout << "Spring created" << endl;
-		GameObject* spring = new Springs(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22, GameController);
+		GameObject* spring = new Springs(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
+		spring->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 		GameObjects->push_back(spring);
 	}
 }
@@ -129,7 +135,7 @@ void ofApp::keyPressed(int key)
 	cam.keyPressed(key);
 	Fluid_Manager.keyPressed(key);
 	Events.keyPressed(key);
-	Scene_Manager.keyPressed(key, Fluid_Manager, GameController, GameObjects);
+	Scene_Manager.keyPressed(key);
 
 	if ((Events.fullInput) || (Events.canKeypress)) {
 		for (int i = 0; i < GameObjects->size(); i++) {

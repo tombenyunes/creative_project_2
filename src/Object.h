@@ -7,7 +7,7 @@ class Object : public GameObject {
 	
 public:
 
-	Object(ofVec2f _pos, float _mass, float _radius, Controller* _controller);
+	Object(ofVec2f _pos, float _mass, float _radius);
 	
 	void update() override;
 
@@ -16,6 +16,7 @@ public:
 	void mouseReleased(float _x, float _y, int _button) override;
 
 	void draw() override;
+	void getColor();
 
 private:
 
@@ -26,8 +27,7 @@ private:
 	void updateGUI();
 	void resetForces();
 	
-	bool mouse_down_triggered;
-	bool initiai_values_triggered;
+	bool gui_values_need_to_be_set;
 	
 	ofVec2f posBeforeDrag;
 	bool startedDragging = false;

@@ -1,19 +1,15 @@
 #include "Object.h"
 
-Object::Object(ofVec2f _pos, float _mass, float _radius, Controller* _controller)
+Object::Object(ofVec2f _pos, float _mass, float _radius)
 {
-	// game controller must be initialized before waiting for root_update, as very occasionally it is required before the first update cycle
-	GameController = _controller;
-
 	type = "Object";
 
 	pos.set(_pos);
-	color = ofColor(255);
+	color = ofColor(passiveColor);
 	mass = _mass;
 	radius = _radius;
 
-	mouse_down_triggered = false;
-	initiai_values_triggered = false;
+	gui_values_need_to_be_set = true;
 	mouseDrag = false;
 
 	AddModule("screenBounce");
@@ -66,9 +62,9 @@ void Object::dragNodes()
 void Object::updateGUI()
 {
 	if (GameController->getActive() == this) {
-		if (!initiai_values_triggered) {
-			initiai_values_triggered = true;
+		if (gui_values_need_to_be_set) {
 			gui_Controller->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 2);
+			gui_values_need_to_be_set = false;
 		}
 		else {
 			gui_Controller->updateValues(pos, vel, accel, gui_Controller->selected_mass, gui_Controller->selected_infiniteMass, gui_Controller->selected_radius, gui_Controller->selected_affectedByGravity, 2);
@@ -96,13 +92,10 @@ void Object::resetForces()
 
 void Object::mousePressed(float _x, float _y, int _button)
 {
-	if (!mouse_down_triggered) {
-		mouse_down_triggered = true;
-		if (_button == 2 && mouseOver) {
-			if (GameController->getActive() != this) {
-				initiai_values_triggered = false;
-				GameController->makeActive(this);
-			}
+	if (_button == 2 && mouseOver) {
+		if (GameController->getActive() != this) {
+			GameController->makeActive(this);
+			gui_values_need_to_be_set = true;
 		}
 	}
 }
@@ -123,13 +116,8 @@ void Object::mouseDragged(float _x, float _y, int _button)
 void Object::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
-		if (mouse_down_triggered) {
-			mouse_down_triggered = false;
-		}
-		if (mouseDrag) {
-			mouseDrag = false;
-			GameController->setMouseDragged(false);
-		}
+		mouseDrag = false;
+		GameController->setMouseDragged(false);
 	}
 }
 
@@ -141,19 +129,25 @@ void Object::draw()
 {
 	ofPushStyle();
 
-	if (infiniteMass) {
-		ofSetColor(255, 0, 0);
-	}
-	else if (GameController->getActive() == this) {
-		ofSetColor(255, 165, 0);
-	}
-	else {
-		ofSetColor(color);
-	}
+	getColor();
+
 	ofNoFill();
 	ofSetLineWidth(ofMap(mass, MINIMUM_MASS, MAXIMUM_MASS, 0.1, 10));
 
 	ofEllipse(pos.x, pos.y, radius, radius);
 
 	ofPopStyle();
+}
+
+void Object::getColor()
+{	
+	if ((GameController->getActive() == this) || (mouseOver || mouseDrag)) {
+		ofSetColor(selectedColor);
+	}
+	else if (infiniteMass) {
+		ofSetColor(passiveColor);
+	}
+	else {
+		ofSetColor(color);
+	}
 }

@@ -9,9 +9,18 @@ SceneManager::SceneManager()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, string _sceneName)
+void SceneManager::init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager)
 {
-	cout << "----------------------------------------" << endl;
+	GameObjects = _gameobjects;
+	GameController = _controller;
+	gui_Controller = _guiController;
+	cam = _cam;
+	Fluid_Manager = _fluidManager;
+}
+
+void SceneManager::saveScene(string _sceneName)
+{	
+	cout << "------------SceneManager.cpp------------" << endl;
 
 	xml1.popTag();
 	xml1.clear();
@@ -23,22 +32,22 @@ void SceneManager::saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, 
 
 	xml1.addTag("Fluid");
 	xml1.pushTag("Fluid", 0);
-	xml1.addValue("mode", _fluidMode);
+	xml1.addValue("mode", (int&)(Fluid_Manager->getDrawer()->drawMode));
 	xml1.popTag();
 
-	for (int i = 0; i < _gameobjects->size(); i++) {
+	for (int i = 0; i < GameObjects->size(); i++) {
 		xml1.addTag("GameObject");
 		xml1.pushTag("GameObject", i);
-		xml1.addValue("type", (*_gameobjects)[i]->type);
-		xml1.addValue("pos.x", (*_gameobjects)[i]->pos.x);
-		xml1.addValue("pos.y", (*_gameobjects)[i]->pos.y);
-		xml1.addValue("mass", (*_gameobjects)[i]->mass);
-		xml1.addValue("radius", (*_gameobjects)[i]->radius);
-		if ((*_gameobjects)[i]->type == "Spring") {
-			xml1.addValue("mass1", (*_gameobjects)[i]->nodeMasses[0]);
-			xml1.addValue("mass2", (*_gameobjects)[i]->nodeMasses[1]);
-			xml1.addValue("radius1", (*_gameobjects)[i]->nodeRadiuses[0]);
-			xml1.addValue("radius2", (*_gameobjects)[i]->nodeRadiuses[1]);
+		xml1.addValue("type", (*GameObjects)[i]->type);
+		xml1.addValue("pos.x", (*GameObjects)[i]->pos.x);
+		xml1.addValue("pos.y", (*GameObjects)[i]->pos.y);
+		xml1.addValue("mass", (*GameObjects)[i]->mass);
+		xml1.addValue("radius", (*GameObjects)[i]->radius);
+		if ((*GameObjects)[i]->type == "Spring") {
+			xml1.addValue("mass1", (*GameObjects)[i]->nodeMasses[0]);
+			xml1.addValue("mass2", (*GameObjects)[i]->nodeMasses[1]);
+			xml1.addValue("radius1", (*GameObjects)[i]->nodeRadiuses[0]);
+			xml1.addValue("radius2", (*GameObjects)[i]->nodeRadiuses[1]);
 		}
 		xml1.popTag();
 	}
@@ -50,24 +59,24 @@ void SceneManager::saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, 
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Controller* _controller, msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer)
+void SceneManager::loadScene(string _path)
 {
-	destroyCurrentScene(_gameobjects, _controller);
-	resetFluid(_fluidSolver, _fluidDrawer);
+	destroyCurrentScene();
+	resetFluid();
 
 	// load scene //
 
 	if (xml.loadFile(_path + ".xml")) {
 		xml.pushTag("Scene");
 
-		cout << "----------------------------------------" << endl;
+		cout << "------------SceneManager.cpp------------" << endl;
 		cout << "[ Scene Loaded ]" << endl;
 		cout << "- Scene Name: " << xml.getValue("name", "N/A") << endl;
 
 		int FluidCount = xml.getNumTags("Fluid");
 		for (int i = 0; i < FluidCount; i++) {
 			xml.pushTag("Fluid", i);
-			(int&)_fluidDrawer->drawMode = xml.getValue("mode", -1);
+			(int&)Fluid_Manager->getDrawer()->drawMode = xml.getValue("mode", -1);
 			cout << "- Fluid Mode: " << xml.getValue("mode", -1) << endl;
 			xml.popTag();
 		}
@@ -87,14 +96,16 @@ void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Co
 				float radius = (xml.getValue("radius", -1));
 
 				GameObject* player = new Player;
-				_gameobjects->push_back(player);
+				player->init(GameObjects, GameController, gui_Controller, cam, Fluid_Manager);
+				GameObjects->push_back(player);
 			}
 			else if (type == "Object") {
 				float mass = (xml.getValue("mass", -1));
 				float radius = (xml.getValue("radius", -1));
 
-				GameObject* object = new Object(pos, mass, radius, _controller);
-				_gameobjects->push_back(object);
+				GameObject* object = new Object(pos, mass, radius);
+				object->init(GameObjects, GameController, gui_Controller, cam, Fluid_Manager);
+				GameObjects->push_back(object);
 			}
 			else if (type == "Spring") {
 				float mass1 = (xml.getValue("mass1", -1));
@@ -102,8 +113,9 @@ void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Co
 				float radius1 = (xml.getValue("radius1", -1));
 				float radius2 = (xml.getValue("radius2", -1));
 
-				GameObject* spring = new Springs(pos, radius1, mass1, radius2, mass2, 2, 2, 22, _controller);
-				_gameobjects->push_back(spring);
+				GameObject* spring = new Springs(pos, radius1, mass1, radius2, mass2, 2, 2, 22);
+				spring->init(GameObjects, GameController, gui_Controller, cam, Fluid_Manager);
+				GameObjects->push_back(spring);
 			}
 
 			xml.popTag();
@@ -115,65 +127,52 @@ void SceneManager::loadScene(string _path, vector<GameObject*>* _gameobjects, Co
 	}
 }
 
-void SceneManager::destroyCurrentScene(vector<GameObject*>* _gameobjects, Controller* _controller)
+void SceneManager::destroyCurrentScene()
 {
-	for (int i = 0; i < _gameobjects->size(); i++) {
-		(*_gameobjects)[i]->needs_to_be_deleted = true;
+	for (int i = 0; i < GameObjects->size(); i++) {
+		(*GameObjects)[i]->needs_to_be_deleted = true;
 	}
 }
 
-void SceneManager::resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer)
+void SceneManager::resetFluid()
 {
-	//_fluidSolver->setup(100, 100);
-	//_fluidSolver->enableRGB(true).setFadeSpeed(0.002).setDeltaT(0.5).setVisc(0.00015).setColorDiffusion(0);
-	//_fluidDrawer->setup(_fluidSolver);
-	_fluidSolver->reset();
+	Fluid_Manager->resetFluid();
 }
 
-void SceneManager::keyPressed(int key, FluidManager& Fluid_Manager, Controller* GameController, vector<GameObject*>* GameObjects)
+void SceneManager::keyPressed(int key)
 {
 	if (key == '1') {
 		// load scene 1
-		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
-		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
-		loadScene("Scene1", GameObjects, GameController, solver, drawer);
+		loadScene("Scene1");
 
-		Fluid_Manager.explosion(500);
+		Fluid_Manager->explosion(500);
 	}
 	else if (key == '2') {
 		// load scene 2
-		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
-		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
-		loadScene("Scene2", GameObjects, GameController, solver, drawer);
+		loadScene("Scene2");
 
-		Fluid_Manager.explosion(500);
+		Fluid_Manager->explosion(500);
 	}
 	else if (key == '3') {
 		// load scene 2
-		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
-		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
-		loadScene("Scene3", GameObjects, GameController, solver, drawer);
+		loadScene("Scene3");
 
-		Fluid_Manager.explosion(500);
+		Fluid_Manager->explosion(500);
 	}
 	else if (key == '4') {
 		// load scene 2
-		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
-		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
-		loadScene("Scene4", GameObjects, GameController, solver, drawer);
+		loadScene("Scene4");
 
-		Fluid_Manager.explosion(500);
+		Fluid_Manager->explosion(500);
 	}
 	else if (key == '9') {
 		// load saved scene
-		msa::fluid::Solver* solver = Fluid_Manager.getSolver();
-		msa::fluid::DrawerGl* drawer = Fluid_Manager.getDrawer();
-		loadScene("newScene", GameObjects, GameController, solver, drawer);
+		loadScene("newScene");
 
-		Fluid_Manager.explosion(500);
+		Fluid_Manager->explosion(500);
 	}
 	else if (key == '0') {
 		// save scene
-		saveScene(GameObjects, (int&)(Fluid_Manager.getDrawer()->drawMode), "newScene");
+		saveScene("newScene");
 	}
 }

@@ -1,18 +1,15 @@
 #include "Springs.h"
 
-Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass, Controller* _controller)
+Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass)
 {
-	GameController = _controller;
-	
 	type = "Spring";
 
-	color = ofColor(255);
+	color = ofColor(passiveColor);
 
 	mouseOver = false;
 	mouseDrag = false;
 
-	mouse_down_triggered = false;
-	initiai_values_triggered = false;
+	gui_values_need_to_be_set = true;
 
 	isSpring = true;
 	affectedByGravity = true;
@@ -25,8 +22,8 @@ Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float
 	radius = 8;
 	timeStep = 0.28;
 	
-	createNode(pos, ofVec2f(0, 0), ofVec2f(0, 0), _nodeRadius1, _nodeMass1);
-	createNode(pos, ofVec2f(0, 0), ofVec2f(0, 0), _nodeRadius2, _nodeMass2);
+	createNode(ofVec2f(pos.x + ofRandom(-50, 50), pos.y), ofVec2f(0, 0), ofVec2f(0, 0), _nodeRadius1, _nodeMass1);
+	createNode(ofVec2f(pos.x + ofRandom(-50, 50), pos.y), ofVec2f(0, 0), ofVec2f(0, 0), _nodeRadius2, _nodeMass2);
 	
 	AddModule("screenBounce");
 	AddModule("ellipseCollider");
@@ -46,6 +43,7 @@ void Springs::createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, fl
 
 void Springs::update()
 {
+	posBeforeDrag.set(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 	updateForces();
 	dragNodes();
 	updateGUI();
@@ -178,20 +176,28 @@ void Springs::dragNodes()
 void Springs::updateGUI()
 {
 	if (GameController->getActive() == this) {
-		if (!initiai_values_triggered) {
-			initiai_values_triggered = true;
-			gui_Controller->updateMultipleValues(pos, nodePositions[0], nodeVelocities[0], nodeAccelerations[0], nodeMasses[0], nodeRadiuses[0], nodePositions[1], nodeVelocities[1], nodeAccelerations[1], nodeMasses[1], nodeRadiuses[1], k, damping, springmass, affectedByGravity);
+		if (gui_values_need_to_be_set) {					
+			if (selectedNodeIndex != -1) {
+				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], nodeMasses[selectedNodeIndex], nodeRadiuses[selectedNodeIndex]);
+			}
+			else {
+				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity);
+			}
+			gui_values_need_to_be_set = false;
 		}
-		else {
-			gui_Controller->updateMultipleValues(pos, nodePositions[0], nodeVelocities[0], nodeAccelerations[0], gui_Controller->nodeMass1, gui_Controller->nodeRadius1, nodePositions[1], nodeVelocities[1], nodeAccelerations[1], gui_Controller->nodeMass2, gui_Controller->nodeRadius2, gui_Controller->k, gui_Controller->damping, gui_Controller->springmass, gui_Controller->spring_affectedByGravity);
-			nodeMasses[0] = gui_Controller->nodeMass1;
-			nodeRadiuses[0] = gui_Controller->nodeRadius1;
-			nodeMasses[1] = gui_Controller->nodeMass2;
-			nodeRadiuses[1] = gui_Controller->nodeRadius2;
-			k = gui_Controller->k;
-			damping = gui_Controller->damping;
-			springmass = gui_Controller->springmass;
-			affectedByGravity = gui_Controller->spring_affectedByGravity;
+		else {		
+			if (selectedNodeIndex != -1) {				
+				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], gui_Controller->nodeMass, gui_Controller->nodeRadius);
+				nodeMasses[selectedNodeIndex] = gui_Controller->nodeMass;
+				nodeRadiuses[selectedNodeIndex] = gui_Controller->nodeRadius;
+			}
+			else {
+				gui_Controller->updateSpringValues(pos, gui_Controller->k, gui_Controller->damping, gui_Controller->springmass, gui_Controller->spring_affectedByGravity);
+				k = gui_Controller->k;
+				damping = gui_Controller->damping;
+				springmass = gui_Controller->springmass;
+				affectedByGravity = gui_Controller->spring_affectedByGravity;
+			}
 		}
 	}
 }
@@ -234,32 +240,32 @@ void Springs::isColliding(GameObject* _other, int _node)
 	applyForce(nodeAccelerations[_node], accel, false);
 }
 
-void Springs::mouseHover()
-{
-	if (GameController->getMouseDragged() == false) {
-		if (CollisionDetector.EllipseCompare(nodePositions[0], nodeRadiuses[0], GameController->getWorldMousePos(), 0)) {
-			mouseOver = true;
-			mouseOverIndex = 0;
-			mouseOffsetFromCenter = nodePositions[0] - GameController->getWorldMousePos();
-		}
-		else if (CollisionDetector.EllipseCompare(nodePositions[1], nodeRadiuses[1], GameController->getWorldMousePos(), 0)) {
-			mouseOver = true;
-			mouseOverIndex = 1;
-			mouseOffsetFromCenter = nodePositions[1] - GameController->getWorldMousePos();
-		}
-		else if (CollisionDetector.EllipseCompare(pos, radius, GameController->getWorldMousePos(), 0)) {
-			mouseOver = true;
-			mouseOverIndex = -1;
-			mouseOffsetFromCenter = pos - GameController->getWorldMousePos();
-		}
-		else {			
-			mouseOver = false;
-			mouseOffsetFromCenter.set(0);
-			
-			color = ofColor(255);
-		}
-	}
-}
+//void Springs::mouseHover()
+//{
+//	if (GameController->getMouseDragged() == false) {
+//		if (CollisionDetector.EllipseCompare(nodePositions[0], nodeRadiuses[0], GameController->getWorldMousePos(), 0)) {
+//			mouseOver = true;
+//			mouseOverIndex = 0;
+//			mouseOffsetFromCenter = nodePositions[0] - GameController->getWorldMousePos();
+//		}
+//		else if (CollisionDetector.EllipseCompare(nodePositions[1], nodeRadiuses[1], GameController->getWorldMousePos(), 0)) {
+//			mouseOver = true;
+//			mouseOverIndex = 1;
+//			mouseOffsetFromCenter = nodePositions[1] - GameController->getWorldMousePos();
+//		}
+//		else if (CollisionDetector.EllipseCompare(pos, radius, GameController->getWorldMousePos(), 0)) {
+//			mouseOver = true;
+//			mouseOverIndex = -1;
+//			mouseOffsetFromCenter = pos - GameController->getWorldMousePos();
+//		}
+//		else {			
+//			mouseOver = false;
+//			mouseOffsetFromCenter.set(0);
+//			
+//			color = ofColor(passiveColor);
+//		}
+//	}
+//}
 
 
 // ----- EVENT FUNCTIONS ----- //
@@ -271,10 +277,17 @@ void Springs::mousePressed(float _x, float _y, int _button)
 		if (GameController->getActive() != this) {
 			GameController->makeActive(this);
 		}
+		gui_values_need_to_be_set = true;
+		selectedNodeIndex = mouseOverIndex;		
 	}
+}
+
+void Springs::mouseDragged(float _x, float _y, int _button)
+{
 	if (_button == 2) {
-		if (GameController->getMouseDragged() == false) {
-			if (mouseOver) {
+		if (mouseOver && GameController->getMouseDragged() == false) {
+			if (posBeforeDrag.distance(ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)) > 2) {
+				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouseDrag = true;
 				GameController->setMouseDragged(true);
 			}
@@ -291,6 +304,13 @@ void Springs::mouseReleased(float _x, float _y, int _button)
 
 }
 
+void Springs::keyPressed(int key)
+{
+	if (key == 'a') {
+		createNode(ofVec2f(pos.x + ofRandom(-50, 50), pos.y), ofVec2f(0, 0), ofVec2f(0, 0), nodeRadiuses[nodeRadiuses.size() - 1], nodeMasses[nodeRadiuses.size() - 1]);
+	}
+}
+
 
 // ----- RENDER LOOP ----- //
 
@@ -299,22 +319,13 @@ void Springs::draw()
 {
 	ofPushStyle();
 
-	if (GameController->getActive() == this) {
-		color = ofColor(255, 165, 0);
-	}
-	else {
-		color = ofColor(255);
-	}
-
 	ofNoFill();
 	ofSetColor(color);
+	getNodeColor(-2);
 
-	for (int i = 0; i < nodePositions.size(); i++) {
-		if (i == 0) ofLine(nodePositions[i].x, nodePositions[i].y, pos.x, pos.y);
-		else ofLine(nodePositions[i].x, nodePositions[i].y, nodePositions[i-1].x, nodePositions[i-1].y);
-	}
+	drawConnectingLines();
 	
-	ofFill();
+	(fillEllipses) ? ofFill() : ofNoFill();
 	getNodeColor(-1);
 	ofEllipse(pos.x, pos.y, radius, radius);
 
@@ -335,10 +346,78 @@ void Springs::draw()
 
 void Springs::getNodeColor(int _node)
 {
-	if ((GameController->getActive() == this) || (mouseOver || mouseDrag) && mouseOverIndex == _node) {
-		ofSetColor(255, 165, 0);
+	if ((GameController->getActive() == this) && (selectedNodeIndex == -1 || selectedNodeIndex == _node || ((mouseOver || mouseDrag) && mouseOverIndex == _node))) {
+		ofSetColor(selectedColor);
 	}
 	else {
-		ofSetColor(color);
+		ofSetColor(passiveColor);
 	}
+}
+
+void Springs::drawConnectingLines()
+{
+	for (int i = 0; i < nodePositions.size(); i++) {
+		if (i == 0) {
+			if (fillEllipses) {
+				ofLine(nodePositions[i].x, nodePositions[i].y, pos.x, pos.y);
+			}
+			else {
+				float from = angleBetween(nodePositions[i], pos);
+				float to = angleBetween(pos, nodePositions[i]);
+
+				ofVec2f pointFrom = getPointOnCircle(nodePositions[i], from, nodeRadiuses[i] / 2);
+				ofVec2f pointTo = getPointOnCircle(pos, to, radius / 2);
+
+				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], pos, radius) == false) {
+					ofLine(pointFrom.x, pointFrom.y, pointTo.x, pointTo.y);
+				}
+			}
+		}
+		else {
+			if (fillEllipses) {
+				ofLine(nodePositions[i].x, nodePositions[i].y, nodePositions[i - 1].x, nodePositions[i - 1].y);
+			}
+			else {
+				float from = angleBetween(nodePositions[i], nodePositions[i - 1]);
+				float to = angleBetween(nodePositions[i - 1], nodePositions[i]);
+
+				ofVec2f pointFrom = getPointOnCircle(nodePositions[i], from, nodeRadiuses[i] / 2);
+				ofVec2f pointTo = getPointOnCircle(nodePositions[i - 1], to, nodeRadiuses[i - 1] / 2);
+
+				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], nodePositions[i - 1], nodeRadiuses[i - 1]) == false) {
+					ofLine(pointFrom.x, pointFrom.y, pointTo.x, pointTo.y);
+				}
+			}
+		}
+	}
+}
+
+float Springs::angleBetween(ofVec2f from, ofVec2f to)
+{
+	float x = from.x;
+	float y = from.y;
+
+	float deltaX = to.x - x;
+	float deltaY = to.y - y;
+
+	float rotation = -atan2(deltaX, deltaY);
+	rotation += 3.14159 / 2;
+
+	return rotation;
+}
+
+ofVec2f Springs::getPointOnCircle(ofVec2f center, float radians, float  radius) {
+
+	float x = center.x;
+	float y = center.y;
+
+	//radians = radians - Math.toRadians(90.0); // 0 becomes the top
+	
+	float xPosy = round((float)(x + cos(radians) * radius));
+	float yPosy = round((float)(y + sin(radians) * radius));
+
+	ofVec2f point = ofVec2f(xPosy, yPosy);
+
+	return point;
+
 }

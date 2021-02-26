@@ -1,7 +1,7 @@
 <Scene>
     <name>Scene3</name>
     <Fluid>
-        <mode>2</mode>
+        <mode>1</mode>
     </Fluid>
     <GameObject>
         <type>Player</type>
