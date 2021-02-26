@@ -13,11 +13,16 @@ Controller::Controller()
 	USER_CAN_INPUT = false;
 }
 
-ofVec3f Controller::getWorldMousePos(Camera* cam)
+void Controller::update(Camera* cam)
 {
 	ofVec3f localPos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
 	ofVec3f worldPos = cam->screenToWorld(localPos);
-	return worldPos;
+	MOUSE_POS = worldPos;
+}
+
+ofVec3f Controller::getWorldMousePos()
+{
+	return MOUSE_POS;
 }
 
 void Controller::makeActive(GameObject* _this)

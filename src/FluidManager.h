@@ -3,7 +3,7 @@
 #include "MSAFluid.h"
 #include "ofxSimpleGuiToo.h"
 #include "ParticleSystem.h"
-#include "GameObject.h"
+#include "Controller.h"
 
 class FluidManager {
 
@@ -11,11 +11,14 @@ public:
 
 	FluidManager();
 	void update();
-	void draw();
+	void renderFluid();
+	void renderParticles();
 	void drawGUI(bool enable);
 
 	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
 	void explosion(int count = 500);
+
+	void resetFluid();
 
 	msa::fluid::Solver* getSolver();
 	msa::fluid::DrawerGl* getDrawer();

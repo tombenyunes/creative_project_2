@@ -59,7 +59,7 @@ void FluidManager::update()
 	fluidSolver.update();
 }
 
-void FluidManager::draw()
+void FluidManager::renderFluid()
 {
 	if (drawFluid) {
 		ofBackground(0);
@@ -68,6 +68,10 @@ void FluidManager::draw()
 		ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
 		fluidDrawer.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 	}
+}
+
+void FluidManager::renderParticles()
+{
 	if (drawParticles) {
 		particleSystem.updateAndDraw(fluidSolver, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), drawFluid/*, p*/);
 	}
@@ -117,6 +121,11 @@ void FluidManager::explosion(int count)
 		ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
 		addToFluid(pos, vel, true, true);
 	}
+}
+
+void FluidManager::resetFluid()
+{
+	fluidSolver.reset();
 }
 
 msa::fluid::Solver* FluidManager::getSolver()

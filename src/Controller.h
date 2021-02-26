@@ -34,7 +34,9 @@ public:
 	
 	Controller();
 
-	ofVec3f getWorldMousePos(Camera* cam);
+	void update(Camera* cam);
+
+	ofVec3f getWorldMousePos();
 
 	void makeActive(GameObject* _this);
 	GameObject* getActive();
@@ -65,6 +67,7 @@ public:
 
 private:
 
+	ofVec3f MOUSE_POS;
 	GameObject* ACTIVE_OBJECT;
 	bool GRAVITY;
 	bool NEED_TO_DELETE_ALL;

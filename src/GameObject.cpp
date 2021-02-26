@@ -13,6 +13,8 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	infiniteMass = false;
 	affectedByGravity = false;
 
+	passiveColor = ofColor(255);
+	selectedColor = ofColor(255, 165, 0);
 
 	/*nodePos1.set(0);
 	nodeVel1.set(0);
@@ -25,7 +27,6 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	nodeRadius2 = 0;
 	nodeMass2 = 0;*/
 
-	hasMultipleNodes = false;
 
 	needs_to_be_deleted = false;
 	mouseOver = false;
@@ -44,10 +45,18 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	mouseHover_enabled = false;
 }
 
-// root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
-void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, msa::fluid::Solver* _fluidSolver, ParticleSystem* _particleSystem, Camera* _cam)
+void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager)
 {
-	cam = _cam; // necessary for calculating mouse positions
+	GameObjects = _gameobjects;
+	GameController = _controller;
+	gui_Controller = _guiController;
+	cam = _cam;
+	Fluid_Manager = _fluidManager;
+}
+
+// root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
+void GameObject::root_update()
+{
 
 	if (deleteKeyDown) {
 		if (mouseOver) {
@@ -56,11 +65,6 @@ void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _con
 	}
 	if (!needs_to_be_deleted) {
 
-		GameObjects = _gameobjects;
-		GameController = _controller;
-		gui_Controller = _guiController;
-		fluidSolver = _fluidSolver;
-		particleSystem = _particleSystem;
 
 		if (screenWrap_enabled) {
 			screenWrap();
@@ -82,44 +86,11 @@ void GameObject::root_update(vector<GameObject*>* _gameobjects, Controller* _con
 		}
 
 		prevPos = pos;
-
-		//addToFluid(ofVec2f(ofMap(pos.x, -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1), ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1)), vel / 600, false, true);
-		/*ofVec2f newPos;
-		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -ofGetWidth() / 2, ofGetWidth() / 2, 0, 1);
-		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
-		ofVec2f newVel;
-		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
-		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
-		addToFluid(newPos, newVel, true, true);*/
 		
 		update(); // <--- user defined update function for every gameobject
 	}
 	else {		
 		//cout << "Error: 'Dead' GameObject is still being updated" << endl;
-	}
-}
-
-void GameObject::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count) {
-	float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
-	if (speed > 0) {
-		pos.x = ofClamp(pos.x, 0.0f, 1.0f);
-		pos.y = ofClamp(pos.y, 0.0f, 1.0f);
-
-		int index = fluidSolver->getIndexForPos(pos);
-
-		if (addColor) {
-			//			Color drawColor(CM_HSV, (getElapsedFrames() % 360) / 360.0f, 1, 1);
-			ofColor drawColor;
-			drawColor.setHsb((ofGetFrameNum() % 255), 255, 255);
-
-			fluidSolver->addColorAtIndex(index, drawColor * 1);
-
-			particleSystem->addParticles(pos * ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), count);
-		}
-
-		if (addForce)
-			fluidSolver->addForceAtIndex(index, vel * 1);
-
 	}
 }
 
@@ -184,7 +155,7 @@ void GameObject::screenWrap()
 // object 'bounce' when hitting the screen edge
 void GameObject::screenBounce()
 {
-	if (!hasMultipleNodes) {
+	if (nodePositions.size() == 0) {
 		if (pos.x > 0 + (WORLD_WIDTH / 2) - (radius) / 2) {
 			vel.x *= -1;
 			pos.x = 0 + (WORLD_WIDTH / 2) - (radius) / 2;
@@ -227,73 +198,54 @@ void GameObject::screenBounce()
 // simple ellipse collision detection
 void GameObject::ellipseCollider()
 {
-	if (!hasMultipleNodes) {
-		for (int i = 0; i < GameObjects->size(); i++) {
-			if ((*GameObjects)[i]->isSpring == false) {
-				if (((*GameObjects)[i] != this) && ((*GameObjects)[i]->ellipseCollider_enabled)) {
+	for (int i = 0; i < GameObjects->size(); i++) {
+		if ((*GameObjects)[i]->ellipseCollider_enabled) {
+			if ((*GameObjects)[i] != this) {
+				if ((*GameObjects)[i]->isSpring == false) {
 					if (CollisionDetector.EllipseCompare(pos, radius, (*GameObjects)[i]->pos, (*GameObjects)[i]->radius)) {
-
 						isColliding((*GameObjects)[i]);
-					}					
-				}
-			}
-		}
-	}
-	else {
-		for (int i = 0; i < GameObjects->size(); i++) {
-			if ((*GameObjects)[i]->isSpring == false) {
-				if (((*GameObjects)[i] != this) && ((*GameObjects)[i]->ellipseCollider_enabled)) {
-					for (int j = 0; j < nodePositions.size(); j++) {
-						if (CollisionDetector.EllipseCompare(nodePositions[j], nodeRadiuses[j], (*GameObjects)[i]->pos, (*GameObjects)[i]->radius)) {
-							
-							isColliding((*GameObjects)[i], ofVec2f(0, 0), 0);
-							(*GameObjects)[i]->isColliding(this, nodePositions[j]);
-						}
 					}
 				}
 			}
 		}
 	}
-
 }
 // called when an object is currently colliding
-void GameObject::isColliding(GameObject* _other, ofVec2f _nodePos, int _nodeIndex)
+void GameObject::isColliding(GameObject* _other, ofVec2f _nodePos)
 {
-	ofVec2f otherPos = _other->pos;
-	if (_nodePos != ofVec2f(99999, 99999)) otherPos = _nodePos;
-
-	if (!hasMultipleNodes) {
-		if (GameController->getUseHardCollisions()) {
-			ofVec2f forceVec = pos - otherPos;
-			if (prevPos != ofVec2f(99999, 99999)) pos = prevPos;
-			//vel.set(0);
-			applyForce(accel, (forceVec / mass), false);
-		}
-		else {
-			ofVec2f forceVec = pos - otherPos;
-			applyForce(accel, (forceVec / mass), true);
-		}
+	ofVec2f otherPos;
+	if (_other->isSpring) {
+		otherPos = _nodePos;
 	}
 	else {
-		ofVec2f forceVec = nodePositions[_nodeIndex] - _other->pos;
-		ofVec2f accel = forceVec / nodeMasses[_nodeIndex];
-		applyForce(nodeAccelerations[_nodeIndex], accel, false);
+		otherPos = _other->pos;
+	}
+
+	if (GameController->getUseHardCollisions()) {
+		ofVec2f forceVec = pos - otherPos;
+		if (prevPos != ofVec2f(99999, 99999)) pos = prevPos;
+		//vel.set(0);
+		applyForce(accel, (forceVec / mass), false);
+	}
+	else {
+		ofVec2f forceVec = pos - otherPos;
+		applyForce(accel, (forceVec / mass), true);
 	}
 }
 
 void GameObject::gravity()
 {
-	if (!hasMultipleNodes) {
+	if (nodePositions.size() == 0) {
 		if (GameController->getGravity() == 1 || affectedByGravity) {
-			ofVec2f gravity = { 0, (float)GRAVITY_FORCE * mass };
-			applyForce(accel, gravity, false);
+			ofVec2f newForce = { 0, (float)GRAVITY_FORCE * mass };
+			applyForce(accel, newForce, false);
 		}
 	}
 	else {
 		for (int i = 0; i < nodePositions.size(); i++) {
 			if (GameController->getGravity() == 1 || affectedByGravity) {
-				ofVec2f gravity = { 0, (float)GRAVITY_FORCE * 400 * nodeMasses[i] };
-				applyForce(nodeAccelerations[i], gravity, false);
+				ofVec2f newForce = { 0, (float)GRAVITY_FORCE * 400 * nodeMasses[i] };
+				applyForce(nodeAccelerations[i], newForce, false);
 			}
 		}
 	}
@@ -301,7 +253,7 @@ void GameObject::gravity()
 
 void GameObject::friction()
 {
-	if (!hasMultipleNodes) {
+	if (nodePositions.size() == 0) {
 		ofVec2f friction = vel * -1;
 		friction *= FRICTION_FORCE;
 		applyForce(accel, friction, true);
@@ -310,7 +262,7 @@ void GameObject::friction()
 		for (int i = 0; i < nodePositions.size(); i++) {
 			ofVec2f friction = nodeVelocities[i] * -1;
 			friction *= FRICTION_FORCE;
-			applyForce(nodeAccelerations[i], friction, true);
+			applyForce(accel, friction, false);
 		}
 	}
 }
@@ -318,44 +270,34 @@ void GameObject::friction()
 // determines if the mouse is over an object
 void GameObject::mouseHover()
 {
-	if (!hasMultipleNodes) {
-		if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y), 0)) {
-			if (GameController->getMouseDragged() == false) {
-				color = ofColor(255, 165, 0);
-				mouseOver = true;
-				mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
+	if (nodePositions.size() == 0) {
+		if (GameController->getMouseDragged() == false) {
+			if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 0)) {
+					mouseOver = true;
+					mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 			}
-		}
-		else {
-			color = ofColor(255);
-			mouseOver = false;
-			mouseOffsetFromCenter.set(0);
+			else {
+				mouseOver = false;			
+			}
 		}
 	}
 	else {
 		if (GameController->getMouseDragged() == false) {
 			for (int i = 0; i < nodePositions.size(); i++) {
-				// compare with all nodes
-				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y), 0)) {
-					color = ofColor(255, 165, 0);
+				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], GameController->getWorldMousePos(), 0)) {
 					mouseOver = true;
 					mouseOverIndex = i;
-					mouseOffsetFromCenter = nodePositions[i] - ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
+					mouseOffsetFromCenter = nodePositions[i] - GameController->getWorldMousePos();
 					break;
 				}
-				// compare with root / anchor node
-				else if ((CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y), 0))) {
-					color = ofColor(255, 165, 0);
+				else if (CollisionDetector.EllipseCompare(pos, radius, GameController->getWorldMousePos(), 0)) {
 					mouseOver = true;
 					mouseOverIndex = -1;
-					mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos(cam).x, GameController->getWorldMousePos(cam).y);
-					//break;
+					mouseOffsetFromCenter = pos - GameController->getWorldMousePos();
+					break;
 				}
 				else {
-					color = ofColor(255);
 					mouseOver = false;
-					mouseOffsetFromCenter.set(0);
-					//break;
 				}
 			}
 		}
@@ -374,13 +316,13 @@ void GameObject::applyForce(ofVec2f& _accel, ofVec2f _force, bool _limit, float 
 	}
 	else {
 		_accel += _force;
-		if (!hasMultipleNodes) addForces(false);
+		addForces(false);
 	}
 }
 
 void GameObject::addForces(bool _interpPos)
 {
-	if (!hasMultipleNodes) {
+	if (nodePositions.size() == 0) {
 		vel += accel;
 		vel.limit(MAXIMUM_VELOCITY);
 		if (_interpPos) {
@@ -391,10 +333,10 @@ void GameObject::addForces(bool _interpPos)
 		}
 	}
 	else {
-		for (int i = 0; i < nodePositions.size(); i++) {
+		/*for (int i = 0; i < nodePositions.size(); i++) {
 			nodeVelocities[i] += nodeAccelerations[i];
 			nodePositions[i] += nodeVelocities[i] * 0.28;
-		}
+		}*/
 	}
 }
 

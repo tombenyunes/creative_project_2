@@ -13,18 +13,27 @@
 #include "FluidManager.h"
 
 class SceneManager {
-	public:
+public:
 
 		SceneManager();
-		
-		void saveScene(vector<GameObject*>* _gameobjects, int _fluidMode, string _sceneName);
-		void loadScene(string _path, vector<GameObject*>* _gameobjects, Controller* _controller, msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);
-		void destroyCurrentScene(vector<GameObject*>* _gameobjects, Controller* _controller);
-		void resetFluid(msa::fluid::Solver* _fluidSolver, msa::fluid::DrawerGl* _fluidDrawer);
+		void init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager);
 
-		void keyPressed(int key, FluidManager& Fluid_Manager, Controller* GameController, vector<GameObject*>* _gameobjects);
+		void saveScene(string _sceneName);
+		void loadScene(string _path);
+		void destroyCurrentScene();
+		void resetFluid();
+
+		void keyPressed(int key);
 
 		ofxXmlSettings xml;
 		ofxXmlSettings xml1;
+
+private:
+
+		vector<GameObject*>* GameObjects;
+		Controller* GameController;
+		guiController* gui_Controller;
+		Camera* cam;
+		FluidManager* Fluid_Manager;
 
 };
