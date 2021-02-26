@@ -9,7 +9,7 @@ Player::Player(ofVec2f _pos, ofColor _color)
 
 	vel.set(0);
 	accel.set(0);
-	radius = 35;
+	radius = 10; // 35
 	mass = 500;
 
 	isPlayer = true;
@@ -57,7 +57,6 @@ ofVec2f Player::getMovementVector()
 {
 	ofVec2f movementVec = pos - mouse_pos;
 	movementVec.scale(5);
-	//cout << movementVec << endl;
 	return movementVec;
 }
 
@@ -189,6 +188,6 @@ void Player::drawParticleTrail() // draws particle trail following the player wh
 		ofVec2f newVel;
 		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
 		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
-		addToFluid(newPos, newVel, true, true);
+		Fluid_Manager->addToFluid(newPos, newVel, true, true);
 	}
 }

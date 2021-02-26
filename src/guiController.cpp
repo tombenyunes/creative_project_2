@@ -33,30 +33,21 @@ guiController::guiController()
 	selected_gui.add(selected_mass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
 	selected_gui.add(selected_infiniteMass.setup("infinite mass", false));
 	selected_gui.add(selected_radius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
-	selected_gui.add(selected_affectedByGravity.setup("gravity", false));
+	selected_gui.add(selected_affectedByGravity.setup("gravity", false));	
 
-	multi_selection_gui_anchor.setup("Selected Object", "", ofGetWidth() - multi_selection_gui_anchor.getWidth() - buffer, buffer);
-	multi_selection_gui_anchor.add(anchorPos.setup("pos", errorMessage));
-
-	multi_selection_gui_node1.setup("Node 1", "", ofGetWidth() - multi_selection_gui_node1.getWidth() - buffer, multi_selection_gui_anchor.getPosition().y + multi_selection_gui_anchor.getHeight() + buffer);
-	multi_selection_gui_node1.add(nodePos1.setup("pos", errorMessage));
-	multi_selection_gui_node1.add(nodeVel1.setup("vel", errorMessage));
-	multi_selection_gui_node1.add(nodeAccel1.setup("accel", errorMessage));
-	multi_selection_gui_node1.add(nodeMass1.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
-	multi_selection_gui_node1.add(nodeRadius1.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
-	
-	multi_selection_gui_node2.setup("Node 2", "", ofGetWidth() - multi_selection_gui_node2.getWidth() - buffer, multi_selection_gui_node1.getPosition().y + multi_selection_gui_node1.getHeight() + buffer);
-	multi_selection_gui_node2.add(nodePos2.setup("pos", errorMessage));
-	multi_selection_gui_node2.add(nodeVel2.setup("vel", errorMessage));
-	multi_selection_gui_node2.add(nodeAccel2.setup("accel", errorMessage));
-	multi_selection_gui_node2.add(nodeMass2.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
-	multi_selection_gui_node2.add(nodeRadius2.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
-
-	multi_selection_gui_spring.setup("Spring Settings", "", ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_node2.getPosition().y + multi_selection_gui_node2.getHeight() + buffer);
+	multi_selection_gui_spring.setup("Spring Settings", "", ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, buffer);
+	multi_selection_gui_spring.add(anchorPos.setup("anchor pos", errorMessage));
 	multi_selection_gui_spring.add(k.setup("springiness", errorInt, kBounds.x, kBounds.y));
 	multi_selection_gui_spring.add(damping.setup("damping", errorInt, dampingBounds.x, dampingBounds.y));
 	multi_selection_gui_spring.add(springmass.setup("springmass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
 	multi_selection_gui_spring.add(spring_affectedByGravity.setup("gravity", false));
+
+	multi_selection_gui_node.setup("Selected Node", "", ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_spring.getPosition().y + multi_selection_gui_spring.getHeight() + buffer);
+	multi_selection_gui_node.add(nodePos.setup("pos", errorMessage));
+	multi_selection_gui_node.add(nodeVel.setup("vel", errorMessage));
+	multi_selection_gui_node.add(nodeAccel.setup("accel", errorMessage));
+	multi_selection_gui_node.add(nodeMass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
+	multi_selection_gui_node.add(nodeRadius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 
 	create_node_gui.setup("Create", "", ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
 	create_node_gui.add(howToMove.setup("", "Hold M1 to Move Player"));
@@ -129,36 +120,35 @@ void guiController::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, flo
 	}
 }
 
-void guiController::updateMultipleValues(ofVec2f _anchorpos, ofVec2f _nodePos1, ofVec2f _nodeVel1, ofVec2f _nodeAccel1, float _nodeMass1, float _nodeRadius1, ofVec2f _nodePos2, ofVec2f _nodeVel2, ofVec2f _nodeAccel2, float _nodeMass2, float _nodeRadius2, float _k, float _damping, float _springmass, bool _affectedByGravity)
+void guiController::updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos, ofVec2f _selectedNodeVel, ofVec2f _selectedNodeAccel, float _selectedNodeMass, float _selectedNodeRadius)
 {
 	anchorPos = ofToString(roundf(_anchorpos.x)) + ", " + ofToString(roundf(_anchorpos.y));
-	
-	nodePos1 = ofToString(roundf(_nodePos1.x)) + ", " + ofToString(roundf(_nodePos1.y));
-	nodeVel1 = ofToString(roundf(_nodeVel1.x * 100) / 100) + ", " + ofToString(roundf(_nodeVel1.y * 100) / 100);
-	nodeAccel1 = ofToString(roundf(_nodeAccel1.x * 10000) / 10000) + ", " + ofToString(roundf(_nodeAccel1.y * 10000) / 10000);
-	nodeMass1 = _nodeMass1;
-	nodeRadius1 = _nodeRadius1;
-	
-	nodePos2 = ofToString(roundf(_nodePos2.x)) + ", " + ofToString(roundf(_nodePos2.y));
-	nodeVel2 = ofToString(roundf(_nodeVel2.x * 100) / 100) + ", " + ofToString(roundf(_nodeVel2.y * 100) / 100);
-	nodeAccel2 = ofToString(roundf(_nodeAccel2.x * 10000) / 10000) + ", " + ofToString(roundf(_nodeAccel2.y * 10000) / 10000);
-	nodeMass2 = _nodeMass2;
-	nodeRadius2 = _nodeRadius2;
 
 	k = _k;
 	damping = _damping;
 	springmass = _springmass;
 	spring_affectedByGravity = _affectedByGravity;
+
+	if (_selectedNodePos == ofVec2f(-1, -1) && _selectedNodeVel == ofVec2f(-1, -1) && _selectedNodeAccel == ofVec2f(-1, -1) && _selectedNodeMass == -1 && _selectedNodeRadius == -1) {
+		// can't draw
+		multiNodeSelected = false;
+	}
+	else {
+		multiNodeSelected = true;
+		nodePos = ofToString(roundf(_selectedNodePos.x)) + ", " + ofToString(roundf(_selectedNodePos.y));
+		nodeVel = ofToString(roundf(_selectedNodeVel.x * 100) / 100) + ", " + ofToString(roundf(_selectedNodeVel.y * 100) / 100);
+		nodeAccel = ofToString(roundf(_selectedNodeAccel.x * 10000) / 10000) + ", " + ofToString(roundf(_selectedNodeAccel.y * 10000) / 10000);
+		nodeMass = _selectedNodeMass;
+		nodeRadius = _selectedNodeRadius;
+	}
 }
 
 void guiController::windowResized(int w, int h)
 {
 	create_node_gui.setPosition(ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
 	selected_gui.setPosition(ofGetWidth() - selected_gui.getWidth() - buffer, buffer);
-	multi_selection_gui_anchor.setPosition(ofGetWidth() - multi_selection_gui_anchor.getWidth() - buffer, buffer);
-	multi_selection_gui_node1.setPosition(ofGetWidth() - multi_selection_gui_node1.getWidth() - buffer, multi_selection_gui_anchor.getPosition().y + multi_selection_gui_anchor.getHeight()+ buffer);
-	multi_selection_gui_node2.setPosition(ofGetWidth() - multi_selection_gui_node2.getWidth() - buffer, multi_selection_gui_node1.getPosition().y + multi_selection_gui_node1.getHeight() + buffer);
-	multi_selection_gui_spring.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_node2.getPosition().y + multi_selection_gui_node2.getHeight() + buffer);
+	multi_selection_gui_spring.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, buffer);
+	multi_selection_gui_node.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_spring.getPosition().y + multi_selection_gui_spring.getHeight() + buffer);
 }
 
 void guiController::setClearAll()
