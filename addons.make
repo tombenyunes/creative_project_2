@@ -1,5 +1,6 @@
 ofxBlur
 ofxGui
+ofxMaxim
 ofxMSACore
 ofxMSAFluid
 ofxMSAInteractiveObject

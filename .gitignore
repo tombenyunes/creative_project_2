@@ -1,0 +1,15 @@
+### OpenFrameworks ###
+# ignore generated binaries
+# but not the data folder
+/bin/*
+!/bin/data/
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+obj/
+*.sln
+icon.rc
+config.make
