@@ -45,7 +45,6 @@ FluidManager::FluidManager()
 	gui.show();
 
 	resizeFluid = true;
-	cout << "initialized fluid manager" << endl;
 }
 
 void FluidManager::update()

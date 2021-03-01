@@ -44,6 +44,14 @@ void ofApp::setup()
 		object->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 		GameObjects->push_back(object);
 	}*/
+
+
+	Audio_Manager.setup(this);
+}
+
+void ofApp::audioOut(float* output, int bufferSize, int nChannels)
+{
+	Audio_Manager.audioOut(output, bufferSize, nChannels);
 }
 
 void ofApp::update()
@@ -142,6 +150,8 @@ void ofApp::drawRequiredGUI() {
 	}
 
 	Fluid_Manager.drawGUI(drawParticleGUI);
+
+	Audio_Manager.draw();
 }
 
 void ofApp::createNode()
@@ -168,6 +178,8 @@ void ofApp::createNode()
 
 void ofApp::keyPressed(int key)
 {
+	Audio_Manager.keyPressed(key);
+
 	cam.keyPressed(key);
 	Fluid_Manager.keyPressed(key);
 	Events.keyPressed(key);
@@ -213,6 +225,8 @@ void ofApp::keyPressed(int key)
 
 void ofApp::keyReleased(int key)
 {
+	Audio_Manager.keyPressed(key);
+
 	cam.keyReleased(key);
 
 	if ((Events.fullInput) || (Events.canKeypress)) {

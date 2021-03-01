@@ -1,0 +1,13 @@
+<Scene>
+    <name>Scene4</name>
+    <Fluid>
+        <mode>1</mode>
+    </Fluid>
+    <GameObject>
+        <type>Player</type>
+        <pos.x>-33.858810425</pos.x>
+        <pos.y>47.363624573</pos.y>
+        <mass>500.000000000</mass>
+        <radius>35.000000000</radius>
+    </GameObject>
+</Scene>
