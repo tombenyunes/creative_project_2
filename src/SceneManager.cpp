@@ -2,7 +2,7 @@
 
 SceneManager::SceneManager()
 {
-	cout << "----------------------------------------" << endl;
+	cout << "------------SceneManager.cpp------------" << endl;
 	cout << "Press '1-4' to load preset scenes" << endl;
 	cout << "Press '0' to save the current scene" << endl;
 	cout << "Press '9' to load a saved scene" << endl;
@@ -52,7 +52,7 @@ void SceneManager::saveScene(string _sceneName)
 		xml1.popTag();
 	}
 
-	xml1.save("newScene.xml");
+	xml1.save(_sceneName + ".xml");
 
 	cout << "[ Current Scene Saved ]" << endl;
 	cout << "- Scene Name: " << _sceneName << endl;
@@ -143,36 +143,36 @@ void SceneManager::keyPressed(int key)
 {
 	if (key == '1') {
 		// load scene 1
-		loadScene("Scene1");
+		loadScene("Scenes/Scene1");
 
 		Fluid_Manager->explosion(500);
 	}
 	else if (key == '2') {
 		// load scene 2
-		loadScene("Scene2");
+		loadScene("Scenes/Scene2");
 
 		Fluid_Manager->explosion(500);
 	}
 	else if (key == '3') {
 		// load scene 2
-		loadScene("Scene3");
+		loadScene("Scenes/Scene3");
 
 		Fluid_Manager->explosion(500);
 	}
 	else if (key == '4') {
 		// load scene 2
-		loadScene("Scene4");
+		loadScene("Scenes/Scene4");
 
 		Fluid_Manager->explosion(500);
 	}
 	else if (key == '9') {
 		// load saved scene
-		loadScene("newScene");
+		loadScene("Scenes/newScene");
 
 		Fluid_Manager->explosion(500);
 	}
 	else if (key == '0') {
 		// save scene
-		saveScene("newScene");
+		saveScene("Scenes/newScene");
 	}
 }

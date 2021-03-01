@@ -21,6 +21,10 @@
 
 #include "FluidManager.h"
 
+#include "ofxBlur.h"
+
+#include "AudioManager.h"
+
 using namespace glm;
 
 class ofApp : public ofBaseApp{
@@ -46,6 +50,11 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+		//==================AUDIO=OUTPUT================//
+		void audioOut(float* output, int bufferSize, int nChannels);
+		//==============================================//
+
+		AudioManager Audio_Manager;
 
 		// ---> Core Setup <--- //
 
@@ -63,6 +72,9 @@ class ofApp : public ofBaseApp{
 		ofxSimpleGuiToo gui;
 		
 		Camera cam;
+
+		ofxBlur blur;
+		ofxBlur blur2;
 		
 		ofLight keyLight;
 

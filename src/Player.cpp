@@ -9,7 +9,7 @@ Player::Player(ofVec2f _pos, ofColor _color)
 
 	vel.set(0);
 	accel.set(0);
-	radius = 10; // 35
+	radius = 14; // 35
 	mass = 500;
 
 	isPlayer = true;
@@ -183,11 +183,15 @@ void Player::drawParticleTrail() // draws particle trail following the player wh
 		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
 		
 		ofVec2f newPos;
-		newPos.x = ofMap(pos.x + ofRandom(-radius / 4, radius / 4), -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
-		newPos.y = ofMap(pos.y + ofRandom(-radius / 4, radius / 4), -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+		newPos.x = ofMap(pos.x/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+		newPos.y = ofMap(pos.y/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+		
 		ofVec2f newVel;
-		newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
-		newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
+		//newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
+		//newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
+		newVel.x = ((getMovementVector().x + ofRandom(-1, 1)) / 6400) * -1;
+		newVel.y = ((getMovementVector().y + ofRandom(-1, 1)) / 6400) * -1;
+
 		Fluid_Manager->addToFluid(newPos, newVel, true, true);
 	}
 }

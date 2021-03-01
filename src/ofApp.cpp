@@ -4,6 +4,9 @@ void ofApp::setup()
 {
 	// ---> Core setup <--- //
 
+	ofSetWindowPosition(3849, 649);
+	ofSetWindowTitle("iota");	
+
 	GameController = new Controller;
 	gui_Controller = new guiController;
 
@@ -27,6 +30,28 @@ void ofApp::setup()
 	keyLight.setDiffuseColor(ofFloatColor(1.0, 1.0, 1.0));
 	keyLight.setSpecularColor(keyLight.getDiffuseColor());
 	keyLight.setPosition(vec3(120.0, 100.0, 120.0));
+
+	blur.setup(WORLD_WIDTH, WORLD_HEIGHT, 10, .2, 2);
+	blur2.setup(ofGetWidth(), ofGetHeight(), 10, .2, 2);
+
+	//blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
+	//blur2.setScale(0);
+	//blur2.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
+
+	/*for (int i = 0; i < 100; i++) {
+		GameObject* object = new Object(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		object->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObjects->push_back(object);
+	}*/
+
+
+	Audio_Manager.setup(this);
+}
+
+void ofApp::audioOut(float* output, int bufferSize, int nChannels)
+{
+	Audio_Manager.audioOut(output, bufferSize, nChannels);
 }
 
 void ofApp::update()
@@ -63,6 +88,11 @@ void ofApp::update()
 	}
 
 	Fluid_Manager.update();
+
+	//blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
+	//blur2.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//blur2.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
 void ofApp::draw()
@@ -71,8 +101,16 @@ void ofApp::draw()
 	//keyLight.enable();
 	cam.begin();
 
+
+	blur.begin();
 	Fluid_Manager.renderFluid();
+	blur.end();
+	blur.draw();
+
+	//blur2.begin();
 	Fluid_Manager.renderParticles();
+	//blur2.end();
+	//blur2.draw();
 
 	ofSetCircleResolution(176); // must be a high resolution as the radius is flexible
 
@@ -112,6 +150,8 @@ void ofApp::drawRequiredGUI() {
 	}
 
 	Fluid_Manager.drawGUI(drawParticleGUI);
+
+	Audio_Manager.draw();
 }
 
 void ofApp::createNode()
@@ -128,10 +168,18 @@ void ofApp::createNode()
 		spring->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
 		GameObjects->push_back(spring);
 	}
+	else if (GameController->getNewNodeType() == 2) {
+		cout << "Point created" << endl;
+		GameObject* point = new Object(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 10, 25);
+		point->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObjects->push_back(point);
+	}
 }
 
 void ofApp::keyPressed(int key)
 {
+	Audio_Manager.keyPressed(key);
+
 	cam.keyPressed(key);
 	Fluid_Manager.keyPressed(key);
 	Events.keyPressed(key);
@@ -157,10 +205,28 @@ void ofApp::keyPressed(int key)
 	else if (key == 57345) { // f2
 		(GameController->getGUIVisible()) ? GameController->setGUIVisible(false) : GameController->setGUIVisible(true), drawParticleGUI = false;
 	}
+	
+	if ((Events.fullInput) || (Events.canKeypress)) {
+		if (key == 57358) {
+			if (GameController->getNewNodeType() < 2) {
+				GameController->setNewNodeType(GameController->getNewNodeType() + 1); // next
+			}
+		}
+		else if (key == 57356) {
+			if (GameController->getNewNodeType() > 0) {
+				GameController->setNewNodeType(GameController->getNewNodeType() - 1); // previous
+			}
+			else {
+				GameController->setNewNodeType(0);
+			}
+		}
+	}
 }
 
 void ofApp::keyReleased(int key)
 {
+	Audio_Manager.keyPressed(key);
+
 	cam.keyReleased(key);
 
 	if ((Events.fullInput) || (Events.canKeypress)) {
@@ -199,25 +265,6 @@ void ofApp::mousePressed(int x, int y, int button)
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY)
 {
 	cam.mouseScrolled(x, y, scrollX, scrollY);
-
-	if ((Events.fullInput) || (Events.canKeypress)) {
-		if (scrollY == 1) {
-			if (GameController->getNewNodeType() < 1) {
-				GameController->setNewNodeType(GameController->getNewNodeType() + 1);
-			}
-			else {
-				GameController->setNewNodeType(0);
-			}
-		}
-		else if (scrollY == -1) {
-			if (GameController->getNewNodeType() > 0) {
-				GameController->setNewNodeType(GameController->getNewNodeType() - 1);
-			}
-			else {
-				GameController->setNewNodeType(1);
-			}
-		}
-	}
 }
 
 void ofApp::mouseReleased(int x, int y, int button)

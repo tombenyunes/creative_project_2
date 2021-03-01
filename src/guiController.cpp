@@ -81,6 +81,9 @@ void guiController::updateCreateNodeValues()
 		case 1:
 			name = "Spring";
 			break;
+		case 2:
+			name = "Point";
+			break;
 	}
 }
 

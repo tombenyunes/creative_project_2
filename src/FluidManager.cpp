@@ -45,7 +45,6 @@ FluidManager::FluidManager()
 	gui.show();
 
 	resizeFluid = true;
-	cout << "initialized fluid manager" << endl;
 }
 
 void FluidManager::update()
@@ -57,6 +56,8 @@ void FluidManager::update()
 	}
 
 	fluidSolver.update();
+
+	//randomForces();
 }
 
 void FluidManager::renderFluid()
@@ -120,6 +121,31 @@ void FluidManager::explosion(int count)
 		ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
 		ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
 		addToFluid(pos, vel, true, true);
+	}
+}
+
+void FluidManager::randomForces()
+{
+	if (ofGetFrameNum() % (int)ofRandom(25, 100) == 0) {
+		ofVec2f pos = ofVec2f(ofRandom(0.25, 0.75), ofRandom(0.25, 0.75));
+		//for (int i = 0; i < 100; i++) {
+		//	//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
+		//	ofVec2f vel = ofVec2f(ofMap(i, 0, 99, -0.001, 0.001), ofMap(i, 0, 99, -0.001, 0.001));
+		//	addToFluid(pos, vel, true, true, 1);
+		//}
+		//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
+		//addToFluid(pos + 0.01, vel, true, true, 1);
+		//cout << "placed" << endl;
+		
+		float pi = 3.14159;
+		float radius = 0.01;
+		for (double angle = 0; angle <= 2 * pi; angle += 0.1) {
+			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
+			//ofVec2f vel = ofVec2f(-0.0001, 0.0001);
+			ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01, 0.01, -0.001, 0.001), ofMap(radius * sin(angle), -0.01, 0.01, -0.001, 0.001));
+			//cout << vel << endl;
+			addToFluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
+		}
 	}
 }
 
