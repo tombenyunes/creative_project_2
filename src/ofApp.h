@@ -21,6 +21,8 @@
 
 #include "FluidManager.h"
 
+#include "ofxBlur.h"
+
 using namespace glm;
 
 class ofApp : public ofBaseApp{
@@ -63,6 +65,9 @@ class ofApp : public ofBaseApp{
 		ofxSimpleGuiToo gui;
 		
 		Camera cam;
+
+		ofxBlur blur;
+		ofxBlur blur2;
 		
 		ofLight keyLight;
 

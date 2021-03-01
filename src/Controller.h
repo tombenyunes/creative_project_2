@@ -20,8 +20,8 @@
 #define FRICTION_FORCE 0.015
 #define GRAVITY_FORCE 0.0001
 
-#define WORLD_WIDTH 2000*1
-#define WORLD_HEIGHT 1500*1
+#define WORLD_WIDTH 2000*2
+#define WORLD_HEIGHT 1500*2
 
 class GameObject;
 
@@ -50,7 +50,7 @@ public:
 	void setMouseDragged(bool _value);
 	bool getMouseDragged();
 
-	void setNewNodeType(bool _value);
+	void setNewNodeType(int _value);
 	int getNewNodeType();
 
 	void setUseHardCollisions(bool _value);
@@ -73,7 +73,7 @@ private:
 	bool NEED_TO_DELETE_ALL;
 	bool OBJECT_SELECTED;
 	bool MOUSE_BEING_DRAGGED;
-	int NEW_NODE_NAME;
+	int NEW_NODE_ID;
 	bool HARD_COLLISIONS;
 	bool GUI_VISIBLE;
 	bool USER_CAN_INPUT;

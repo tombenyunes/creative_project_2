@@ -7,7 +7,7 @@ Controller::Controller()
 	NEED_TO_DELETE_ALL = false;
 	OBJECT_SELECTED = false;
 	MOUSE_BEING_DRAGGED = false;
-	NEW_NODE_NAME = 0;
+	NEW_NODE_ID = 0;
 	HARD_COLLISIONS = false;
 	GUI_VISIBLE = false;
 	USER_CAN_INPUT = false;
@@ -65,13 +65,13 @@ bool Controller::getMouseDragged()
 {
 	return MOUSE_BEING_DRAGGED;
 }
-void Controller::setNewNodeType(bool _value)
+void Controller::setNewNodeType(int _value)
 {
-	(_value == 1) ? NEW_NODE_NAME = 1 : NEW_NODE_NAME = 0;
+	NEW_NODE_ID = _value;
 }
 int Controller::getNewNodeType()
 {
-	return NEW_NODE_NAME;
+	return NEW_NODE_ID;
 }
 void Controller::setUseHardCollisions(bool _value)
 {

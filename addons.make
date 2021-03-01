@@ -1,3 +1,4 @@
+ofxBlur
 ofxGui
 ofxMSACore
 ofxMSAFluid

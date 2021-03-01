@@ -17,6 +17,7 @@ public:
 
 	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
 	void explosion(int count = 500);
+	void randomForces();
 
 	void resetFluid();
 
