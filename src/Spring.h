@@ -15,10 +15,10 @@ public:
 
 	//void mouseHover() override;
 	void ellipseCollider() override;
-	void isColliding(GameObject* _other, int _node);
+	void isColliding(GameObject* _other, int _nodeIndex);
 
 	void draw() override;
-	void getNodeColor(int _node);
+	void getNodeColor(int _nodeIndex);
 	void drawConnectingLines();
 	float angleBetween(ofVec2f from, ofVec2f to);
 	ofVec2f getPointOnCircle(ofVec2f center, float radians, float  radius);

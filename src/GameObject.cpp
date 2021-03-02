@@ -45,13 +45,15 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	mouseHover_enabled = false;
 }
 
-void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager)
+void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)
 {
 	GameObjects = _gameobjects;
 	GameController = _controller;
 	GUI_Manager = _GUIManager;
-	cam = _cam;
 	Fluid_Manager = _fluidManager;
+	Audio_Manager = _audioManager;
+
+	cam = _cam;
 }
 
 // root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
@@ -237,14 +239,14 @@ void GameObject::gravity()
 {
 	if (nodePositions.size() == 0) {
 		if (GameController->getGravity() == 1 || affectedByGravity) {
-			ofVec2f newForce = { 0, (float)GRAVITY_FORCE * mass };
+			ofVec2f newForce = { 0, (float)GRAVITY_FORCE * gravityMult * mass };
 			applyForce(accel, newForce, false);
 		}
 	}
 	else {
 		for (int i = 0; i < nodePositions.size(); i++) {
 			if (GameController->getGravity() == 1 || affectedByGravity) {
-				ofVec2f newForce = { 0, (float)GRAVITY_FORCE * 400 * nodeMasses[i] };
+				ofVec2f newForce = { 0, (float)GRAVITY_FORCE * gravityMult * nodeMasses[i] };
 				applyForce(nodeAccelerations[i], newForce, false);
 			}
 		}

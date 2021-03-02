@@ -13,6 +13,8 @@ Spring::Spring(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _
 
 	isSpring = true;
 	affectedByGravity = true;
+	gravityMult = 400;
+	collisionMult = 4;
 
 	k = _k;
 	damping = _damping;
@@ -182,11 +184,14 @@ void Spring::ellipseCollider()
 		}
 	}
 }
-void Spring::isColliding(GameObject* _other, int _node)
+void Spring::isColliding(GameObject* _other, int _nodeIndex)
 {
-	ofVec2f forceVec = nodePositions[_node] - _other->pos;
-	ofVec2f accel = forceVec / nodeMasses[_node];
-	applyForce(nodeAccelerations[_node], accel, false);
+	Audio_Manager->playRandomSample();
+
+	ofVec2f forceVec = nodePositions[_nodeIndex] - _other->pos;
+	ofVec2f accel = forceVec / nodeMasses[_nodeIndex];
+	accel *= collisionMult;
+	applyForce(nodeAccelerations[_nodeIndex], accel, false);
 }
 
 //void Springs::mouseHover()
@@ -293,9 +298,9 @@ void Spring::draw()
 	ofPopStyle();
 }
 
-void Spring::getNodeColor(int _node)
+void Spring::getNodeColor(int _nodeIndex)
 {
-	if ((GameController->getActive() == this) && (selectedNodeIndex == -1 || selectedNodeIndex == _node || ((mouseOver || mouseDrag) && mouseOverIndex == _node))) {
+	if ((GameController->getActive() == this) && (selectedNodeIndex == -1 || selectedNodeIndex == _nodeIndex || ((mouseOver || mouseDrag) && mouseOverIndex == _nodeIndex))) {
 		ofSetColor(selectedColor);
 	}
 	else {

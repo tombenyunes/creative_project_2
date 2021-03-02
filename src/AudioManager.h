@@ -9,7 +9,7 @@ class AudioManager {
 public:
     void setup(ofBaseApp* appPtr);
     void update();
-    void draw();
+    void drawGUI(bool _draw);
 
     //--------------SETUPS-----------------//
     void envelopeSetup();  //set up envelopes
@@ -24,6 +24,10 @@ public:
     double playKeyLoopHi();
     double playKeyLoopLow();
     //------------------------------------//
+
+    void playRandomSample();
+    bool randomSampleTriggered = false;
+    int r = 0;
 
     void keyPressed(int key);
     void keyReleased(int key);

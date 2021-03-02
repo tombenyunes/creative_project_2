@@ -4,15 +4,15 @@
 #include "Controller.h"
 #include "GUIManager.h"
 #include "Collisions.h"
-
 #include "FluidManager.h"
+#include "AudioManager.h"
 
 class GameObject {
 	
 public:
 
 	GameObject(ofVec2f _pos = { 0, 0 }, ofColor _color = ofColor(255));
-	void init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager);
+	void init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager);
 
 	void root_update();
 	void root_draw();
@@ -30,8 +30,10 @@ public:
 	vector<GameObject*>* GameObjects;
 	Controller* GameController;
 	GUIManager* GUI_Manager;
-	Camera* cam;
 	FluidManager* Fluid_Manager;
+	AudioManager* Audio_Manager;
+	
+	Camera* cam;
 	
 	Collisions CollisionDetector;
 
@@ -85,6 +87,8 @@ protected:
 	
 	bool infiniteMass;
 	bool affectedByGravity;
+	int gravityMult = 1;
+	int collisionMult = 1;
 		
 	bool mouseOver;
 	int mouseOverIndex;

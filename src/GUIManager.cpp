@@ -46,7 +46,7 @@ GUIManager::GUIManager()
 	multi_selection_gui_node.add(nodePos.setup("pos", errorMessage));
 	multi_selection_gui_node.add(nodeVel.setup("vel", errorMessage));
 	multi_selection_gui_node.add(nodeAccel.setup("accel", errorMessage));
-	multi_selection_gui_node.add(nodeMass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
+	multi_selection_gui_node.add(nodeMass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS/10));
 	multi_selection_gui_node.add(nodeRadius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 
 	create_node_gui.setup("Create", "", ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);

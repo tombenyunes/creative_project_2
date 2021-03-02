@@ -9,13 +9,15 @@ SceneManager::SceneManager()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager)
+void SceneManager::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)
 {
 	GameObjects = _gameobjects;
 	GameController = _controller;
 	GUI_Manager = _GUIManager;
-	cam = _cam;
 	Fluid_Manager = _fluidManager;
+	Audio_Manager = _audioManager;
+	
+	cam = _cam;
 }
 
 void SceneManager::saveScene(string _sceneName)
@@ -96,7 +98,7 @@ void SceneManager::loadScene(string _path)
 				float radius = (xml.getValue("radius", -1));
 
 				GameObject* player = new Player;
-				player->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager);
+				player->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 				GameObjects->push_back(player);
 			}
 			else if (type == "Mass") {
@@ -104,7 +106,7 @@ void SceneManager::loadScene(string _path)
 				float radius = (xml.getValue("radius", -1));
 
 				GameObject* object = new Mass(pos, mass, radius);
-				object->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager);
+				object->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 				GameObjects->push_back(object);
 			}
 			else if (type == "Spring") {
@@ -114,7 +116,7 @@ void SceneManager::loadScene(string _path)
 				float radius2 = (xml.getValue("radius2", -1));
 
 				GameObject* spring = new Spring(pos, radius1, mass1, radius2, mass2, 2, 2, 22);
-				spring->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager);
+				spring->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 				GameObjects->push_back(spring);
 			}
 

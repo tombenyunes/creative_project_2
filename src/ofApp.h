@@ -31,7 +31,11 @@ class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
+
+		void audioOut(float* output, int bufferSize, int nChannels);
+
 		void update();
+
 		void draw();
 		void drawRequiredGUI();
 
@@ -48,11 +52,7 @@ class ofApp : public ofBaseApp{
 		void mouseExited(int x, int y);
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
-		
-		//==================AUDIO=OUTPUT================//
-		void audioOut(float* output, int bufferSize, int nChannels);
-		//==============================================//
+		void gotMessage(ofMessage msg);		
 
 		AudioManager Audio_Manager;
 
@@ -61,8 +61,8 @@ class ofApp : public ofBaseApp{
 		vector <GameObject*> vec;
 		vector <GameObject*>* GameObjects = &vec; // the main vector of all objects in the scene
 
-		Controller* GameController; // this controls global game properties (the selected object, gravity, etc)
-		GUIManager* GUI_Manager;
+		Controller GameController; // this controls global game properties (the selected object, gravity, etc)
+		GUIManager GUI_Manager;
 		
 		Collisions CollisionDetector;
 		EventManager Events; // simple system for allowing relevant interactions/gui interfacts - only used for the starting tutorial
@@ -74,15 +74,13 @@ class ofApp : public ofBaseApp{
 		Camera cam;
 
 		ofxBlur blur;
-		ofxBlur blur2;
-		
-		ofLight keyLight;
 
 
 		// ---> Fluid Setup <--- //
 
 		FluidManager Fluid_Manager;
 		bool drawParticleGUI;
+		bool drawAudioGUI;
 		
 		float vectorLength;
 		

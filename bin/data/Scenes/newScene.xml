@@ -5,16 +5,23 @@
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>-108.463264465</pos.x>
-        <pos.y>385.954864502</pos.y>
+        <pos.x>0.000000000</pos.x>
+        <pos.y>0.000000000</pos.y>
         <mass>500.000000000</mass>
         <radius>14.000000000</radius>
     </GameObject>
     <GameObject>
-        <type>Object</type>
-        <pos.x>197.000000000</pos.x>
-        <pos.y>-32.000000000</pos.y>
-        <mass>2478.000000000</mass>
-        <radius>154.000000000</radius>
+        <type>Mass</type>
+        <pos.x>183.999877930</pos.x>
+        <pos.y>-40.999755859</pos.y>
+        <mass>706.770446777</mass>
+        <radius>170.525207520</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>-208.000122070</pos.x>
+        <pos.y>-51.999877930</pos.y>
+        <mass>1025.109008789</mass>
+        <radius>50.296783447</radius>
     </GameObject>
 </Scene>

@@ -333,12 +333,41 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
 //--------------------------------------------------------------
 void AudioManager::update() {
-
+    if (randomSampleTriggered) {
+        if (ofGetFrameNum() % 30 == 0) {
+            randomSampleTriggered = false;
+        }
+    }
 }
 
 //--------------------------------------------------------------
-void AudioManager::draw() {
-    gui.draw();
+void AudioManager::drawGUI(bool _draw) {
+    if (_draw) gui.draw();
+}
+
+void AudioManager::playRandomSample() {
+    
+    if (!randomSampleTriggered) {
+        randomSampleTriggered = true;
+        //int r = (int)ofRandom(0, 3);
+        switch (r)
+        {
+        case 0:
+            hitHi.trigger();
+            hitHiEnv.trigger = 1;
+            break;
+        case 1:
+            hitMid.trigger();
+            hitMidEnv.trigger = 1;
+            break;
+        case 2:
+            hitLow.trigger();
+            hitLowEnv.trigger = 1;
+            break;
+        }
+        if (r < 2) r++;
+        else r = 0;
+    }
 }
 
 //--------------------------------------------------------------
@@ -362,9 +391,6 @@ void AudioManager::keyPressed(int key) {
         hitLowEnv.trigger = 1; //sample is triggered if = 1
 //        std::cout<<"true"<<std::endl;
     }
-
-
-
 }
 
 //--------------------------------------------------------------
