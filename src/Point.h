@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Object.h"
+#include "Mass.h"
 
-class Point : public Object {
+class Point : public Mass {
 
 public:
 

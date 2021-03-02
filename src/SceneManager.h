@@ -6,8 +6,8 @@
 
 #include "GameObject.h"
 #include "Player.h"
-#include "Object.h"
-#include "Springs.h"
+#include "Mass.h"
+#include "Spring.h"
 
 #include "MSAFluid.h"
 #include "FluidManager.h"
@@ -16,7 +16,7 @@ class SceneManager {
 public:
 
 		SceneManager();
-		void init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager);
+		void init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager);
 
 		void saveScene(string _sceneName);
 		void loadScene(string _path);
@@ -32,7 +32,7 @@ private:
 
 		vector<GameObject*>* GameObjects;
 		Controller* GameController;
-		guiController* gui_Controller;
+		GUIManager* GUI_Manager;
 		Camera* cam;
 		FluidManager* Fluid_Manager;
 

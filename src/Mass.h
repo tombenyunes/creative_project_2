@@ -3,11 +3,11 @@
 #include "ofMain.h"
 #include "GameObject.h"
 
-class Object : public GameObject {
+class Mass : public GameObject {
 	
 public:
 
-	Object(ofVec2f _pos, float _mass, float _radius);
+	Mass(ofVec2f _pos, float _mass, float _radius);
 	
 	void update() override;
 

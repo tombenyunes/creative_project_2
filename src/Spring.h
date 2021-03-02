@@ -3,11 +3,11 @@
 #include "ofMain.h"
 #include "GameObject.h"
 
-class Springs : public GameObject {
+class Spring : public GameObject {
 	
 public:
 
-	Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass);
+	Spring(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass);
 
 	void createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, float nodeRadius, float nodeMass);
 

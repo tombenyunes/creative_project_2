@@ -1,6 +1,6 @@
-#include "Springs.h"
+#include "Spring.h"
 
-Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass)
+Spring::Spring(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass)
 {
 	type = "Spring";
 
@@ -32,7 +32,7 @@ Springs::Springs(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float
 	AddModule("mouseHover");
 }
 
-void Springs::createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, float nodeRadius, float nodeMass)
+void Spring::createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, float nodeRadius, float nodeMass)
 {
 	nodePositions.push_back(nodePos);
 	nodeVelocities.push_back(nodeVel);
@@ -41,7 +41,7 @@ void Springs::createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, fl
 	nodeMasses.push_back(nodeMass);
 }
 
-void Springs::update()
+void Spring::update()
 {
 	posBeforeDrag.set(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 	updateForces();
@@ -50,73 +50,22 @@ void Springs::update()
 	resetForces();
 }
 
-void Springs::updateForces()
+void Spring::updateForces()
 {
 	applyAllForces();
 
 	addForces();
 }
 
-void Springs::applyAllForces()
+void Spring::applyAllForces()
 {
 	for (int i = 0; i < nodePositions.size(); i++) {
 		applyForce(nodeAccelerations[i], updateSprings(i) * timeStep, false);
 	}
 }
 
-ofVec2f Springs::updateSprings(int _node) {
-	// Mass 1 Spring Force
-	//ofVec2f mass1SpringForce;
-	//mass1SpringForce.x = -k * (nodePositions[0].x - pos.x);
-	//mass1SpringForce.y = -k * (nodePositions[0].y - pos.y);
-
-	//// Mass 2 Spring Force
-	//ofVec2f mass2SpringForce;
-	//mass2SpringForce.x = -k * (nodePositions[1].x - nodePositions[0].x);
-	//mass2SpringForce.y = -k * (nodePositions[1].y - nodePositions[0].y);
-
-	//ofVec2f mass3SpringForce;
-	//mass3SpringForce.x = -k * (nodePositions[2].x - nodePositions[1].x);
-	//mass3SpringForce.y = -k * (nodePositions[2].y - nodePositions[1].y);
-
-	//// Mass 1 Damping
-	//ofVec2f mass1DampingForce;
-	//mass1DampingForce.x = damping * nodeVelocities[0].x;
-	//mass1DampingForce.y = damping * nodeVelocities[0].y;
-
-	//// Mass 2 Damping
-	//ofVec2f mass2DampingForce;
-	//mass2DampingForce.x = damping * nodeVelocities[1].x;
-	//mass2DampingForce.y = damping * nodeVelocities[1].y;
-
-	//ofVec2f mass3DampingForce;
-	//mass3DampingForce.x = damping * nodeVelocities[2].x;
-	//mass3DampingForce.y = damping * nodeVelocities[2].y;
-
-	//// Mass 1 Net Force
-	//ofVec2f mass1Force;
-	//mass1Force.x = mass1SpringForce.x - mass1DampingForce.x - mass2SpringForce.x + mass2DampingForce.x;
-	//mass1Force.y = mass1SpringForce.y + springmass - mass1DampingForce.y - mass2SpringForce.y + mass2DampingForce.y;
-
-	//// Mass 2 Net Force
-	//ofVec2f mass2Force;
-	//mass2Force.x = mass2SpringForce.x - mass2DampingForce.x;
-	//mass2Force.y = mass2SpringForce.y + springmass - mass2DampingForce.y;
-
-	//ofVec2f mass3Force;
-	//mass3Force.x = mass3SpringForce.x - mass3DampingForce.x;
-	//mass3Force.y = mass3SpringForce.y + springmass - mass3DampingForce.y;
-
-	//if (_node == 0) {
-	//	return mass1Force / springmass;
-	//}
-	//else if (_node == 1) {
-	//	return mass2Force / springmass;
-	//}
-	//else if (_node == 2) {
-	//	return mass3Force / springmass;
-	//}
-
+ofVec2f Spring::updateSprings(int _node) 
+{	
 	vector<ofVec2f> massSpringForces;
 	for (int i = 0; i < nodePositions.size(); i++) {
 		if (i - 1 < 0) {
@@ -160,7 +109,7 @@ ofVec2f Springs::updateSprings(int _node) {
 	return massForces[_node] / springmass;
 };
 
-void Springs::dragNodes()
+void Spring::dragNodes()
 {
 	if (mouseDrag) {
 		if (mouseOverIndex != -1) {
@@ -173,43 +122,43 @@ void Springs::dragNodes()
 	}
 }
 
-void Springs::updateGUI()
+void Spring::updateGUI()
 {
 	if (GameController->getActive() == this) {
 		if (gui_values_need_to_be_set) {					
 			if (selectedNodeIndex != -1) {
-				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], nodeMasses[selectedNodeIndex], nodeRadiuses[selectedNodeIndex]);
+				GUI_Manager->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], nodeMasses[selectedNodeIndex], nodeRadiuses[selectedNodeIndex]);
 			}
 			else {
-				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity);
+				GUI_Manager->updateSpringValues(pos, k, damping, springmass, affectedByGravity);
 			}
 			gui_values_need_to_be_set = false;
 		}
 		else {		
 			if (selectedNodeIndex != -1) {				
-				gui_Controller->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], gui_Controller->nodeMass, gui_Controller->nodeRadius);
-				nodeMasses[selectedNodeIndex] = gui_Controller->nodeMass;
-				nodeRadiuses[selectedNodeIndex] = gui_Controller->nodeRadius;
+				GUI_Manager->updateSpringValues(pos, k, damping, springmass, affectedByGravity, nodePositions[selectedNodeIndex], nodeVelocities[selectedNodeIndex], nodeAccelerations[selectedNodeIndex], GUI_Manager->nodeMass, GUI_Manager->nodeRadius);
+				nodeMasses[selectedNodeIndex] = GUI_Manager->nodeMass;
+				nodeRadiuses[selectedNodeIndex] = GUI_Manager->nodeRadius;
 			}
 			else {
-				gui_Controller->updateSpringValues(pos, gui_Controller->k, gui_Controller->damping, gui_Controller->springmass, gui_Controller->spring_affectedByGravity);
-				k = gui_Controller->k;
-				damping = gui_Controller->damping;
-				springmass = gui_Controller->springmass;
-				affectedByGravity = gui_Controller->spring_affectedByGravity;
+				GUI_Manager->updateSpringValues(pos, GUI_Manager->k, GUI_Manager->damping, GUI_Manager->springmass, GUI_Manager->spring_affectedByGravity);
+				k = GUI_Manager->k;
+				damping = GUI_Manager->damping;
+				springmass = GUI_Manager->springmass;
+				affectedByGravity = GUI_Manager->spring_affectedByGravity;
 			}
 		}
 	}
 }
 
-void Springs::resetForces()
+void Spring::resetForces()
 {
 	for (int i = 0; i < nodePositions.size(); i++) {
 		nodeAccelerations[i].set(0);
 	}
 }
 
-void Springs::addForces()
+void Spring::addForces()
 {
 	for (int i = 0; i < nodePositions.size(); i++) {
 		nodeVelocities[i] += nodeAccelerations[i];
@@ -217,7 +166,7 @@ void Springs::addForces()
 	}
 }
 
-void Springs::ellipseCollider()
+void Spring::ellipseCollider()
 {
 	for (int i = 0; i < GameObjects->size(); i++) {
 		if ((*GameObjects)[i]->ellipseCollider_enabled) {
@@ -233,7 +182,7 @@ void Springs::ellipseCollider()
 		}
 	}
 }
-void Springs::isColliding(GameObject* _other, int _node)
+void Spring::isColliding(GameObject* _other, int _node)
 {
 	ofVec2f forceVec = nodePositions[_node] - _other->pos;
 	ofVec2f accel = forceVec / nodeMasses[_node];
@@ -271,7 +220,7 @@ void Springs::isColliding(GameObject* _other, int _node)
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Springs::mousePressed(float _x, float _y, int _button)
+void Spring::mousePressed(float _x, float _y, int _button)
 {
 	if (_button == 2 && mouseOver) {
 		if (GameController->getActive() != this) {
@@ -282,7 +231,7 @@ void Springs::mousePressed(float _x, float _y, int _button)
 	}
 }
 
-void Springs::mouseDragged(float _x, float _y, int _button)
+void Spring::mouseDragged(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		if (mouseOver && GameController->getMouseDragged() == false) {
@@ -295,7 +244,7 @@ void Springs::mouseDragged(float _x, float _y, int _button)
 	}
 }
 
-void Springs::mouseReleased(float _x, float _y, int _button)
+void Spring::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		mouseDrag = false;
@@ -304,7 +253,7 @@ void Springs::mouseReleased(float _x, float _y, int _button)
 
 }
 
-void Springs::keyPressed(int key)
+void Spring::keyPressed(int key)
 {
 	if (key == 'a') {
 		createNode(ofVec2f(pos.x + ofRandom(-50, 50), pos.y), ofVec2f(0, 0), ofVec2f(0, 0), nodeRadiuses[nodeRadiuses.size() - 1], nodeMasses[nodeRadiuses.size() - 1]);
@@ -315,7 +264,7 @@ void Springs::keyPressed(int key)
 // ----- RENDER LOOP ----- //
 
 
-void Springs::draw()
+void Spring::draw()
 {
 	ofPushStyle();
 
@@ -344,7 +293,7 @@ void Springs::draw()
 	ofPopStyle();
 }
 
-void Springs::getNodeColor(int _node)
+void Spring::getNodeColor(int _node)
 {
 	if ((GameController->getActive() == this) && (selectedNodeIndex == -1 || selectedNodeIndex == _node || ((mouseOver || mouseDrag) && mouseOverIndex == _node))) {
 		ofSetColor(selectedColor);
@@ -354,7 +303,7 @@ void Springs::getNodeColor(int _node)
 	}
 }
 
-void Springs::drawConnectingLines()
+void Spring::drawConnectingLines()
 {
 	for (int i = 0; i < nodePositions.size(); i++) {
 		if (i == 0) {
@@ -392,7 +341,7 @@ void Springs::drawConnectingLines()
 	}
 }
 
-float Springs::angleBetween(ofVec2f from, ofVec2f to)
+float Spring::angleBetween(ofVec2f from, ofVec2f to)
 {
 	float x = from.x;
 	float y = from.y;
@@ -406,7 +355,7 @@ float Springs::angleBetween(ofVec2f from, ofVec2f to)
 	return rotation;
 }
 
-ofVec2f Springs::getPointOnCircle(ofVec2f center, float radians, float  radius) {
+ofVec2f Spring::getPointOnCircle(ofVec2f center, float radians, float  radius) {
 
 	float x = center.x;
 	float y = center.y;

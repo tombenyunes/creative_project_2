@@ -65,14 +65,14 @@ void Player::updateGUI()
 	static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
 	if (!initiai_values_triggered) {
 		initiai_values_triggered = true;
-		gui_Controller->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 1);
+		GUI_Manager->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 1);
 	}
 	else {
-		gui_Controller->updateValues(pos, vel, accel, gui_Controller->mass, gui_Controller->infiniteMass, gui_Controller->radius, gui_Controller->affectedByGravity, 1); // receiving and updating the results from the gui_controller
-		if (infiniteMass) mass = 9999999999999999999; else mass = gui_Controller->mass;
-		radius = gui_Controller->radius;
-		infiniteMass = gui_Controller->infiniteMass;
-		affectedByGravity = gui_Controller->affectedByGravity;
+		GUI_Manager->updateValues(pos, vel, accel, GUI_Manager->mass, GUI_Manager->infiniteMass, GUI_Manager->radius, GUI_Manager->affectedByGravity, 1); // receiving and updating the results from the GUI_Manager
+		if (infiniteMass) mass = 9999999999999999999; else mass = GUI_Manager->mass;
+		radius = GUI_Manager->radius;
+		infiniteMass = GUI_Manager->infiniteMass;
+		affectedByGravity = GUI_Manager->affectedByGravity;
 	}
 }
 

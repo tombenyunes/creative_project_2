@@ -4,11 +4,11 @@
 #include "ofxGui.h"
 #include "Controller.h"
 
-class guiController {
+class GUIManager {
 
 public:
 
-	guiController();
+	GUIManager();
 	void update(Controller* _controller);
 	void updateWorld();
 	void updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel);

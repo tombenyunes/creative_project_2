@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "Controller.h"
-#include "guiController.h"
+#include "GUIManager.h"
 #include "Collisions.h"
 
 #include "FluidManager.h"
@@ -12,7 +12,7 @@ class GameObject {
 public:
 
 	GameObject(ofVec2f _pos = { 0, 0 }, ofColor _color = ofColor(255));
-	void init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager);
+	void init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager);
 
 	void root_update();
 	void root_draw();
@@ -29,7 +29,7 @@ public:
 
 	vector<GameObject*>* GameObjects;
 	Controller* GameController;
-	guiController* gui_Controller;
+	GUIManager* GUI_Manager;
 	Camera* cam;
 	FluidManager* Fluid_Manager;
 	

@@ -45,11 +45,11 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	mouseHover_enabled = false;
 }
 
-void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, guiController* _guiController, Camera* _cam, FluidManager* _fluidManager)
+void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager)
 {
 	GameObjects = _gameobjects;
 	GameController = _controller;
-	gui_Controller = _guiController;
+	GUI_Manager = _GUIManager;
 	cam = _cam;
 	Fluid_Manager = _fluidManager;
 }

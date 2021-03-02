@@ -1,6 +1,6 @@
-#include "guiController.h"
+#include "GUIManager.h"
 
-guiController::guiController()
+GUIManager::GUIManager()
 {
 	buffer = 5; // buffer between all panels and each other + screen edges
 	string errorMessage = "Error: Updating failed"; // error message will show for all parameters that require but haven't received an update
@@ -10,7 +10,7 @@ guiController::guiController()
 	ofVec2f dampingBounds = { 0.1, 8 };
 	ofVec2f springmassBounds = { 0.1, 50 };
 
-	newScene.addListener(this, &guiController::setClearAll);
+	newScene.addListener(this, &GUIManager::setClearAll);
 
 	world_gui.setup("World", "", buffer, buffer);
 	world_gui.add(newScene.setup("clear all"));
@@ -59,20 +59,20 @@ guiController::guiController()
 	create_node_gui.add(name.setup("Type", errorMessage));
 }
 
-void guiController::update(Controller* _controller)
+void GUIManager::update(Controller* _controller)
 {
 	GameController = _controller;
 	updateWorld();
 	updateCreateNodeValues();
 }
 
-void guiController::updateWorld()
+void GUIManager::updateWorld()
 {
 	GameController->setGravity(gravity);
 	GameController->setUseHardCollisions(hardCollisions);
 }
 
-void guiController::updateCreateNodeValues()
+void GUIManager::updateCreateNodeValues()
 {
 	switch (GameController->getNewNodeType()) {
 		case 0:
@@ -87,7 +87,7 @@ void guiController::updateCreateNodeValues()
 	}
 }
 
-void guiController::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel)
+void GUIManager::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel)
 {
 	if (panel == 1) {
 		position = ofToString(roundf(_pos.x)) + ", " + ofToString(roundf(_pos.y));
@@ -123,7 +123,7 @@ void guiController::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, flo
 	}
 }
 
-void guiController::updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos, ofVec2f _selectedNodeVel, ofVec2f _selectedNodeAccel, float _selectedNodeMass, float _selectedNodeRadius)
+void GUIManager::updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos, ofVec2f _selectedNodeVel, ofVec2f _selectedNodeAccel, float _selectedNodeMass, float _selectedNodeRadius)
 {
 	anchorPos = ofToString(roundf(_anchorpos.x)) + ", " + ofToString(roundf(_anchorpos.y));
 
@@ -146,7 +146,7 @@ void guiController::updateSpringValues(ofVec2f _anchorpos, float _k, float _damp
 	}
 }
 
-void guiController::windowResized(int w, int h)
+void GUIManager::windowResized(int w, int h)
 {
 	create_node_gui.setPosition(ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
 	selected_gui.setPosition(ofGetWidth() - selected_gui.getWidth() - buffer, buffer);
@@ -154,7 +154,7 @@ void guiController::windowResized(int w, int h)
 	multi_selection_gui_node.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_spring.getPosition().y + multi_selection_gui_spring.getHeight() + buffer);
 }
 
-void guiController::setClearAll()
+void GUIManager::setClearAll()
 {
 	GameController->setDeleteAll(true);
 }

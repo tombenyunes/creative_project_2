@@ -1,8 +1,8 @@
-#include "Object.h"
+#include "Mass.h"
 
-Object::Object(ofVec2f _pos, float _mass, float _radius)
+Mass::Mass(ofVec2f _pos, float _mass, float _radius)
 {
-	type = "Object";
+	type = "Mass";
 
 	pos.set(_pos);
 	color = ofColor(passiveColor);
@@ -19,7 +19,7 @@ Object::Object(ofVec2f _pos, float _mass, float _radius)
 	AddModule("mouseHover");
 }
 
-void Object::update()
+void Mass::update()
 {
 	posBeforeDrag.set(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 	updateForces();
@@ -28,12 +28,12 @@ void Object::update()
 	resetForces();
 }
 
-void Object::updateForces()
+void Mass::updateForces()
 {
 	addForces(false);
 }
 
-void Object::dragNodes()
+void Mass::dragNodes()
 {
 	static ofVec2f mousePosBeforeDrag;
 	if (mouseDrag) {
@@ -59,29 +59,29 @@ void Object::dragNodes()
 	}
 }
 
-void Object::updateGUI()
+void Mass::updateGUI()
 {
 	if (GameController->getActive() == this) {
 		if (gui_values_need_to_be_set) {
-			gui_Controller->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 2);
+			GUI_Manager->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 2);
 			gui_values_need_to_be_set = false;
 		}
 		else {
-			gui_Controller->updateValues(pos, vel, accel, gui_Controller->selected_mass, gui_Controller->selected_infiniteMass, gui_Controller->selected_radius, gui_Controller->selected_affectedByGravity, 2);
+			GUI_Manager->updateValues(pos, vel, accel, GUI_Manager->selected_mass, GUI_Manager->selected_infiniteMass, GUI_Manager->selected_radius, GUI_Manager->selected_affectedByGravity, 2);
 			if (infiniteMass) {
 				mass = 999999999999;
 			}
 			else {
-				mass = gui_Controller->selected_mass;
+				mass = GUI_Manager->selected_mass;
 			}
-			radius = gui_Controller->selected_radius;
-			infiniteMass = gui_Controller->selected_infiniteMass;
-			affectedByGravity = gui_Controller->selected_affectedByGravity;
+			radius = GUI_Manager->selected_radius;
+			infiniteMass = GUI_Manager->selected_infiniteMass;
+			affectedByGravity = GUI_Manager->selected_affectedByGravity;
 		}
 	}
 }
 
-void Object::resetForces()
+void Mass::resetForces()
 {
 	accel.set(0);
 }
@@ -90,7 +90,7 @@ void Object::resetForces()
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Object::mousePressed(float _x, float _y, int _button)
+void Mass::mousePressed(float _x, float _y, int _button)
 {
 	if (_button == 2 && mouseOver) {
 		if (GameController->getActive() != this) {
@@ -100,7 +100,7 @@ void Object::mousePressed(float _x, float _y, int _button)
 	}
 }
 
-void Object::mouseDragged(float _x, float _y, int _button)
+void Mass::mouseDragged(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		if (mouseOver && GameController->getMouseDragged() == false) {			
@@ -113,7 +113,7 @@ void Object::mouseDragged(float _x, float _y, int _button)
 	}
 }
 
-void Object::mouseReleased(float _x, float _y, int _button)
+void Mass::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		mouseDrag = false;
@@ -125,7 +125,7 @@ void Object::mouseReleased(float _x, float _y, int _button)
 // ----- RENDER LOOP ----- //
 
 
-void Object::draw()
+void Mass::draw()
 {
 	ofPushStyle();
 
@@ -139,7 +139,7 @@ void Object::draw()
 	ofPopStyle();
 }
 
-void Object::getColor()
+void Mass::getColor()
 {	
 	if ((GameController->getActive() == this) || (mouseOver || mouseDrag)) {
 		ofSetColor(selectedColor);

@@ -4,11 +4,11 @@
 #include "GameObject.h"
 #include "Controller.h"
 #include "Player.h"
-#include "Object.h"
-#include "Springs.h"
+#include "Mass.h"
+#include "Spring.h"
 
 #include "ofxGui.h"
-#include "guiController.h"
+#include "GUIManager.h"
 #include "Collisions.h"
 #include "EventManager.h"
 
@@ -62,7 +62,7 @@ class ofApp : public ofBaseApp{
 		vector <GameObject*>* GameObjects = &vec; // the main vector of all objects in the scene
 
 		Controller* GameController; // this controls global game properties (the selected object, gravity, etc)
-		guiController* gui_Controller;
+		GUIManager* GUI_Manager;
 		
 		Collisions CollisionDetector;
 		EventManager Events; // simple system for allowing relevant interactions/gui interfacts - only used for the starting tutorial

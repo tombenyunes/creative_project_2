@@ -2,8 +2,8 @@
 
 #include "Controller.h"
 #include "GameObject.h"
-#include "Object.h"
-#include "Springs.h"
+#include "Mass.h"
+#include "Spring.h"
 
 class EventManager
 {

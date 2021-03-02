@@ -8,16 +8,16 @@ void ofApp::setup()
 	ofSetWindowTitle("iota");	
 
 	GameController = new Controller;
-	gui_Controller = new guiController;
+	GUI_Manager = new GUIManager;
 
 	GameObject* player = new Player;
-	player->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+	player->init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 	GameObjects->push_back(player);
 
 	Events.showTutorial(false);	// <----- enable or disable tutorial
 	Events.setup();
 
-	Scene_Manager.init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+	Scene_Manager.init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 
 	ofBackground(0);
 	ofSetVerticalSync(true);
@@ -40,8 +40,8 @@ void ofApp::setup()
 	//blur2.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 
 	/*for (int i = 0; i < 100; i++) {
-		GameObject* object = new Object(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
-		object->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObject* object = new Mass(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		object->init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 		GameObjects->push_back(object);
 	}*/
 
@@ -75,7 +75,7 @@ void ofApp::update()
 	}
 
 	GameController->update(&cam);
-	gui_Controller->update(GameController);
+	GUI_Manager->update(GameController);
 	Events.update(GameController, GameObjects);
 
 	if (GameController->getDeleteAll()) {
@@ -131,22 +131,22 @@ void ofApp::draw()
 
 void ofApp::drawRequiredGUI() {
 	if (GameController->getGUIVisible() || Events.playerGUIVisible) {
-		gui_Controller->player_gui.draw();
+		GUI_Manager->player_gui.draw();
 		if (GameController->getActive() != nullptr) {
 			if (GameController->getActive()->isSpring) {	// if an object is a spring then it has multiple gui windows to draw
-				gui_Controller->multi_selection_gui_spring.draw();
-				if (gui_Controller->multiNodeSelected == true) {
-					gui_Controller->multi_selection_gui_node.draw();
+				GUI_Manager->multi_selection_gui_spring.draw();
+				if (GUI_Manager->multiNodeSelected == true) {
+					GUI_Manager->multi_selection_gui_node.draw();
 				}
 			}
 			else {
-				gui_Controller->selected_gui.draw();
+				GUI_Manager->selected_gui.draw();
 			}
 		}
 	}
 	if (GameController->getGUIVisible()) {
-		gui_Controller->world_gui.draw();
-		gui_Controller->create_node_gui.draw();
+		GUI_Manager->world_gui.draw();
+		GUI_Manager->create_node_gui.draw();
 	}
 
 	Fluid_Manager.drawGUI(drawParticleGUI);
@@ -158,20 +158,20 @@ void ofApp::createNode()
 {
 	if (GameController->getNewNodeType() == 0) {
 		cout << "Mass created" << endl;
-		GameObject* object = new Object(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
-		object->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObject* object = new Mass(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		object->init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 		GameObjects->push_back(object);
 	}
 	else if (GameController->getNewNodeType() == 1) {
 		cout << "Spring created" << endl;
-		GameObject* spring = new Springs(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
-		spring->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObject* spring = new Spring(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
+		spring->init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 		GameObjects->push_back(spring);
 	}
 	else if (GameController->getNewNodeType() == 2) {
 		cout << "Point created" << endl;
-		GameObject* point = new Object(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 10, 25);
-		point->init(GameObjects, GameController, gui_Controller, &cam, &Fluid_Manager);
+		GameObject* point = new Mass(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 10, 25);
+		point->init(GameObjects, GameController, GUI_Manager, &cam, &Fluid_Manager);
 		GameObjects->push_back(point);
 	}
 }
@@ -286,7 +286,7 @@ void ofApp::mouseExited(int x, int y)
 
 void ofApp::windowResized(int w, int h)
 {
-	gui_Controller->windowResized(w, h);
+	GUI_Manager->windowResized(w, h);
 }
 
 void ofApp::gotMessage(ofMessage msg)

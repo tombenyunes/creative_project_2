@@ -92,7 +92,7 @@ void EventManager::update(Controller* _controller, vector<GameObject*>* _gameobj
 		static bool i8 = false;
 		if (currentIndex >= 8 && !i8) {
 			i8 = true;
-			GameObject* object = new Object(ofVec2f(340, 0), 1000, 220);
+			GameObject* object = new Mass(ofVec2f(340, 0), 1000, 220);
 			_gameobjects->push_back(object);
 		}
 		static bool i9 = false;
@@ -103,7 +103,7 @@ void EventManager::update(Controller* _controller, vector<GameObject*>* _gameobj
 		static bool i11 = false;
 		if (currentIndex >= 11 && !i11) {
 			i11 = true;
-			GameObject* object = new Object(ofVec2f(294, 174), 4000, 115);
+			GameObject* object = new Mass(ofVec2f(294, 174), 4000, 115);
 			_gameobjects->push_back(object);
 		}
 		static bool i16 = false;
@@ -115,7 +115,7 @@ void EventManager::update(Controller* _controller, vector<GameObject*>* _gameobj
 		if (currentIndex >= 19 && !i19) {
 			i19 = true;
 			for (int i = 0; i < 30; i++) {
-				GameObject* spring = new Springs(ofVec2f(ofRandom(-ofGetWidth() / 2, ofGetWidth() / 2), ofRandom(-ofGetHeight() / 2, ofGetHeight() / 2)), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
+				GameObject* spring = new Spring(ofVec2f(ofRandom(-ofGetWidth() / 2, ofGetWidth() / 2), ofRandom(-ofGetHeight() / 2, ofGetHeight() / 2)), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
 				_gameobjects->push_back(spring);
 			}
 		}
