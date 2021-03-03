@@ -4,12 +4,16 @@
 #include "ofxMaxim.h"
 #include "ofxGui.h"
 
+#include "Controller.h"
+
 class AudioManager {
 
 public:
     void setup(ofBaseApp* appPtr);
     void update();
-    void drawGUI(bool _draw);
+    void draw();
+    void drawGUI(bool enable);
+    void drawWaveform();
 
     //--------------SETUPS-----------------//
     void envelopeSetup();  //set up envelopes
@@ -17,6 +21,7 @@ public:
     void guiSetup();       //setup gui
     void clockSetup();     //setup clock
     void soundSetup(ofBaseApp* appPtr);     //setup audio
+
 
     //==============SOUNDS================//
     double playMetronome();
@@ -47,20 +52,27 @@ public:
 
 
 //====Audio-Setup====//
-    //int bufferSize;
-    //int sampleRate;
-    //===================//
+    int bufferSize;
+    int sampleRate;
 
+    // used for drawing waveform
+    float soundBuffer[512];
+    float soundBufMix[512];
+
+
+    maxiOsc cellSin;
+    double cellSinOut;
+
+    //===================//
 
     //-----SETUP-CLOCK---//
     maxiClock clock;
     int playHead;
     //===================//
 
-
     //--MIX'S-&-OUTPUTS--//
     double mix;
-    double  stereoMix[2], masterStereoOutput[2];
+    double stereoMix[2], masterStereoOutput[2];
     //=========================================//
 
 
@@ -74,7 +86,7 @@ public:
     double delayMix[2], stereoDelayOutput[2];
 
     //----------REVERB-----------//
-    maxiDelayline reverbsL[20], reverbsR[20];
+    maxiDelayline reverbsL[10], reverbsR[10];
     vector<double>reverbTimes;
     double reverbMix[2], reverbOutput[2];
     //=================================//
@@ -103,20 +115,21 @@ public:
     // [32] = 4 bar loop
     // [128] = 8 bar loop
 
+
     //---KEY-ARP-LOOP---//
     maxiSample keyArpLoop;
     double keyArp_out;
-    //-------------//
+
     maxiEnv keyArpEnv;
     double keyArp_envOut;
-    //-------------//
+
     int keyArpTrigger;
     int keyArpSeq[32] = { 1,0,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0 };
 
-    //-------------//
+
     maxiMix keyArpStereo;
     double keyArpMix[2];
     //==================//
@@ -125,10 +138,10 @@ public:
     //---KEY-LOOP-HI---//
     maxiSample keyHi;
     double keyHi_out;
-    //-------------//
+
     maxiEnv keyHiEnv;
     double keyHi_envOut;
-    //-------------//
+
     int keyHiTrigger;
     int keyHiSeq[64] = { 1,0,0,0, 0,0,0,0,
                         0,0,0,0, 0,0,0,0,
@@ -147,11 +160,13 @@ public:
     //--KEY-LOOP-LOW-BASS-//
     maxiSample keyLow;
     double keyLow_out;
-    //-------------//
+
     maxiEnv keyLowEnv;
     double keyLow_envOut;
-    //-------------//
+
     int keyLowTrigger;
+
+    //4 BAR LOOP
     int keyLowSeq[128] = { 1,0,0,0, 0,0,0,0,
                           0,0,0,0, 0,0,0,0,
                           0,0,0,0, 0,0,0,0,
@@ -184,7 +199,7 @@ public:
     //=======================//
 
 
-    //===========INTERACTIVE-SAMPLE-HITS=============//
+    //==========INTERACTIVE-SAMPLE-HITS==========//
     maxiSample hitHi;
     maxiEnv hitHiEnv;
     double hitHi_out, hitHi_envOut;
@@ -202,6 +217,15 @@ public:
     double hitLow_out, hitLow_envOut;
     double hitLowMix[2];
     maxiMix hitLowStereo;
+
+    maxiSample hitSub;
+    maxiEnv hitSubEnv;
+    double hitSub_out, hitSub_envOut;
+    double hitSubMix[2];
+    maxiMix hitSubStereo;
+
+
+
 
 
     //====POLYSYNTH-EFFECT========//
@@ -227,10 +251,16 @@ public:
     int sBassLinePitch[6] = { 51,56,63,
                            51,54,63 };
 
+
     //========================================//
+
 
     //-----------GUI-SETUP---------//
     ofxPanel gui;
+    ofParameter<float> cellSpeed;
+    ofParameter<float> cellRadius;
+
+    ofParameter<float> masterGain;
     ofParameter<float> metGain;
 
     ofParameter<float> keyLoopGain;
@@ -244,7 +274,6 @@ public:
 
     ofParameter<float> synthLineGain;
     ofParameter<float> synthLinePan;
-
 
     ofParameter<float> atmosGain;
 

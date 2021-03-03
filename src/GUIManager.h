@@ -9,7 +9,10 @@ class GUIManager {
 public:
 
 	GUIManager();
-	void update(Controller* _controller);
+
+	void init(Controller* _controller);
+
+	void update();
 	void updateWorld();
 	void updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel);
 	void updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos = ofVec2f(-1, -1), ofVec2f _selectedNodeVel = ofVec2f(-1, -1), ofVec2f _selectedNodeAccel = ofVec2f(-1, -1), float _selectedNodeMass = -1, float _selectedNodeRadius = -1);

@@ -1,21 +1,23 @@
 #include "AudioManager.h"
+
 //--------------------------------------------------------------
 void AudioManager::loadSamples() {
 
     //==================LOAD-SAMPLES-HERE===================//
-    metronome.load(ofToDataPath("./Audio/Samples/rim.wav"));
+    metronome.load(ofToDataPath("./audio/samples/rim.wav"));
 
-    hitHi.load(ofToDataPath("./Audio/Samples/synthSpace_hi.wav"));
-    hitMid.load(ofToDataPath("./Audio/Samples/synthSpace_mid.wav"));
-    hitLow.load(ofToDataPath("./Audio/Samples/synthSpace_low.wav"));
+    hitHi.load(ofToDataPath("./audio/samples/synthSpace_hi.wav"));
+    hitMid.load(ofToDataPath("./audio/samples/synthSpace_mid.wav"));
+    hitLow.load(ofToDataPath("./audio/samples/synthSpace_low.wav"));
+
+    hitSub.load(ofToDataPath("./audio/samples/subAtmosphere.wav"));
 
     //=====================LOAD-LOOPS=======================//
-    atmos.load(ofToDataPath("./Audio/Loops/atmosphere.wav"));
+    atmos.load(ofToDataPath("./audio/loops/atmosphere.wav"));
 
-    keyArpLoop.load(ofToDataPath("./Audio/Loops/keyArploop.wav"));
-    keyHi.load(ofToDataPath("./Audio/Loops/keysLoopHi.wav"));
-    keyLow.load(ofToDataPath("./Audio/Loops/keysLoopLow.wav"));
-
+    keyArpLoop.load(ofToDataPath("./audio/loops/keyArploop.wav"));
+    keyHi.load(ofToDataPath("./audio/loops/keysLoopHi.wav"));
+    keyLow.load(ofToDataPath("./audio/loops/keysLoopLow.wav"));
 
 }
 
@@ -37,12 +39,27 @@ void AudioManager::envelopeSetup() {
     hitLowEnv.setSustain(5);
     hitLowEnv.setRelease(15000);
 
+    hitSubEnv.setAttack(0.2);
+    hitSubEnv.setDecay(5);
+    hitSubEnv.setSustain(5);
+    hitSubEnv.setRelease(15000);
+
 }
 
 //--------------------------------------------------------------
 void AudioManager::guiSetup() {
     gui.setup();
-    gui.add(metGain.set("metronome gain", 0.05, 0, 1.0));
+
+    gui.add(cellSpeed.set("cell Speed", 42.662, 0, 60));
+    gui.add(cellRadius.set("cell radius", 50, 0, 200));
+
+
+
+    gui.add(masterGain.set("master gain", 1, 0, 3));
+
+
+
+    gui.add(metGain.set("metronome gain", 0.5, 0, 1.0));
 
     gui.add(atmosGain.set("atmos gain", 0.3, 0, 1.0));
 
@@ -56,16 +73,18 @@ void AudioManager::guiSetup() {
     gui.add(keyLowPan.set("keys Low Pan", 0.1, 0, 1.0));
 
 
-    gui.add(synthLineGain.set("synth line gain", 0.01, 0, 1.0));
+    gui.add(synthLineGain.set("synth line gain", 0.01, 0, 0.05));
     gui.add(synthLinePan.set("synth line Pan", 0.05, 0, 1.0));
 
 
     gui.add(lowResFreq.set("lowRes filter freq", 4000, 0, 4000));
     gui.add(lowResQ.set("lowRes Filter Q", 0.5, 0, 4));
 
+
     gui.add(dryDelayMix.set("delay Wet/Dry Mix", 0.7, 0, 1));
     gui.add(delayFeedback.set("delay feedback", 0.5, 0, 0.9));
-    gui.add(delayTime.set("delay time", 1.2, 0, 2));
+    gui.add(delayTime.set("delay time", 0.9, 0, 2));
+
 
     gui.add(dryReverbMix.set("reverb Wet/Dry Mix", 0.7, 0, 1));
     gui.add(reverbFeedback.set("reverb feedback", 0.95, 0, 0.99));
@@ -153,18 +172,17 @@ double AudioManager::playKeyLoopLow() {
 void AudioManager::soundSetup(ofBaseApp* appPtr) {
 
     //=======MAXIM-SOUND-SETUP=========//
-    int sampleRate = 44100;
-    int bufferSize = 512;
+    sampleRate = 44100;
+    bufferSize = 512;
     ofxMaxiSettings::setup(sampleRate, 2, bufferSize);
     //=====================================================//
     ofSoundStreamSetup(2, 0, appPtr, sampleRate, bufferSize, 4);
     /* this has to happen at the end of setup - it switches on the DAC */
 }
 
+
 //===============================================================//
 void AudioManager::setup(ofBaseApp* appPtr) {
-
-    cout << "------------AudioManager.cpp------------" << endl;
 
     //=======OF-SETUP======//
     ofSetFrameRate(60);
@@ -173,6 +191,7 @@ void AudioManager::setup(ofBaseApp* appPtr) {
     ofEnableSmoothing();
     ofBackground(0, 0, 0);
     //====================//
+
 
     //REVERB-SETUP
     for (int i = 0; i < 20; i++) {
@@ -186,12 +205,32 @@ void AudioManager::setup(ofBaseApp* appPtr) {
     guiSetup();    //setup gui
     soundSetup(appPtr);  //run at the end of setup!
     //============================================//
-
-    cout << "----------------------------------------" << endl;
 }
 
 //--------------------------------------------------------------
 void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
+
+    stereoMix[0] = 0;
+    stereoMix[1] = 0;
+
+    lowResFilterMix[0] = 0;
+    lowResFilterMix[1] = 0;
+
+    delayMix[0] = 0;
+    delayMix[1] = 0;
+
+    stereoDelayOutput[0] = 0;
+    stereoDelayOutput[1] = 0;
+
+    reverbMix[0] = 0;
+    reverbMix[1] = 0;
+
+    reverbOutput[0] = 0;
+    reverbOutput[1] = 0;
+
+    masterStereoOutput[0] = 0;
+    masterStereoOutput[1] = 0;
+
 
     for (int i = 0; i < bufferSize; i++) {
 
@@ -202,7 +241,6 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
         if (clock.tick) {   //iterate through sequences
 
-
             //-----------------------------------//
             metTrigger = metSeq[playHead % 16];
             metSpeed = metSpeedSeq[playHead % 16];
@@ -212,7 +250,7 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             keyLowTrigger = keyLowSeq[playHead % 128];
             //-----------------------------------//
 
-
+            //USE FOR TRIGERRING SYNTH LINE
             sBassTrigger = sBassLineTrigger[playHead % 16];
             if (sBassTrigger == 1) {
 
@@ -229,18 +267,16 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         }
         //========================================//
         //========================================//
-
+        //cell animation sin
+        cellSinOut = cellSin.sinewave(cellSpeed);
 
         //synth arp sound
         sBass_envOut = sBassEnv.ar(sBass.sinewave(sBassPitch), 0.05, 0.99, 5000, sBassTrigger) * synthLineGain;
 
 
-
-
         //---------ATMOSPHERE-LOOP-PLAY------//
         atmos_out = atmos.play() * atmosGain;
         //===================================//
-
 
         //===================================//
         //---------SAMPLE-HITS---------------//
@@ -257,12 +293,13 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         hitLow_envOut = hitLowEnv.adsr(hitLow_out, hitLowEnv.trigger);
         hitLowStereo.stereo(hitLow_envOut, hitLowMix, 0.4);
         //===================================//
+        hitSub_out = hitSub.playOnce() * 1.5;
+        hitSub_envOut = hitSubEnv.adsr(hitSub_out, hitSubEnv.trigger);
+        hitSubStereo.stereo(hitSub_envOut, hitSubMix, 0.3);
         //===================================//
 
 
-
-
-        //----------------SEND-AUDIO-TO-STEREO-CHANNEL-DRY-MIX-----------
+        //----------------SEND-AUDIO-TO-STEREO-CHANNEL-DRY-MIX----------//
         atmosStereo.stereo(atmos_out, atmosStereoOut, (autoPanner.sinewave(0.01) + 1) / 2);
         keyArpStereo.stereo(playKeyLoop(), keyArpMix, keyLoopPan);
         keyHiStereo.stereo(playKeyLoopHi(), keyHiMix, keyHiPan);
@@ -271,22 +308,26 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         //==============================================================//
 
 
-        //=============================MIX===============================
-        stereoMix[0] = keyArpMix[0] + keyHiMix[0] + keyLowMix[0] + sBassMix[0] + playMetronome() + hitHiMix[0] + hitMidMix[0] + hitLowMix[0];
-        stereoMix[1] = keyArpMix[1] + keyHiMix[1] + keyLowMix[1] + sBassMix[1] + playMetronome() + hitHiMix[1] + hitMidMix[1] + hitLowMix[1];
-        //==============================================================//
+        //=============================MIX===============================//
+        stereoMix[0] = keyArpMix[0] + keyHiMix[0] + keyLowMix[0] + sBassMix[0] + playMetronome() + hitHiMix[0] + hitMidMix[0] + hitLowMix[0] + hitSubMix[0];
+        stereoMix[1] = keyArpMix[1] + keyHiMix[1] + keyLowMix[1] + sBassMix[1] + playMetronome() + hitHiMix[1] + hitMidMix[1] + hitLowMix[1] + hitSubMix[1];
+        //================================================================//
 
 
-        //===================LOWRES=FILTER=MIX==========================
+
+
+        //===================LOWRES=FILTER=MIX=================================//
         lowResFilterMix[0] = lowRes[0].lores(stereoMix[0], lowResFreq, lowResQ);
         lowResFilterMix[1] = lowRes[1].lores(stereoMix[1], lowResFreq, lowResQ);
-        //==============================================================//
+        //=====================================================================//
 
 
-        //=======================DELAY===================================
+
+
+        //==============================DELAY==========================================//
         delayMix[0] = delay[0].dl(lowResFilterMix[0], 44100 * delayTime, delayFeedback);
         delayMix[1] = delay[1].dl(lowResFilterMix[1], 44100 * delayTime, delayFeedback);
-        //==============================================================//
+        //=============================================================================//
 
         //=======================DELAY-WET-DRY=MIX=======================
         stereoDelayOutput[0] = delayMix[0] * (1 - dryDelayMix) + (lowResFilterMix[0] * dryDelayMix);
@@ -295,31 +336,33 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
 
 
-        //=======================REVERB-CHANNEL==========================
-        for (int i = 0; i < 20; i++) {
-            reverbMix[0] = reverbsL[i].dl(lowResFilterMix[0], 44100 * reverbTimes[i], reverbFeedback) / 8;
-            reverbMix[1] = reverbsR[i].dl(lowResFilterMix[1], 44100 * reverbTimes[i], reverbFeedback) / 8;
-        }
-        //==============================================================//
 
-        //=======================REVERB-WET/DRY-MIX======================
+        //========================================REVERB-CHANNEL======================================//
+        for (int i = 0; i < 10; i++) {
+            reverbMix[0] = reverbsL[i].dl(lowResFilterMix[0], 44100 * reverbTimes[i], reverbFeedback) / 10;
+            reverbMix[1] = reverbsR[i].dl(lowResFilterMix[1], 44100 * reverbTimes[i], reverbFeedback) / 10;
+        }
+        //=============================================================================================//
+
+        //=======================REVERB-WET/DRY-MIX===========================================//
         reverbOutput[0] = reverbMix[0] * (1 - dryReverbMix) + (lowResFilterMix[0] * dryReverbMix);
         reverbOutput[1] = reverbMix[1] * (1 - dryReverbMix) + (lowResFilterMix[1] * dryReverbMix);
-        //==============================================================//
+        //====================================================================================//
 
 
+
+
+        //============================================================//
         //------------------MASTER-OUTPUT-MIX-------------------------//
         masterStereoOutput[0] = stereoDelayOutput[0] + reverbOutput[0];
         masterStereoOutput[1] = stereoDelayOutput[1] + reverbOutput[1];
-        //==============================================================//
+        //============================================================//
 
-        //-----------MASTER-OUTPUT-(STEREO)-----------//
-        output[i * nChannels] = masterStereoOutput[0] + atmosStereoOut[0];
-        output[i * nChannels + 1] = masterStereoOutput[1] + atmosStereoOut[1];
-        //============================================//
-        //============================================//
-
-
+        //-----------------------------MASTER-OUTPUT-(STEREO)-----------------------------//
+        output[i * nChannels] = (masterStereoOutput[0] + atmosStereoOut[0]) * masterGain;
+        output[i * nChannels + 1] = (masterStereoOutput[1] + atmosStereoOut[1]) * masterGain;
+        //================================================================================//
+        //================================================================================//
 
 
         //==========RESET-SEQUENCER=TRIGGERS==========//
@@ -327,7 +370,66 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         keyArpTrigger = 0;
         keyHiTrigger = 0;
         keyLowTrigger = 0;
+
+
+        //use for drawing
+//        soundBuffer[i] = (masterStereoOutput[0] + masterStereoOutput[1] +
+//                          atmosStereoOut[0] + atmosStereoOut[1]) * 5;
+
+        //pass sound ouput to array fo animation
+
+        soundBuffer[i] = cellSinOut;
+        soundBufMix[i] = +hitHi_envOut + hitMid_envOut + hitLow_envOut + hitSub_envOut;
     }
+
+}
+
+
+//--------------------------------------------------------------
+void AudioManager::drawWaveform() {
+
+    ofNoFill();
+    ofSetColor(0, 200, 0);
+    ofSetLineWidth(1.2);
+
+
+    //    ofBeginShape();
+    //    for(int i = 0; i < bufferSize; i++) {
+    //        float x = ofMap(i, 0, bufferSize, 0, ofGetWidth());
+    //
+    //            ofVertex(x, ofGetHeight()*.5 + soundBuffer[i] * 200);
+    //    }
+    //    ofEndShape();
+
+
+        //---------------------//
+
+    ofPushMatrix();
+
+    ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, -1000);
+
+    //ofBeginShape();
+    for (int i = 0; i < 255; i++) {
+
+        ofColor c = ofColor(0);
+        float col = ofMap(soundBuffer[i], -0.8, 0.8, 100, 255);
+        c.setHsb(col, i * 10, 200);
+
+        //std::cout<<soundBuffer[i]<<std::endl;
+
+        ofFill();
+        ofSetColor(c);
+
+
+        float x = (soundBuffer[i] + (10 * soundBufMix[i])) * cos(float(i)) * cellRadius;
+        float y = (soundBuffer[i] + (10 * soundBufMix[i])) * sin(float(i)) * cellRadius;
+
+        ofDrawCircle(x, y, 1);
+
+    }
+    //ofEndShape();
+
+    ofPopMatrix();
 
 }
 
@@ -341,12 +443,16 @@ void AudioManager::update() {
 }
 
 //--------------------------------------------------------------
-void AudioManager::drawGUI(bool _draw) {
-    if (_draw) gui.draw();
+void AudioManager::draw() {
+    drawWaveform();
+}
+
+void AudioManager::drawGUI(bool enable) {
+    if (enable) gui.draw();
 }
 
 void AudioManager::playRandomSample() {
-    
+
     if (!randomSampleTriggered) {
         randomSampleTriggered = true;
         //int r = (int)ofRandom(0, 3);
@@ -377,27 +483,37 @@ void AudioManager::keyPressed(int key) {
     if (key == '1') {
         hitHi.trigger(); //resets sample position to 0
         hitHiEnv.trigger = 1; //sample is triggered if = 1
-//        std::cout<<"true"<<std::endl;
+        //std::cout<<"true"<<std::endl;
     }
 
     if (key == '2') {
         hitMid.trigger(); //resets sample position to 0
         hitMidEnv.trigger = 1; //sample is triggered if = 1
-//        std::cout<<"true"<<std::endl;
+        //std::cout<<"true"<<std::endl;
     }
 
     if (key == '3') {
         hitLow.trigger(); //resets sample position to 0
         hitLowEnv.trigger = 1; //sample is triggered if = 1
-//        std::cout<<"true"<<std::endl;
+        //std::cout<<"true"<<std::endl;
     }
+
+    if (key == '4') {
+        hitSub.trigger(); //resets sample position to 0
+        hitSubEnv.trigger = 1; //sample is triggered if = 1
+        //std::cout<<"true"<<std::endl;
+    }
+
+
+
 }
 
 //--------------------------------------------------------------
 void AudioManager::keyReleased(int key) {
-    hitHiEnv.trigger = 0;
-    hitMidEnv.trigger = 0; //sample is triggered if = 1
-    hitLowEnv.trigger = 0;
+    //    hitHiEnv.trigger = 0;
+    //    hitMidEnv.trigger = 0; //sample is triggered if = 1
+    //    hitLowEnv.trigger = 0;
+    //    hitSubEnv.trigger = 0;
 }
 
 //--------------------------------------------------------------

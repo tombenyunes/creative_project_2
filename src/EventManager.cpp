@@ -5,6 +5,11 @@ EventManager::EventManager()
 	tutorialEnabled = false;
 }
 
+void EventManager::init(EntityManager* entityManager)
+{
+	Entity_Manager = entityManager;
+}
+
 void EventManager::setup()
 {
 	if (tutorialEnabled) {
@@ -122,7 +127,7 @@ void EventManager::update(Controller* _controller, vector<GameObject*>* _gameobj
 		static bool i21 = false;
 		if (currentIndex >= 21 && !i21) {
 			i21 = true;
-			_controller->setDeleteAll(true);
+			Entity_Manager->deleteAll(true);
 		}
 		static bool i22 = false;
 		if (currentIndex >= 22 && !i22) {

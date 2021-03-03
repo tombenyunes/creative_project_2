@@ -59,9 +59,13 @@ GUIManager::GUIManager()
 	create_node_gui.add(name.setup("Type", errorMessage));
 }
 
-void GUIManager::update(Controller* _controller)
+void GUIManager::init(Controller* _controller)
 {
 	GameController = _controller;
+}
+
+void GUIManager::update()
+{	
 	updateWorld();
 	updateCreateNodeValues();
 }

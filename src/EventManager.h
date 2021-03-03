@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Mass.h"
 #include "Spring.h"
+#include "EntityManager.h"
 
 class EventManager
 {
@@ -11,6 +12,9 @@ class EventManager
 public:
 	
 	EventManager();
+
+	void init(EntityManager* entityManager);
+
 	void setup();
 	void update(Controller* _controller, vector<GameObject*>* _gameobjects);
 	void draw();
@@ -26,6 +30,8 @@ public:
 	bool canDrag;
 	bool canKeypress;
 	bool fullInput;
+
+	EntityManager* Entity_Manager;
 
 private:
 

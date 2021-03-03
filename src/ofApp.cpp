@@ -6,38 +6,37 @@ void ofApp::setup()
 
 	ofSetWindowPosition(3849, 649);
 	ofSetWindowTitle("iota");
-
 	ofSetCircleResolution(176);
-
-	GameObject* player = new Player;
-	player->init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-	GameObjects->push_back(player);
-
-	Events.showTutorial(false);
-	Events.setup();
-
-	Scene_Manager.init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-
 	ofBackground(0);
 	ofSetVerticalSync(true);
-
-	windowResized(ofGetWidth(), ofGetHeight());		// force this at start (cause I don't think it is called)
-
+	windowResized(ofGetWidth(), ofGetHeight()); // force this at start (cause I don't think it is called)
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
 
-	blur.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, .2, 2);
-	//blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
-	//blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
+	Entity_Manager.init(&GameController, &cam);
+	Scene_Manager.init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+	GUI_Manager.init(&GameController);
+
+	Audio_Manager.setup(this);
+	
+	Events.init(&Entity_Manager);
+	Events.showTutorial(false);
+	Events.setup();
+
+
+	GameObject* player = new Player;
+	player->init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+	Entity_Manager.addGameObject(player);
 
 	for (int i = 0; i < 100; i++) {
 		GameObject* object = new Mass(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
-		object->init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-		GameObjects->push_back(object);
-	}
+		object->init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+		Entity_Manager.addGameObject(object);
+	}	
 
-
-	Audio_Manager.setup(this);
+	blur.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, .2, 2);
+	//blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));	
 }
 
 void ofApp::audioOut(float* output, int bufferSize, int nChannels)
@@ -46,37 +45,12 @@ void ofApp::audioOut(float* output, int bufferSize, int nChannels)
 }
 
 void ofApp::update()
-{
-	// erase objects that need to be deleted and free memory
-	for (int i = 0; i < GameObjects->size(); i++) {
-		if ((*GameObjects)[i]->isPlayer == true) {
-			cam.update(WORLD_WIDTH, WORLD_HEIGHT, ofVec2f((*GameObjects)[i]->pos.x + WORLD_WIDTH / 2, (*GameObjects)[i]->pos.y + WORLD_HEIGHT / 2));
-		}
-		if ((*GameObjects)[i]->needs_to_be_deleted == true) {
-			if ((*GameObjects)[i] == GameController.getActive()) {
-				GameController.makeActive(nullptr);
-			}
-			delete (*GameObjects)[i];
-			GameObjects->erase(GameObjects->begin() + i);
-		}
-	}
-	// update all gameobjects
-	for (int i = 0; i < GameObjects->size(); i++) {
-		(*GameObjects)[i]->root_update();
-	}
+{	
+	Entity_Manager.updateGameObjects();
 
 	GameController.update(&cam);
-	GUI_Manager.update(&GameController);
-	Events.update(&GameController, GameObjects);
-
-	if (GameController.getDeleteAll()) {
-		GameController.setDeleteAll(false);
-		for (int i = 0; i < GameObjects->size(); i++) {
-			if ((*GameObjects)[i]->isPlayer != true) {
-				(*GameObjects)[i]->needs_to_be_deleted = true;
-			}
-		}
-	}
+	GUI_Manager.update();
+	Events.update(&GameController, Entity_Manager.getGameObjects());
 
 	Fluid_Manager.update();
 	Audio_Manager.update();
@@ -96,12 +70,11 @@ void ofApp::draw()
 	
 	Fluid_Manager.renderParticles();	
 
+	Audio_Manager.draw();
+
 	ofPushMatrix();
 
-	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-	for (int i = 0; i < GameObjects->size(); i++) {
-		(*GameObjects)[i]->root_draw();
-	}
+	Entity_Manager.drawGameObjects(ofVec2f(WORLD_WIDTH / 2, WORLD_HEIGHT / 2));	
 
 	Events.draw();
 
@@ -140,20 +113,20 @@ void ofApp::createNode()
 	if (GameController.getNewNodeType() == 0) {
 		cout << "Mass created" << endl;
 		GameObject* object = new Mass(ofVec2f(GameController.getWorldMousePos().x, GameController.getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
-		object->init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-		GameObjects->push_back(object);
+		object->init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+		Entity_Manager.addGameObject(object);
 	}
 	else if (GameController.getNewNodeType() == 1) {
 		cout << "Spring created" << endl;
 		GameObject* spring = new Spring(ofVec2f(GameController.getWorldMousePos().x, GameController.getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
-		spring->init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-		GameObjects->push_back(spring);
+		spring->init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+		Entity_Manager.addGameObject(spring);
 	}
 	else if (GameController.getNewNodeType() == 2) {
 		cout << "Point created" << endl;
 		GameObject* point = new Mass(ofVec2f(GameController.getWorldMousePos().x, GameController.getWorldMousePos().y), 10, 25);
-		point->init(GameObjects, &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-		GameObjects->push_back(point);
+		point->init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+		Entity_Manager.addGameObject(point);
 	}
 }
 
@@ -167,8 +140,8 @@ void ofApp::keyPressed(int key)
 	Scene_Manager.keyPressed(key);
 
 	if ((Events.fullInput) || (Events.canKeypress)) {
-		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->root_keyPressed(key);
+		for (int i = 0; i < Entity_Manager.getGameObjects()->size(); i++) {
+			(*Entity_Manager.getGameObjects())[i]->root_keyPressed(key);
 		}
 		if (key == 'c') {
 			createNode();
@@ -235,8 +208,8 @@ void ofApp::keyReleased(int key)
 	cam.keyReleased(key);
 
 	if ((Events.fullInput) || (Events.canKeypress)) {
-		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->root_keyReleased(key);
+		for (int i = 0; i < Entity_Manager.getGameObjects()->size(); i++) {
+			(*Entity_Manager.getGameObjects())[i]->root_keyReleased(key);
 		}
 	}
 }
@@ -248,10 +221,10 @@ void ofApp::mouseMoved(int x, int y)
 void ofApp::mouseDragged(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canDrag)) {
-		for (int i = 0; i < GameObjects->size(); i++) {
+		for (int i = 0; i < Entity_Manager.getGameObjects()->size(); i++) {
 			ofVec3f localView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
 			ofVec3f worldView = cam.screenToWorld(localView);
-			(*GameObjects)[i]->mouseDragged(worldView.x, worldView.y, button);
+			(*Entity_Manager.getGameObjects())[i]->mouseDragged(worldView.x, worldView.y, button);
 		}
 	}
 }
@@ -259,10 +232,10 @@ void ofApp::mouseDragged(int x, int y, int button)
 void ofApp::mousePressed(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
-		for (int i = 0; i < GameObjects->size(); i++) {
+		for (int i = 0; i < Entity_Manager.getGameObjects()->size(); i++) {
 			ofVec3f localView = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam.getPosition().z);
 			ofVec3f worldView = cam.screenToWorld(localView);
-			(*GameObjects)[i]->mousePressed(worldView.x, worldView.y, button);
+			(*Entity_Manager.getGameObjects())[i]->mousePressed(worldView.x, worldView.y, button);
 		}
 	}
 }
@@ -275,8 +248,8 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY)
 void ofApp::mouseReleased(int x, int y, int button)
 {
 	if ((Events.fullInput) || (button == 0 && Events.canLMB) || (button == 2 && Events.canSelect)) {
-		for (int i = 0; i < GameObjects->size(); i++) {
-			(*GameObjects)[i]->mouseReleased(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), button);
+		for (int i = 0; i < Entity_Manager.getGameObjects()->size(); i++) {
+			(*Entity_Manager.getGameObjects())[i]->mouseReleased(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), button);
 		}
 	}
 }
