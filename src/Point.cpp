@@ -1,8 +1,8 @@
-#include "Mass.h"
+#include "Point.h"
 
-Mass::Mass(ofVec2f _pos, float _mass, float _radius)
+Point::Point(ofVec2f _pos, float _mass, float _radius)
 {
-	type = "Mass";
+	type = "Point";
 
 	pos.set(_pos);
 	color = ofColor(passiveColor);
@@ -19,7 +19,7 @@ Mass::Mass(ofVec2f _pos, float _mass, float _radius)
 	AddModule("mouseHover");
 }
 
-void Mass::update()
+void Point::update()
 {	
 	updateForces();
 	dragNodes();
@@ -27,12 +27,12 @@ void Mass::update()
 	resetForces();
 }
 
-void Mass::updateForces()
+void Point::updateForces()
 {
 	addForces(false);
 }
 
-void Mass::dragNodes()
+void Point::dragNodes()
 {
 	posBeforeDrag.set(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
 	static ofVec2f mousePosBeforeDrag;
@@ -59,7 +59,7 @@ void Mass::dragNodes()
 	}
 }
 
-void Mass::updateGUI()
+void Point::updateGUI()
 {
 	if (GameController->getActive() == this) {
 		if (gui_values_need_to_be_set) {
@@ -81,16 +81,21 @@ void Mass::updateGUI()
 	}
 }
 
-void Mass::resetForces()
+void Point::resetForces()
 {
 	accel.set(0);
+}
+
+void Point::isColliding(GameObject* _other, ofVec2f _nodePos)
+{
+	needs_to_be_deleted = true;
 }
 
 
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Mass::mousePressed(float _x, float _y, int _button)
+void Point::mousePressed(float _x, float _y, int _button)
 {
 	if (_button == 2 && mouseOver) {
 		if (GameController->getActive() != this) {
@@ -100,20 +105,20 @@ void Mass::mousePressed(float _x, float _y, int _button)
 	}
 }
 
-void Mass::mouseDragged(float _x, float _y, int _button)
+void Point::mouseDragged(float _x, float _y, int _button)
 {
 	if (_button == 2) {
-		if (mouseOver && GameController->getMouseDragged() == false) {			
+		if (mouseOver && GameController->getMouseDragged() == false) {
 			if (posBeforeDrag.distance(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y)) > 2) {
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouseDrag = true;
-				GameController->setMouseDragged(true);				
+				GameController->setMouseDragged(true);
 			}
 		}
 	}
 }
 
-void Mass::mouseReleased(float _x, float _y, int _button)
+void Point::mouseReleased(float _x, float _y, int _button)
 {
 	if (_button == 2) {
 		mouseDrag = false;
@@ -125,7 +130,7 @@ void Mass::mouseReleased(float _x, float _y, int _button)
 // ----- RENDER LOOP ----- //
 
 
-void Mass::draw()
+void Point::draw()
 {
 	ofPushStyle();
 
@@ -139,8 +144,8 @@ void Mass::draw()
 	ofPopStyle();
 }
 
-void Mass::getColor()
-{	
+void Point::getColor()
+{
 	if ((GameController->getActive() == this) || (mouseOver || mouseDrag)) {
 		ofSetColor(selectedColor);
 	}

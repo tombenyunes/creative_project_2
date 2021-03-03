@@ -12,7 +12,7 @@ void ofApp::setup()
 	ofSetBackgroundAuto(true);
 
 	Entity_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-	Scene_Manager.init(Entity_Manager.getGameObjects(), &GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
+	Scene_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager, &Entity_Manager);
 	GUI_Manager.init(&GameController, &Fluid_Manager, &Audio_Manager);
 	
 	GameController.init(&cam);
@@ -32,7 +32,7 @@ void ofApp::setup()
 
 void ofApp::audioOut(float* output, int bufferSize, int nChannels)
 {
-	Audio_Manager.audioOut(output, bufferSize, nChannels);
+	//Audio_Manager.audioOut(output, bufferSize, nChannels);
 }
 
 void ofApp::update()

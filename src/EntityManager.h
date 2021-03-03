@@ -7,6 +7,7 @@
 #include "AudioManager.h"
 
 // Entity types
+#include "Player.h"
 #include "Mass.h"
 #include "Spring.h"
 #include "Point.h"

@@ -136,7 +136,7 @@ void EntityManager::createEntity()
 	}
 	else if (Game_Controller->getNewNodeType() == 2) {
 		cout << "Point created" << endl;
-		GameObject* point = new Mass(ofVec2f(Game_Controller->getWorldMousePos().x, Game_Controller->getWorldMousePos().y), 10, 25);
+		GameObject* point = new Point(ofVec2f(Game_Controller->getWorldMousePos().x, Game_Controller->getWorldMousePos().y), 10, 25);
 		point->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(point);
 	}

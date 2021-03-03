@@ -9,13 +9,13 @@ SceneManager::SceneManager()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)
+void SceneManager::init(Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, EntityManager* _entityManager)
 {
-	GameObjects = _gameobjects;
 	GameController = _controller;
 	GUI_Manager = _GUIManager;
 	Fluid_Manager = _fluidManager;
 	Audio_Manager = _audioManager;
+	Entity_Manager = _entityManager;
 	
 	cam = _cam;
 }
@@ -37,19 +37,19 @@ void SceneManager::saveScene(string _sceneName)
 	xml1.addValue("mode", (int&)(Fluid_Manager->getDrawer()->drawMode));
 	xml1.popTag();
 
-	for (int i = 0; i < GameObjects->size(); i++) {
+	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
 		xml1.addTag("GameObject");
 		xml1.pushTag("GameObject", i);
-		xml1.addValue("type", (*GameObjects)[i]->type);
-		xml1.addValue("pos.x", (*GameObjects)[i]->pos.x);
-		xml1.addValue("pos.y", (*GameObjects)[i]->pos.y);
-		xml1.addValue("mass", (*GameObjects)[i]->mass);
-		xml1.addValue("radius", (*GameObjects)[i]->radius);
-		if ((*GameObjects)[i]->type == "Spring") {
-			xml1.addValue("mass1", (*GameObjects)[i]->nodeMasses[0]);
-			xml1.addValue("mass2", (*GameObjects)[i]->nodeMasses[1]);
-			xml1.addValue("radius1", (*GameObjects)[i]->nodeRadiuses[0]);
-			xml1.addValue("radius2", (*GameObjects)[i]->nodeRadiuses[1]);
+		xml1.addValue("type", (*Entity_Manager->getGameObjects())[i]->type);
+		xml1.addValue("pos.x", (*Entity_Manager->getGameObjects())[i]->pos.x);
+		xml1.addValue("pos.y", (*Entity_Manager->getGameObjects())[i]->pos.y);
+		xml1.addValue("mass", (*Entity_Manager->getGameObjects())[i]->mass);
+		xml1.addValue("radius", (*Entity_Manager->getGameObjects())[i]->radius);
+		if ((*Entity_Manager->getGameObjects())[i]->type == "Spring") {
+			xml1.addValue("mass1", (*Entity_Manager->getGameObjects())[i]->nodeMasses[0]);
+			xml1.addValue("mass2", (*Entity_Manager->getGameObjects())[i]->nodeMasses[1]);
+			xml1.addValue("radius1", (*Entity_Manager->getGameObjects())[i]->nodeRadiuses[0]);
+			xml1.addValue("radius2", (*Entity_Manager->getGameObjects())[i]->nodeRadiuses[1]);
 		}
 		xml1.popTag();
 	}
@@ -98,16 +98,16 @@ void SceneManager::loadScene(string _path)
 				float radius = (xml.getValue("radius", -1));
 
 				GameObject* player = new Player;
-				player->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				GameObjects->push_back(player);
+				player->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
+				Entity_Manager->addGameObject(player);
 			}
 			else if (type == "Mass") {
 				float mass = (xml.getValue("mass", -1));
 				float radius = (xml.getValue("radius", -1));
 
 				GameObject* object = new Mass(pos, mass, radius);
-				object->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				GameObjects->push_back(object);
+				object->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
+				Entity_Manager->addGameObject(object);
 			}
 			else if (type == "Spring") {
 				float mass1 = (xml.getValue("mass1", -1));
@@ -116,8 +116,16 @@ void SceneManager::loadScene(string _path)
 				float radius2 = (xml.getValue("radius2", -1));
 
 				GameObject* spring = new Spring(pos, radius1, mass1, radius2, mass2, 2, 2, 22);
-				spring->init(GameObjects, GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				GameObjects->push_back(spring);
+				spring->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
+				Entity_Manager->addGameObject(spring);
+			}
+			else if (type == "Point") {
+				float mass = (xml.getValue("mass", -1));
+				float radius = (xml.getValue("radius", -1));
+
+				GameObject* point = new Point(pos, mass, radius);
+				point->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
+				Entity_Manager->addGameObject(point);
 			}
 
 			xml.popTag();
@@ -131,8 +139,8 @@ void SceneManager::loadScene(string _path)
 
 void SceneManager::destroyCurrentScene()
 {
-	for (int i = 0; i < GameObjects->size(); i++) {
-		(*GameObjects)[i]->needs_to_be_deleted = true;
+	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
+		(*Entity_Manager->getGameObjects())[i]->needs_to_be_deleted = true;
 	}
 }
 
