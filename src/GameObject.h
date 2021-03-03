@@ -56,6 +56,9 @@ public:
 	bool needs_to_be_deleted;
 	ofVec2f mouseOffsetFromCenter;
 
+	bool requestToBeSelected;
+	bool isSelected;
+
 protected:
 
 	// Modules

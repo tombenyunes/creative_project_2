@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Controller.h"
+#include "FluidManager.h"
+#include "AudioManager.h"
 
 class GUIManager {
 
@@ -10,7 +12,7 @@ public:
 
 	GUIManager();
 
-	void init(Controller* _controller);
+	void init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager);
 
 	void update();
 	void updateWorld();
@@ -22,7 +24,12 @@ public:
 	
 	void setClearAll();
 
+	void drawRequiredGUI(bool _isSpring);
+	void keyPressed(int key);
+
 	Controller* GameController;
+	FluidManager* Fluid_Manager;
+	AudioManager* Audio_Manager;
 
 	// ----- Panels ----- //
 
@@ -88,5 +95,8 @@ public:
 	ofxLabel howToDelete;
 
 	int buffer;
+
+	bool drawParticleGUI;
+	bool drawAudioGUI;
 
 };

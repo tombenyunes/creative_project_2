@@ -34,7 +34,10 @@ public:
 	
 	Controller();
 
-	void update(Camera* cam);
+	void init(Camera* _cam);
+	Camera* cam;
+
+	void update();
 
 	ofVec3f getWorldMousePos();
 
@@ -62,9 +65,6 @@ public:
 	void setGUIVisible(bool _value);
 	bool getGUIVisible();
 
-	void setCanUserInput(bool _value);
-	bool getCanUserInput();
-
 private:
 
 	ofVec3f MOUSE_POS;
@@ -76,6 +76,5 @@ private:
 	int NEW_NODE_ID;
 	bool HARD_COLLISIONS;
 	bool GUI_VISIBLE;
-	bool USER_CAN_INPUT;
 	
 };

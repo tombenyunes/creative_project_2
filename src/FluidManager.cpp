@@ -171,10 +171,7 @@ ParticleSystem* FluidManager::getParticleSystem()
 
 void FluidManager::keyPressed(int key)
 {
-	//if (key == 57344) { // f1
-	//	(drawParticleGUI) ? drawParticleGUI = false : drawParticleGUI = true;
-	//}
-	//else if (key == 57345) { // f2
-	//	//(GameController->getGUIVisible()) ? GameController->setGUIVisible(false) : GameController->setGUIVisible(true), drawParticleGUI = false;
-	//}
+	if (key == ' ') {
+		explosion(12500);
+	}
 }

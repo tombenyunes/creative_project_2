@@ -43,6 +43,9 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	friction_enabled = false;
 	ellipseCollider_enabled = false;
 	mouseHover_enabled = false;
+
+	requestToBeSelected = false;
+	isSelected = false;
 }
 
 void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)

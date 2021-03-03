@@ -10,10 +10,14 @@ Controller::Controller()
 	NEW_NODE_ID = 0;
 	HARD_COLLISIONS = false;
 	GUI_VISIBLE = false;
-	USER_CAN_INPUT = false;
 }
 
-void Controller::update(Camera* cam)
+void Controller::init(Camera* _cam)
+{
+	cam = _cam;
+}
+
+void Controller::update()
 {
 	ofVec3f localPos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
 	ofVec3f worldPos = cam->screenToWorld(localPos);
@@ -88,12 +92,4 @@ void Controller::setGUIVisible(bool _value)
 bool Controller::getGUIVisible()
 {
 	return GUI_VISIBLE;
-}
-void Controller::setCanUserInput(bool _value)
-{
-	(_value == 1) ? USER_CAN_INPUT = 1 : USER_CAN_INPUT = 0;
-}
-bool Controller::getCanUserInput()
-{
-	return USER_CAN_INPUT;
 }

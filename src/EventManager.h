@@ -13,34 +13,38 @@ public:
 	
 	EventManager();
 
-	void init(EntityManager* entityManager);
+	void init(Controller* _gameController, EntityManager* _entityManager);
 
 	void setup();
-	void update(Controller* _controller, vector<GameObject*>* _gameobjects);
-	void draw();
+	void update();
+	void drawTutorial();
 
 	void keyPressed(int _key);
 
 	void showTutorial(bool _value);
 	bool tutorialEnabled;
 
-	bool playerGUIVisible;
-	bool canLMB;
-	bool canSelect;
-	bool canDrag;
-	bool canKeypress;
-	bool fullInput;
+	bool isEventAllowed(string event, int button = -1);
 
-	EntityManager* Entity_Manager;
+	bool playerGUIVisible;	
 
 private:
 
-	Controller* GameController;
+	vector<GameObject*>* GameObjects;
+	Controller* Game_Controller;
+	EntityManager* Entity_Manager;
+
 	vector<string> dialogues;
 	vector<ofVec2f> positions;
 	int currentIndex;
 	ofTrueTypeFont PottaOne_main;
 	ofTrueTypeFont PottaOne_context;
+
+	bool canLMB;
+	bool canSelect;
+	bool canDrag;
+	bool canKeypress;
+	bool fullInput;
 
 };
 

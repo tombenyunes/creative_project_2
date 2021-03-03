@@ -57,11 +57,16 @@ GUIManager::GUIManager()
 	create_node_gui.add(howToCreate.setup("", "Press 'c' to Create Node"));
 	create_node_gui.add(howToChangeType.setup("", "MouseWheel Changes Type:"));
 	create_node_gui.add(name.setup("Type", errorMessage));
+
+	drawParticleGUI = false;
+	drawAudioGUI = false;
 }
 
-void GUIManager::init(Controller* _controller)
+void GUIManager::init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager)
 {
 	GameController = _controller;
+	Fluid_Manager = _fluidManager;
+	Audio_Manager = _audioManager;
 }
 
 void GUIManager::update()
@@ -161,4 +166,63 @@ void GUIManager::windowResized(int w, int h)
 void GUIManager::setClearAll()
 {
 	GameController->setDeleteAll(true);
+}
+
+void GUIManager::drawRequiredGUI(bool _isSpring)
+{
+	if (GameController->getGUIVisible() /*|| Event_Manager->playerGUIVisible*/) {
+		player_gui.draw();
+		if (GameController->getActive() != nullptr) {
+			if (_isSpring) {	// if an object is a spring then it has multiple gui windows to draw
+				multi_selection_gui_spring.draw();
+				if (multiNodeSelected == true) {
+					multi_selection_gui_node.draw();
+				}
+			}
+			else {
+				selected_gui.draw();
+			}
+		}
+	}
+	if (GameController->getGUIVisible()) {
+		world_gui.draw();
+		create_node_gui.draw();
+	}
+
+	Fluid_Manager->drawGUI(drawParticleGUI);
+	Audio_Manager->drawGUI(drawAudioGUI);
+}
+
+void GUIManager::keyPressed(int key)
+{
+	if (key == 57344) { // f1
+		if (GameController->getGUIVisible()) {
+			GameController->setGUIVisible(false);
+		}
+		else {
+			GameController->setGUIVisible(true);
+			drawParticleGUI = false;
+			drawAudioGUI = false;
+		}
+	}
+	else if (key == 57345) { // f2
+		if (drawParticleGUI) {
+			drawParticleGUI = false;
+		}
+		else {
+			GameController->setGUIVisible(false);
+			drawParticleGUI = true;
+			drawAudioGUI = false;
+		}
+	}
+	else if (key == 57346) { // f3
+		if (drawAudioGUI) {
+			drawAudioGUI = false;
+		}
+		else {
+			GameController->setGUIVisible(false);
+			drawParticleGUI = false;
+			drawAudioGUI = true;
+		}
+	}
 }
