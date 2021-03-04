@@ -11,8 +11,8 @@ void ofApp::setup()
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
 
-	Entity_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager);
-	Scene_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager, &Entity_Manager);
+	Entity_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager, &GameMode_Manager);
+	Scene_Manager.init(&GameController, &GUI_Manager, &cam, &Fluid_Manager, &Audio_Manager, &Entity_Manager, &GameMode_Manager);
 	GUI_Manager.init(&GameController, &Fluid_Manager, &Audio_Manager);
 	
 	GameController.init(&cam);
@@ -23,7 +23,8 @@ void ofApp::setup()
 
 	Audio_Manager.setup(this);
 	
-	Scene_Manager.loadScene("Scenes/StartingScene");
+	//Scene_Manager.loadScene("Scenes/StartingScene");
+	Scene_Manager.loadProceduralScene();
 
 	fluidBlur.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, .2, 2);
 	//fluidBlur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
@@ -43,6 +44,7 @@ void ofApp::update()
 	Event_Manager.update();
 	Fluid_Manager.update();
 	Audio_Manager.update();
+	Scene_Manager.update();
 
 	//fluidBlur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
 	//fluidBlur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
@@ -86,6 +88,7 @@ void ofApp::keyPressed(int key)
 	Fluid_Manager.keyPressed(key);
 	Event_Manager.keyPressed(key);
 	Scene_Manager.keyPressed(key);
+	GameMode_Manager.keyPressed(key);
 	Fluid_Manager.keyPressed(key);
 	GUI_Manager.keyPressed(key);
 

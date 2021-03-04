@@ -13,12 +13,13 @@ EntityManager::EntityManager()
 	selectedGameObjectIndex = -1;
 }
 
-void EntityManager::init(Controller* _gameController, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)
+void EntityManager::init(Controller* _gameController, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _gamemodeManager)
 {
 	Game_Controller = _gameController;
 	GUI_Manager = _GUIManager;
 	Fluid_Manager = _fluidManager;
 	Audio_Manager = _audioManager;
+	GameMode_Manager = _gamemodeManager;
 
 	cam = _cam;
 }
@@ -91,7 +92,7 @@ void EntityManager::findSelected()
 			}
 			else {
 				// deny request
-				(*getGameObjects())[i]->isSelected = false;				
+				(*getGameObjects())[i]->isSelected = false;
 			}
 
 			(*getGameObjects())[i]->requestToBeSelected = false;
@@ -120,23 +121,36 @@ void EntityManager::drawGameObjects()
 	}
 }
 
-void EntityManager::createEntity()
+void EntityManager::createEntity(string entityType)
 {
-	if (Game_Controller->getNewNodeType() == 0) {
+	int typeID;
+	if (entityType == "") {
+		typeID = Game_Controller->getNewNodeType();
+	}
+	else {
+		typeID = -1;
+	}
+	
+	if (entityType == "Player") {
+		GameObject* player = new Player;
+		player->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
+		addGameObject(player);
+	}
+	if (typeID == 0 || entityType == "Mass") {
 		cout << "Mass created" << endl;
 		GameObject* object = new Mass(ofVec2f(Game_Controller->getWorldMousePos().x, Game_Controller->getWorldMousePos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
 		object->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(object);
 	}
-	else if (Game_Controller->getNewNodeType() == 1) {
+	else if (typeID == 1 || entityType == "Spring") {
 		cout << "Spring created" << endl;
 		GameObject* spring = new Spring(ofVec2f(Game_Controller->getWorldMousePos().x, Game_Controller->getWorldMousePos().y), ofRandom(25, 50), ofRandom(25, 75), ofRandom(25, 50), ofRandom(25, 75), 2, 2, 22);
 		spring->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(spring);
 	}
-	else if (Game_Controller->getNewNodeType() == 2) {
+	else if (typeID == 2 || entityType == "Point") {
 		cout << "Point created" << endl;
-		GameObject* point = new Point(ofVec2f(Game_Controller->getWorldMousePos().x, Game_Controller->getWorldMousePos().y), 10, 25);
+		GameObject* point = new Point(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), 10, 25);
 		point->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(point);
 	}
@@ -147,21 +161,23 @@ void EntityManager::keyPressed(int key)
 	for (int i = 0; i < getGameObjects()->size(); i++) {
 		(*getGameObjects())[i]->root_keyPressed(key);
 	}
-	if (key == 'c') {
-		createEntity();
-	}
 
-	if (key == 57358) {
-		if (Game_Controller->getNewNodeType() < 2) {
-			Game_Controller->setNewNodeType(Game_Controller->getNewNodeType() + 1); // next
+	if (GameMode_Manager->getCurrentModeID() == 0) {
+		if (key == 'c') {
+			createEntity();
 		}
-	}
-	else if (key == 57356) {
-		if (Game_Controller->getNewNodeType() > 0) {
-			Game_Controller->setNewNodeType(Game_Controller->getNewNodeType() - 1); // previous
+		if (key == 57358) {
+			if (Game_Controller->getNewNodeType() < 2) {
+				Game_Controller->setNewNodeType(Game_Controller->getNewNodeType() + 1); // next
+			}
 		}
-		else {
-			Game_Controller->setNewNodeType(0);
+		else if (key == 57356) {
+			if (Game_Controller->getNewNodeType() > 0) {
+				Game_Controller->setNewNodeType(Game_Controller->getNewNodeType() - 1); // previous
+			}
+			else {
+				Game_Controller->setNewNodeType(0);
+			}
 		}
 	}
 }

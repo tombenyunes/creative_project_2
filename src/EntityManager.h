@@ -5,6 +5,7 @@
 #include "GUIManager.h"
 #include "FluidManager.h"
 #include "AudioManager.h"
+#include "GameModeManager.h"
 
 // Entity types
 #include "Player.h"
@@ -17,7 +18,7 @@ class EntityManager {
 public:
 	EntityManager();
 	
-	void init(Controller* _gameController, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager);
+	void init(Controller* _gameController, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _gamemodeManager);
 	vector<GameObject*>* getGameObjects();
 	GameObject* getSelectedGameObject();
 	void addGameObject(GameObject* _gameobject);
@@ -27,7 +28,7 @@ public:
 
 	void deleteAll(bool excludePlayer = true);
 
-	void createEntity();
+	void createEntity(string entityType = "");
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -53,6 +54,7 @@ private:
 	Camera* cam;
 	FluidManager* Fluid_Manager;
 	AudioManager* Audio_Manager;
+	GameModeManager* GameMode_Manager;
 
 
 };

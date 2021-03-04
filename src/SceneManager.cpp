@@ -9,15 +9,24 @@ SceneManager::SceneManager()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::init(Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, EntityManager* _entityManager)
+void SceneManager::init(Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, EntityManager* _entityManager, GameModeManager* _gamemodeManager)
 {
 	GameController = _controller;
 	GUI_Manager = _GUIManager;
 	Fluid_Manager = _fluidManager;
 	Audio_Manager = _audioManager;
 	Entity_Manager = _entityManager;
+	GameMode_Manager = _gamemodeManager;
 	
 	cam = _cam;
+}
+
+void SceneManager::update()
+{
+	if (GameMode_Manager->request_for_new_scene) {
+		loadProceduralScene();
+		GameMode_Manager->request_for_new_scene = false;
+	}
 }
 
 void SceneManager::saveScene(string _sceneName)
@@ -61,12 +70,15 @@ void SceneManager::saveScene(string _sceneName)
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::loadScene(string _path)
+void SceneManager::getReadyForNewScene()
 {
 	destroyCurrentScene();
 	resetFluid();
+}
 
-	// load scene //
+void SceneManager::loadScene(string _path)
+{
+	getReadyForNewScene();
 
 	if (xml.loadFile(_path + ".xml")) {
 		xml.pushTag("Scene");
@@ -137,6 +149,17 @@ void SceneManager::loadScene(string _path)
 	}
 }
 
+void SceneManager::loadProceduralScene()
+{
+	getReadyForNewScene();
+
+	Entity_Manager->createEntity("Player");
+
+	for (int i = 0; i < 10; i++) {
+		Entity_Manager->createEntity("Point");
+	}
+}
+
 void SceneManager::destroyCurrentScene()
 {
 	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
@@ -151,38 +174,43 @@ void SceneManager::resetFluid()
 
 void SceneManager::keyPressed(int key)
 {
-	if (key == '1') {
-		// load scene 1
-		loadScene("Scenes/Scene1");
+	if (GameMode_Manager->getCurrentModeID() == 0) {
+		if (key == '1') {
+			// load scene 1
+			loadScene("Scenes/Scene1");
 
-		Fluid_Manager->explosion(500);
-	}
-	else if (key == '2') {
-		// load scene 2
-		loadScene("Scenes/Scene2");
+			Fluid_Manager->explosion(500);
+		}
+		else if (key == '2') {
+			// load scene 2
+			loadScene("Scenes/Scene2");
 
-		Fluid_Manager->explosion(500);
-	}
-	else if (key == '3') {
-		// load scene 2
-		loadScene("Scenes/Scene3");
+			Fluid_Manager->explosion(500);
+		}
+		else if (key == '3') {
+			// load scene 2
+			loadScene("Scenes/Scene3");
 
-		Fluid_Manager->explosion(500);
-	}
-	else if (key == '4') {
-		// load scene 2
-		loadScene("Scenes/Scene4");
+			Fluid_Manager->explosion(500);
+		}
+		else if (key == '4') {
+			// load scene 2
+			loadScene("Scenes/Scene4");
 
-		Fluid_Manager->explosion(500);
-	}
-	else if (key == '9') {
-		// load saved scene
-		loadScene("Scenes/newScene");
+			Fluid_Manager->explosion(500);
+		}
+		else if (key == '9') {
+			// load saved scene
+			loadScene("Scenes/newScene");
 
-		Fluid_Manager->explosion(500);
+			Fluid_Manager->explosion(500);
+		}
 	}
-	else if (key == '0') {
+	if (key == '0') {
 		// save scene
 		saveScene("Scenes/newScene");
+	}
+	else if (key == 'p') {
+		loadProceduralScene();
 	}
 }

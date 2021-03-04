@@ -12,6 +12,7 @@
 #include "FluidManager.h"
 #include "EventManager.h"
 #include "AudioManager.h"
+#include "GameModeManager.h"
 
 #include "MSAFluid.h"
 #include "ParticleSystem.h"
@@ -47,6 +48,7 @@ class ofApp : public ofBaseApp{
 		Controller GameController; // controls global game properties
 		GUIManager GUI_Manager;
 		SceneManager Scene_Manager;
+		GameModeManager GameMode_Manager{ 1 };
 		EventManager Event_Manager; // will be used for starting tutorial
 		AudioManager Audio_Manager;
 
