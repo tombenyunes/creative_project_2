@@ -40,7 +40,7 @@ void GameModeManager::logCurrentMode()
 		break;
 	}
 	cout << "----------GameModeManager.cpp--------" << endl;
-	cout << "Game Mode: " << modeText << endl;
+	cout << " - Game Mode: " << modeText << endl;
 	cout << "----------------------------------------" << endl;
 }
 

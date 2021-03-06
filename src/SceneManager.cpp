@@ -3,9 +3,9 @@
 SceneManager::SceneManager()
 {
 	cout << "------------SceneManager.cpp------------" << endl;
-	cout << "Press '1-4' to load preset scenes" << endl;
-	cout << "Press '0' to save the current scene" << endl;
-	cout << "Press '9' to load a saved scene" << endl;
+	cout << " - Press '1-4' to load preset scenes" << endl;
+	cout << " - Press '0' to save the current scene" << endl;
+	cout << " - Press '9' to load a saved scene" << endl;
 	cout << "----------------------------------------" << endl;
 }
 
@@ -26,6 +26,13 @@ void SceneManager::update()
 	if (GameMode_Manager->request_for_new_scene) {
 		loadProceduralScene();
 		GameMode_Manager->request_for_new_scene = false;
+	}
+
+	if (GameMode_Manager->getCurrentModeID() == 1) {
+		if (Entity_Manager->getPointCount() <= 0) {
+			loadProceduralScene();
+			
+		}
 	}
 }
 
@@ -65,8 +72,8 @@ void SceneManager::saveScene(string _sceneName)
 
 	xml1.save(_sceneName + ".xml");
 
-	cout << "[ Current Scene Saved ]" << endl;
-	cout << "- Scene Name: " << _sceneName << endl;
+	cout << " [ Current Scene Saved ]" << endl;
+	cout << " - Scene Name: " << _sceneName << endl;
 	cout << "----------------------------------------" << endl;
 }
 
@@ -84,8 +91,8 @@ void SceneManager::loadScene(string _path)
 		xml.pushTag("Scene");
 
 		cout << "------------SceneManager.cpp------------" << endl;
-		cout << "[ Scene Loaded ]" << endl;
-		cout << "- Scene Name: " << xml.getValue("name", "N/A") << endl;
+		cout << " [ Scene Loaded ]" << endl;
+		cout << " - Scene Name: " << xml.getValue("name", "N/A") << endl;
 
 		int FluidCount = xml.getNumTags("Fluid");
 		for (int i = 0; i < FluidCount; i++) {
@@ -143,7 +150,7 @@ void SceneManager::loadScene(string _path)
 			xml.popTag();
 		}
 
-		cout << "- GameObject count: " << count << endl;
+		cout << " - GameObject count: " << count << endl;
 		cout << "----------------------------------------" << endl;
 
 	}
@@ -155,9 +162,13 @@ void SceneManager::loadProceduralScene()
 
 	Entity_Manager->createEntity("Player");
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		Entity_Manager->createEntity("Point");
 	}
+
+	cout << "------------SceneManager.cpp------------" << endl;
+	cout << " - New Procedural Level Loaded" << endl;
+	cout << "----------------------------------------" << endl;
 }
 
 void SceneManager::destroyCurrentScene()

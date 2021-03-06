@@ -28,7 +28,9 @@ void ofApp::setup()
 
 	fluidBlur.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, .2, 2);
 	//fluidBlur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
-	//fluidBlur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));	
+	//fluidBlur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
+
+	testShader.load("testShader");
 }
 
 void ofApp::audioOut(float* output, int bufferSize, int nChannels)
@@ -52,6 +54,8 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+	ofDisableDepthTest();
+
 	cam.begin();
 
 	fluidBlur.begin();
@@ -61,12 +65,22 @@ void ofApp::draw()
 	
 	Fluid_Manager.renderParticles();	
 
-	Audio_Manager.draw(); // background animation effect
+	//Audio_Manager.draw(); // background animation effect
 
 	ofPushMatrix();
-
+	//cout << ofGetElapsedTimef() << endl;	
+	float t = ofGetFrameNum();
+	t /= 100;
+	//cout << (t / 100) << endl;
+	testShader.begin();
+	testShader.setUniform1f("time", t);
+	testShader.setUniform1f("amplitude", 1);
+	testShader.setUniform1f("freqTime", 10);
+	testShader.setUniform1f("freqSpace", 1);
+	testShader.setUniform1f("coordinateSpace", 1);
 	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
 	Entity_Manager.drawGameObjects();
+	testShader.end();
 	Event_Manager.drawTutorial();
 
 	ofPopMatrix();	

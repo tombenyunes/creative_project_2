@@ -55,6 +55,8 @@ class ofApp : public ofBaseApp{
 		Camera cam;		
 
 		FluidManager Fluid_Manager;
-		ofxBlur fluidBlur;	
+		ofxBlur fluidBlur;
+
+		ofShader testShader;
 
 };

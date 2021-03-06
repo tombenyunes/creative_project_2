@@ -141,6 +141,31 @@ void Point::draw()
 
 	ofEllipse(pos.x, pos.y, radius, radius);
 
+	static bool spraying = false;
+	static bool trig = false;
+	if (ofGetFrameNum() % 60 == 0) {
+		spraying = true;
+		trig = false;
+		ofResetElapsedTimeCounter();
+	}
+	if (spraying) {
+		if (ofGetElapsedTimef() < 0.1) {
+			static ofVec2f newPos;
+			static ofVec2f newVel;
+			if (!trig) {
+				newPos.x = ofMap(pos.x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+				newPos.y = ofMap(pos.y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+				newVel.x = (ofRandom(-1, 1) / 120);
+				newVel.y = (ofRandom(-1, 1) / 120);
+				trig = true;
+			}			
+			Fluid_Manager->addToFluid(newPos, newVel, true, true);
+		}
+		else {
+			spraying = false;
+		}
+	}
+
 	ofPopStyle();
 }
 

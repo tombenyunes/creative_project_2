@@ -150,10 +150,21 @@ void EntityManager::createEntity(string entityType)
 	}
 	else if (typeID == 2 || entityType == "Point") {
 		cout << "Point created" << endl;
-		GameObject* point = new Point(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), 10, 25);
+		GameObject* point = new Point(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), 15, 25);
 		point->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(point);
 	}
+}
+
+int EntityManager::getPointCount()
+{
+	int pointCount = 0;
+	for (int i = 0; i < getGameObjects()->size(); i++) {
+		if ((*getGameObjects())[i]->type == "Point") {
+			pointCount++;
+		}
+	}
+	return pointCount;
 }
 
 void EntityManager::keyPressed(int key)
