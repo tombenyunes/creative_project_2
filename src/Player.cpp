@@ -26,6 +26,7 @@ Player::Player(ofVec2f _pos, ofColor _color)
 
 void Player::update()
 {
+	pullPoints();
 	drawParticleTrail();
 	updateForces();
 	updateGUI();
@@ -40,7 +41,7 @@ void Player::updateForces()
 
 void Player::applyAllForces()
 {
-	if (playerCanMove()) applyForce(accel, getMovementVector(), true, 0.15);
+	if (playerCanMove()) applyForce(accel, getMovementVector(), true, 0.15);	
 }
 
 bool Player::playerCanMove()
@@ -58,6 +59,25 @@ ofVec2f Player::getMovementVector()
 	ofVec2f movementVec = pos - mouse_pos;
 	movementVec.scale(5);
 	return movementVec;
+}
+
+void Player::pullPoints()
+{
+	for (int i = 0; i < GameObjects->size(); i++) {
+		if ((*GameObjects)[i]->ellipseCollider_enabled) {
+			if ((*GameObjects)[i] != this) {
+				if ((*GameObjects)[i]->type == "Point") {
+					if (CollisionDetector.EllipseCompare(pos, 600, (*GameObjects)[i]->pos, (*GameObjects)[i]->radius)) {
+						// move points towards player
+						GameObject pullRange;
+						pullRange.pos = pos;
+						pullRange.type == "PullRange";
+						(*GameObjects)[i]->isColliding(&pullRange);
+					}
+				}
+			}
+		}
+	}
 }
 
 void Player::updateGUI()

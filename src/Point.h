@@ -22,6 +22,7 @@ private:
 
 	void updateForces();
 
+	void moveTowardsPlayer();
 	void dragNodes();
 
 	void updateGUI();

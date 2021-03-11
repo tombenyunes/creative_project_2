@@ -17,6 +17,16 @@ public:
 
 	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
 	void explosion(int count = 500);
+	void incrementBrightness();
+	bool doIncrementBrightness = false;
+	float prevBrightness = -1;
+	bool doIncrementDeltaT = false;
+	float prevDeltaT = -1;
+	bool doIncrementViscocity = false;
+	float prevViscocity = -1;
+	bool doIncrementVelocity = false;
+	float prevVelocity = -1;
+
 	void randomForces();
 
 	void resetFluid();

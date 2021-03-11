@@ -13,6 +13,11 @@ public:
 
 	void toggleZoomMode();
 
+	glm::mat4 getLocalTransformMatrix();
+	glm::mat4 getGlobalTransformMatrix();
+	glm::mat4 getProjectionMatrix();
+	glm::mat4 getModelViewMatrix();
+	glm::mat4 getModelViewProjectionMatrix();
 	ofVec3f getPosition();
 	void begin();
 	void end();

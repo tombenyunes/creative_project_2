@@ -30,7 +30,8 @@ void ofApp::setup()
 	//fluidBlur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
 	//fluidBlur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 
-	testShader.load("testShader");
+	//testShader.load("testShader");
+	testShader.load("testShader.vert", "testShader.frag");
 }
 
 void ofApp::audioOut(float* output, int bufferSize, int nChannels)
@@ -54,7 +55,7 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-	ofDisableDepthTest();
+	//ofDisableDepthTest();
 
 	cam.begin();
 
@@ -63,7 +64,7 @@ void ofApp::draw()
 	fluidBlur.end();
 	fluidBlur.draw(); // blur only applies to background fluid
 	
-	Fluid_Manager.renderParticles();	
+	Fluid_Manager.renderParticles();
 
 	//Audio_Manager.draw(); // background animation effect
 
@@ -72,15 +73,23 @@ void ofApp::draw()
 	float t = ofGetFrameNum();
 	t /= 100;
 	//cout << (t / 100) << endl;
-	testShader.begin();
+	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+
+	//testShader.begin();
 	testShader.setUniform1f("time", t);
 	testShader.setUniform1f("amplitude", 1);
 	testShader.setUniform1f("freqTime", 10);
 	testShader.setUniform1f("freqSpace", 1);
-	testShader.setUniform1f("coordinateSpace", 1);
-	ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+	testShader.setUniform1f("coordinateSpace", 4);
+	testShader.setUniformMatrix4f("modelViewMatrix", cam.getModelViewMatrix());
+	testShader.setUniformMatrix4f("modelMatrix", cam.getLocalTransformMatrix());
+	testShader.setUniformMatrix4f("viewMatrix", cam.getGlobalTransformMatrix());
+	testShader.setUniformMatrix4f("projectionMatrix", cam.getProjectionMatrix());
+	testShader.setUniformMatrix4f("modelViewProjectionMatrix", cam.getModelViewProjectionMatrix());
+	
 	Entity_Manager.drawGameObjects();
-	testShader.end();
+	//testShader.end();
+
 	Event_Manager.drawTutorial();
 
 	ofPopMatrix();	

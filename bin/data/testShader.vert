@@ -1,8 +1,8 @@
-#version 150
+#version 120
 
-out vec4 v_color;
+varying out vec4 v_color;
 
-in vec4 position;
+//in vec4 position;
 
 // these are passed in from OF programmable renderer
 uniform mat4 modelViewMatrix;
@@ -11,7 +11,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewProjectionMatrix;
 
-uniform vec4 modelColor;
+//uniform vec4 modelColor;
 uniform float time;
 uniform float amplitude;
 uniform float freqTime;
@@ -20,17 +20,17 @@ uniform float freqSpace;
 uniform float coordinateSpace;
 
 void main (void){
-	v_color = modelColor;
+	
 
-	vec4 posModelSpace = position;
+	vec4 posModelSpace = gl_Vertex;
 	vec4 posWorldSpace = modelMatrix * posModelSpace;
 	vec4 posViewSpace = viewMatrix * posWorldSpace;
-	vec4 posProjectionSpace = projectionMatrix * posViewSpace;	
+	vec4 posProjectionSpace = projectionMatrix * posViewSpace;
 	posProjectionSpace /= posProjectionSpace.w;
 
-	bool animate = true;
+	/*bool animate = true;
 	
-	vec4 posModelSpace2 = position;
+	vec4 posModelSpace2 = gl_Vertex;
 	if (coordinateSpace == 1 && animate) {
 		posModelSpace2.y += amplitude * sin(freqTime * time + freqSpace * posModelSpace2.y);
 	}
@@ -42,12 +42,14 @@ void main (void){
 	if (coordinateSpace == 3 && animate) {
 		posViewSpace2.y += amplitude * sin(freqTime * time + freqSpace * posViewSpace2.y);
 	}	
-	vec4 posProjectionSpace2 = projectionMatrix * posViewSpace2;	
+	vec4 posProjectionSpace2 = projectionMatrix * posViewSpace2;
 	posProjectionSpace2 /= posProjectionSpace2.w;
 	if (coordinateSpace == 4 && animate) {
-		posProjectionSpace2.y += (amplitude / 50) * sin(freqTime * time + freqSpace * posProjectionSpace2.y);
-	}
-	
+		posProjectionSpace2.x += (amplitude / 50) * sin(freqTime * time + freqSpace * posProjectionSpace2.y);
+	}*/
 
-	gl_Position = posProjectionSpace2;
+	//v_color = vec4(1.0, 0.0, 0.0, 1);
+	
+	
+	gl_Position = modelViewProjectionMatrix * gl_Vertex;
 }

@@ -57,6 +57,55 @@ void FluidManager::update()
 
 	fluidSolver.update();
 
+	if (doIncrementBrightness)
+	{
+		if (fluidDrawer.brightness > prevBrightness)
+		{
+			fluidDrawer.brightness -= 0.1;			
+		}
+		else
+		{
+			doIncrementBrightness = false;
+			fluidDrawer.brightness = prevBrightness;
+		}
+	}
+	if (doIncrementDeltaT)
+	{
+		if (fluidSolver.deltaT < prevDeltaT)
+		{
+			fluidSolver.deltaT += 0.005;
+		}
+		else
+		{
+			doIncrementDeltaT = false;
+			fluidSolver.deltaT = prevDeltaT;
+		}
+	}
+	if (doIncrementViscocity)
+	{
+		if (fluidSolver.viscocity < prevViscocity)
+		{
+			fluidSolver.viscocity += 0.000001;
+		}
+		else
+		{
+			doIncrementViscocity = false;
+			fluidSolver.viscocity = prevViscocity;
+		}
+	}
+	if (doIncrementVelocity)
+	{
+		if (velocityMult > prevVelocity)
+		{
+			velocityMult -= 1;
+		}
+		else
+		{
+			doIncrementVelocity = false;
+			velocityMult = prevVelocity;
+		}
+	}
+
 	//randomForces();
 }
 
@@ -122,6 +171,25 @@ void FluidManager::explosion(int count)
 		ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
 		addToFluid(pos, vel, true, true);
 	}
+}
+
+void FluidManager::incrementBrightness()
+{
+	if (!doIncrementBrightness) prevBrightness = fluidDrawer.brightness;
+	fluidDrawer.brightness = 6;
+	doIncrementBrightness = true;
+
+	//if (!doIncrementDeltaT) prevDeltaT = fluidSolver.deltaT;
+	//fluidSolver.deltaT = 0;
+	//doIncrementDeltaT = true;
+
+	//if (!doIncrementViscocity) prevViscocity = fluidSolver.viscocity;
+	//fluidSolver.viscocity = 0;
+	//doIncrementViscocity = true;
+
+	if (!doIncrementVelocity) prevVelocity = velocityMult;
+	velocityMult = 100;
+	doIncrementVelocity = true;
 }
 
 void FluidManager::randomForces()

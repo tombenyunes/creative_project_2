@@ -27,6 +27,8 @@ private:
 	bool playerCanMove();
 	ofVec2f getMovementVector();
 
+	void pullPoints();
+
 	void updateGUI();
 	void resetForces();
 

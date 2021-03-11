@@ -88,7 +88,16 @@ void Point::resetForces()
 
 void Point::isColliding(GameObject* _other, ofVec2f _nodePos)
 {
-	needs_to_be_deleted = true;
+	if (_other->type == "")
+	{
+		ofVec2f directionToPlayer = _other->pos - pos;
+		applyForce(accel, directionToPlayer, true, 2.75f);
+	}
+	if (_other->type == "Player")
+	{
+		Fluid_Manager->incrementBrightness();
+		needs_to_be_deleted = true;
+	}
 }
 
 
@@ -159,7 +168,7 @@ void Point::draw()
 				newVel.y = (ofRandom(-1, 1) / 120);
 				trig = true;
 			}			
-			Fluid_Manager->addToFluid(newPos, newVel, true, true);
+			//Fluid_Manager->addToFluid(newPos, newVel, true, true);
 		}
 		else {
 			spraying = false;

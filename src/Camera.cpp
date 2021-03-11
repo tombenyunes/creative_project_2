@@ -44,6 +44,31 @@ void Camera::toggleZoomMode()
 	}
 }
 
+glm::mat4 Camera::getModelViewMatrix()
+{
+	return cam.getModelViewMatrix();	
+}
+
+glm::mat4 Camera::getLocalTransformMatrix()
+{
+	return cam.getLocalTransformMatrix();		
+}
+
+glm::mat4 Camera::getGlobalTransformMatrix()
+{
+	return cam.getGlobalTransformMatrix();
+}
+
+glm::mat4 Camera::getProjectionMatrix()
+{	
+	return cam.getProjectionMatrix();
+}
+
+glm::mat4 Camera::getModelViewProjectionMatrix()
+{
+	return cam.getModelViewProjectionMatrix();
+}
+
 ofVec3f Camera::getPosition()
 {
 	return cam.getPosition();

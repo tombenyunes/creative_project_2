@@ -59,7 +59,7 @@ void AudioManager::guiSetup() {
 
 
 
-    gui.add(metGain.set("metronome gain", 0.5, 0, 1.0));
+    gui.add(metGain.set("metronome gain", 0.0 /*0.5*/, 0, 1.0));
 
     gui.add(atmosGain.set("atmos gain", 0.3, 0, 1.0));
 
