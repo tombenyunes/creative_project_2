@@ -9,6 +9,8 @@
 class AudioManager {
 
 public:
+    ~AudioManager();
+
     void setup(ofBaseApp* appPtr);
     void update();
     void draw();

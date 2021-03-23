@@ -140,6 +140,7 @@ void FluidManager::drawGUI(bool enable)
 
 void FluidManager::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count)
 {
+	//vel /= 2;
 	float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
 	if (speed > 0) {
 		pos.x = ofClamp(pos.x, 0.0f, 1.0f);

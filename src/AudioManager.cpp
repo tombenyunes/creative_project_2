@@ -181,6 +181,13 @@ void AudioManager::soundSetup(ofBaseApp* appPtr) {
 }
 
 
+AudioManager::~AudioManager()
+{
+    //ofSoundShutdown();
+    //ofSoundStopAll();
+    ofSoundStreamClose();
+}
+
 //===============================================================//
 void AudioManager::setup(ofBaseApp* appPtr) {
 

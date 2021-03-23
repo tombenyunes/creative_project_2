@@ -5,44 +5,154 @@
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>0.000000000</pos.x>
-        <pos.y>0.000000000</pos.y>
+        <pos.x>982.483032227</pos.x>
+        <pos.y>-206.883712769</pos.y>
         <mass>500.000000000</mass>
         <radius>14.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Point</type>
-        <pos.x>-182.039352417</pos.x>
-        <pos.y>-36.363479614</pos.y>
-        <mass>10.000000000</mass>
+        <pos.x>1677.968505859</pos.x>
+        <pos.y>-43.260005951</pos.y>
+        <mass>15.000000000</mass>
         <radius>25.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Point</type>
-        <pos.x>-231.000122070</pos.x>
-        <pos.y>-51.999877930</pos.y>
-        <mass>10.000000000</mass>
+        <pos.x>-1318.094360352</pos.x>
+        <pos.y>4.898192883</pos.y>
+        <mass>15.000000000</mass>
         <radius>25.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Point</type>
-        <pos.x>-289.000122070</pos.x>
-        <pos.y>-63.999755859</pos.y>
+        <pos.x>312.814666748</pos.x>
+        <pos.y>24.948848724</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>322.361267090</pos.x>
+        <pos.y>-832.081054688</pos.y>
+        <mass>1361.300903320</mass>
+        <radius>84.341712952</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>304.798919678</pos.x>
+        <pos.y>-940.246032715</pos.y>
+        <mass>681.775817871</mass>
+        <radius>55.755783081</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>564.108154297</pos.x>
+        <pos.y>-820.451171875</pos.y>
+        <mass>2422.887207031</mass>
+        <radius>86.559638977</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>223.081787109</pos.x>
+        <pos.y>-639.444091797</pos.y>
+        <mass>2447.675781250</mass>
+        <radius>146.553680420</radius>
+    </GameObject>
+    <GameObject>
+        <type>Spring</type>
+        <pos.x>1895.885009766</pos.x>
+        <pos.y>-846.394409180</pos.y>
         <mass>10.000000000</mass>
+        <radius>8.000000000</radius>
+        <mass1>33.525341034</mass1>
+        <mass2>43.678852081</mass2>
+        <radius1>43.807788849</radius1>
+        <radius2>43.450725555</radius2>
+    </GameObject>
+    <GameObject>
+        <type>Spring</type>
+        <pos.x>2093.878662109</pos.x>
+        <pos.y>-839.393066406</pos.y>
+        <mass>10.000000000</mass>
+        <radius>8.000000000</radius>
+        <mass1>50.231170654</mass1>
+        <mass2>74.937431335</mass2>
+        <radius1>46.178318024</radius1>
+        <radius2>45.319980621</radius2>
+    </GameObject>
+    <GameObject>
+        <type>Spring</type>
+        <pos.x>2103.874023438</pos.x>
+        <pos.y>-858.391967773</pos.y>
+        <mass>10.000000000</mass>
+        <radius>8.000000000</radius>
+        <mass1>67.370368958</mass1>
+        <mass2>46.681873322</mass2>
+        <radius1>34.038051605</radius1>
+        <radius2>41.300693512</radius2>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>1037.202026367</pos.x>
+        <pos.y>-1145.680053711</pos.y>
+        <mass>15.000000000</mass>
         <radius>25.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Point</type>
-        <pos.x>-341.000122070</pos.x>
-        <pos.y>-77.999755859</pos.y>
-        <mass>10.000000000</mass>
+        <pos.x>1517.075073242</pos.x>
+        <pos.y>76.952384949</pos.y>
+        <mass>15.000000000</mass>
         <radius>25.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Point</type>
-        <pos.x>-394.000122070</pos.x>
-        <pos.y>-92.999877930</pos.y>
-        <mass>10.000000000</mass>
+        <pos.x>-204.779144287</pos.x>
+        <pos.y>-35.843990326</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>-1543.076660156</pos.x>
+        <pos.y>1463.652221680</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>808.191040039</pos.x>
+        <pos.y>1447.172241211</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>1850.947265625</pos.x>
+        <pos.y>1119.403442383</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>-876.186279297</pos.x>
+        <pos.y>317.010955811</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>-1844.477416992</pos.x>
+        <pos.y>1274.132446289</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Point</type>
+        <pos.x>-1173.924926758</pos.x>
+        <pos.y>1192.190307617</pos.y>
+        <mass>15.000000000</mass>
         <radius>25.000000000</radius>
     </GameObject>
 </Scene>
