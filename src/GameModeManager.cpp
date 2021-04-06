@@ -17,6 +17,24 @@ int GameModeManager::getCurrentModeID()
 	return currentModeID;
 }
 
+string GameModeManager::getCurrentModeString()
+{
+	string modeText;
+	switch (currentModeID)
+	{
+	case 0:
+		modeText = "Sandbox";
+		break;
+	case 1:
+		modeText = "Procedural";
+		break;
+	default:
+		modeText = "[MODE ID UNDEFINED]";
+		break;
+	}
+	return modeText;
+}
+
 void GameModeManager::setCurrentModeID(int gameModeID)
 {
 	currentModeID = gameModeID;

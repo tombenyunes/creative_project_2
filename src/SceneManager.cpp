@@ -29,9 +29,8 @@ void SceneManager::update()
 	}
 
 	if (GameMode_Manager->getCurrentModeID() == 1) {
-		if (Entity_Manager->getPointCount() <= 0) {
+		if (Entity_Manager->getPointCount() <= 0) {			
 			loadProceduralScene();
-			
 		}
 	}
 }
@@ -81,6 +80,8 @@ void SceneManager::getReadyForNewScene()
 {
 	destroyCurrentScene();
 	resetFluid();
+
+	GUI_Manager->prepareForNewScene();
 }
 
 void SceneManager::loadScene(string _path)
@@ -160,11 +161,13 @@ void SceneManager::loadProceduralScene()
 {
 	getReadyForNewScene();
 
+	Fluid_Manager->explosion(500);
+
 	Entity_Manager->createEntity("Player");
 
 	for (int i = 0; i < 5; i++) {
 		Entity_Manager->createEntity("Point");
-	}
+	}	
 
 	cout << "------------SceneManager.cpp------------" << endl;
 	cout << " - New Procedural Level Loaded" << endl;
@@ -174,7 +177,7 @@ void SceneManager::loadProceduralScene()
 void SceneManager::destroyCurrentScene()
 {
 	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
-		(*Entity_Manager->getGameObjects())[i]->needs_to_be_deleted = true;
+		(*Entity_Manager->getGameObjects())[i]->request_to_be_deleted = true;
 	}
 }
 

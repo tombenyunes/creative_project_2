@@ -53,7 +53,8 @@ public:
 	bool isPlayer;
 	bool isSpring;
 	
-	bool needs_to_be_deleted;
+	bool request_to_be_deleted;
+	string request_to_be_deleted_event;
 	ofVec2f mouseOffsetFromCenter;
 
 	bool requestToBeSelected;

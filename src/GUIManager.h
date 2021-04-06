@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "FluidManager.h"
 #include "AudioManager.h"
+#include "GameModeManager.h"
 
 class GUIManager {
 
@@ -12,30 +13,45 @@ public:
 
 	GUIManager();
 
-	void init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager);
+	void init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _GameMode_Manager, Camera* _cam);
 
 	void update();
 	void updateWorld();
 	void updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel);
 	void updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos = ofVec2f(-1, -1), ofVec2f _selectedNodeVel = ofVec2f(-1, -1), ofVec2f _selectedNodeAccel = ofVec2f(-1, -1), float _selectedNodeMass = -1, float _selectedNodeRadius = -1);
 	void updateCreateNodeValues();
+	void incPointsCollected();
+	void incMaxPointCount();
+	void updatePointCount(int count);
+	int pointCount;
+	int pointsCollected;
+	int maxPointCount;
+	void prepareForNewScene();
 	
 	void windowResized(int w, int h);
 	
 	void setClearAll();
 
 	void drawRequiredGUI(bool _isSpring);
+	void drawText();
+	void drawBorder();
+
 	void keyPressed(int key);
 
 	Controller* GameController;
 	FluidManager* Fluid_Manager;
 	AudioManager* Audio_Manager;
+	GameModeManager* GameMode_Manager;
+
+	Camera* cam;
 
 	// ----- Panels ----- //
 
 	ofxPanel world_gui;
 	ofxPanel player_gui;
+	ofVec2f player_gui_position;
 	ofxPanel selected_gui;
+	ofVec2f selected_gui_position;
 
 	ofxPanel multi_selection_gui_spring;
 	ofxPanel multi_selection_gui_node;

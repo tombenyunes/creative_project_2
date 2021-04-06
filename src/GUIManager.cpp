@@ -10,6 +10,10 @@ GUIManager::GUIManager()
 	ofVec2f dampingBounds = { 0.1, 8 };
 	ofVec2f springmassBounds = { 0.1, 50 };
 
+	pointCount = 0;
+	pointsCollected = 0;
+	maxPointCount = 0;
+
 	newScene.addListener(this, &GUIManager::setClearAll);
 
 	world_gui.setup("World", "", buffer, buffer);
@@ -62,11 +66,14 @@ GUIManager::GUIManager()
 	drawAudioGUI = false;
 }
 
-void GUIManager::init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager)
+void GUIManager::init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _GameMode_Manager, Camera* _cam)
 {
 	GameController = _controller;
 	Fluid_Manager = _fluidManager;
 	Audio_Manager = _audioManager;
+	GameMode_Manager = _GameMode_Manager;
+
+	cam = _cam;
 }
 
 void GUIManager::update()
@@ -96,6 +103,21 @@ void GUIManager::updateCreateNodeValues()
 	}
 }
 
+void GUIManager::incPointsCollected()
+{
+	pointsCollected++;
+}
+
+void GUIManager::incMaxPointCount()
+{
+	maxPointCount++;
+}
+
+void GUIManager::updatePointCount(int count)
+{
+	pointCount = count;
+}
+
 void GUIManager::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel)
 {
 	if (panel == 1) {
@@ -113,6 +135,8 @@ void GUIManager::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float 
 		}
 		radius = _radius;
 		affectedByGravity = _affectedByGravity;
+
+		player_gui_position = _pos;
 	}
 	else if (panel == 2) {
 		selected_position = ofToString(roundf(_pos.x)) + ", " + ofToString(roundf(_pos.y));
@@ -129,6 +153,9 @@ void GUIManager::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float 
 		}
 		selected_radius = _radius;
 		selected_affectedByGravity = _affectedByGravity;
+		//selected_gui_position = ofVec2f((_pos.x - selected_gui.getWidth() - buffer), (_pos.y - buffer));
+		selected_gui_position = ofVec2f(cam->screenToWorld(ofVec3f(_pos.x, _pos.y, 0)).x, cam->screenToWorld(ofVec3f(_pos.x, _pos.y, 0)).y);
+		//cout << selected_gui.getPosition() << endl;
 	}
 }
 
@@ -155,6 +182,12 @@ void GUIManager::updateSpringValues(ofVec2f _anchorpos, float _k, float _damping
 	}
 }
 
+void GUIManager::prepareForNewScene()
+{
+	maxPointCount = 0;
+	pointsCollected = 0;
+}
+
 void GUIManager::windowResized(int w, int h)
 {
 	create_node_gui.setPosition(ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
@@ -171,7 +204,15 @@ void GUIManager::setClearAll()
 void GUIManager::drawRequiredGUI(bool _isSpring)
 {
 	if (GameController->getGUIVisible() /*|| Event_Manager->playerGUIVisible*/) {
+		
+		ofPushMatrix();
+		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+		//ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+		//ofVec3f newPos = cam->screenToWorld(ofVec3f(player_gui_position.x, player_gui_position.y, cam->getPosition().z));
+		player_gui.setPosition(player_gui_position.x, player_gui_position.y);
 		player_gui.draw();
+		ofPopMatrix();		
+
 		if (GameController->getActive() != nullptr) {
 			if (_isSpring) {	// if an object is a spring then it has multiple gui windows to draw
 				multi_selection_gui_spring.draw();
@@ -180,7 +221,11 @@ void GUIManager::drawRequiredGUI(bool _isSpring)
 				}
 			}
 			else {
+				ofPushMatrix();
+				ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+				selected_gui.setPosition((selected_gui_position).x, (selected_gui_position).y);
 				selected_gui.draw();
+				ofPopMatrix();
 			}
 		}
 	}
@@ -190,7 +235,30 @@ void GUIManager::drawRequiredGUI(bool _isSpring)
 	}
 
 	Fluid_Manager->drawGUI(drawParticleGUI);
-	Audio_Manager->drawGUI(drawAudioGUI);
+	Audio_Manager->drawGUI(drawAudioGUI);	
+
+	drawText();
+	if (GameMode_Manager->getCurrentModeID() == 0) drawBorder();
+}
+
+void GUIManager::drawText()
+{
+	ofDrawBitmapString("GameMode: " + GameMode_Manager->getCurrentModeString(), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
+	ofDrawBitmapString("Points Found: " + to_string(pointsCollected) + " / " + to_string(maxPointCount), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
+}
+
+void GUIManager::drawBorder()
+{
+	ofPushStyle();
+	ofPushMatrix();
+
+	ofSetColor(255, 0, 0);
+	ofNoFill();
+	ofSetLineWidth(10);
+	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+
+	ofPopMatrix();
+	ofPopStyle();
 }
 
 void GUIManager::keyPressed(int key)

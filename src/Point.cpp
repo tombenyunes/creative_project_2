@@ -96,7 +96,8 @@ void Point::isColliding(GameObject* _other, ofVec2f _nodePos)
 	if (_other->type == "Player")
 	{
 		Fluid_Manager->incrementBrightness();
-		needs_to_be_deleted = true;
+		request_to_be_deleted_event = "Collected";
+		request_to_be_deleted = true;
 	}
 }
 

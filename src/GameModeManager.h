@@ -9,6 +9,7 @@ public:
 	GameModeManager(int gameModeID = 0);
 	void init();
 	int getCurrentModeID();
+	string getCurrentModeString();
 	void setCurrentModeID(int gameModeID);
 	void logCurrentMode();
 

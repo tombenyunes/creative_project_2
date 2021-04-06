@@ -16,19 +16,7 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	passiveColor = ofColor(255);
 	selectedColor = ofColor(255, 165, 0);
 
-	/*nodePos1.set(0);
-	nodeVel1.set(0);
-	nodeAccel1.set(0);
-	nodeRadius1 = 0;
-	nodeMass1 = 0;
-	nodePos2.set(0);
-	nodeVel2.set(0);
-	nodeAccel2.set(0);
-	nodeRadius2 = 0;
-	nodeMass2 = 0;*/
-
-
-	needs_to_be_deleted = false;
+	request_to_be_deleted = false;
 	mouseOver = false;
 	mouseOffsetFromCenter.set(0);
 
@@ -45,6 +33,7 @@ GameObject::GameObject(ofVec2f _pos, ofColor _color)
 	mouseHover_enabled = false;
 
 	requestToBeSelected = false;
+	request_to_be_deleted_event = "";
 	isSelected = false;
 }
 
@@ -65,10 +54,10 @@ void GameObject::root_update()
 
 	if (deleteKeyDown) {
 		if (mouseOver) {
-			needs_to_be_deleted = true;
+			request_to_be_deleted = true;
 		}		
 	}
-	if (!needs_to_be_deleted) {
+	if (!request_to_be_deleted) {
 
 
 		if (screenWrap_enabled) {
@@ -406,7 +395,7 @@ void GameObject::keyReleased(int key)
 
 void GameObject::root_draw()
 {
-	if (!needs_to_be_deleted) {
+	if (!request_to_be_deleted) {
 		draw();
 	}
 	else {

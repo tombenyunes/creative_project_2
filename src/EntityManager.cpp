@@ -57,9 +57,14 @@ void EntityManager::deleteGameObjects()
 		if ((*getGameObjects())[i]->isPlayer == true) {
 			cam->update(WORLD_WIDTH, WORLD_HEIGHT, ofVec2f((*getGameObjects())[i]->pos.x + WORLD_WIDTH / 2, (*getGameObjects())[i]->pos.y + WORLD_HEIGHT / 2));
 		}
-		if ((*getGameObjects())[i]->needs_to_be_deleted == true) {
+		if ((*getGameObjects())[i]->request_to_be_deleted == true) {
 			if ((*getGameObjects())[i] == Game_Controller->getActive()) {
 				Game_Controller->makeActive(nullptr);
+			}
+			if ((*getGameObjects())[i]->type == "Point") {
+				if ((*getGameObjects())[i]->request_to_be_deleted_event == "Collected") {
+					GUI_Manager->incPointsCollected();
+				}
 			}
 			delete (*getGameObjects())[i];
 			getGameObjects()->erase(getGameObjects()->begin() + i);
@@ -105,11 +110,11 @@ void EntityManager::deleteAll(bool excludePlayer)
 	for (int i = 0; i < getGameObjects()->size(); i++) {
 		if (excludePlayer) {
 			if ((*getGameObjects())[i]->isPlayer != true) {
-				(*getGameObjects())[i]->needs_to_be_deleted = true;
+				(*getGameObjects())[i]->request_to_be_deleted = true;
 			}
 		}
 		else {
-			(*getGameObjects())[i]->needs_to_be_deleted = true;
+			(*getGameObjects())[i]->request_to_be_deleted = true;
 		}
 	}
 }
@@ -153,6 +158,7 @@ void EntityManager::createEntity(string entityType)
 		GameObject* point = new Point(ofVec2f(ofRandom(-WORLD_WIDTH / 2, WORLD_WIDTH / 2), ofRandom(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2)), 15, 25);
 		point->init(getGameObjects(), Game_Controller, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
 		addGameObject(point);
+		GUI_Manager->incMaxPointCount();
 	}
 }
 
@@ -164,6 +170,7 @@ int EntityManager::getPointCount()
 			pointCount++;
 		}
 	}
+	GUI_Manager->updatePointCount(pointCount);
 	return pointCount;
 }
 
