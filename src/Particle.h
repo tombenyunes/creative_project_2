@@ -16,8 +16,7 @@ public:
 private:
 	
 	ofVec2f pos_;
-	ofVec2f vel_;
-	
+	ofVec2f vel_;	
 	float radius_{};	
 	float mass_{};
 	

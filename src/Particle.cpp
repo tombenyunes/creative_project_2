@@ -50,7 +50,7 @@ void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_si
 	//	}
 
 	// fade out a bit (and kill if alpha == 0);
-	//alpha *= 0.999f;
+	//alpha *= 0.999f;		<--- particles won't lose alpha
 	if (alpha < 0.01f)
 		alpha = 0;
 }
@@ -59,7 +59,9 @@ void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_si
 void Particle::update_vertex_arrays(const bool drawing_fluid, const ofVec2f& inv_window_size, const int i, float* pos_buffer, float* col_buffer) const
 {
 	int vi = i * 4;
-	pos_buffer[vi++] = pos_.x - max(vel_.x, vel_.x + 0.25f);
+	//pos_buffer[vi++] = pos_.x - vel_.x;
+	//pos_buffer[vi++] = pos_.y - vel_.y;
+	pos_buffer[vi++] = pos_.x - max(vel_.x, vel_.x + 0.25f);		// <--- particles will not get smaller than a certain size (0.25f)
 	pos_buffer[vi++] = pos_.y - max(vel_.y, vel_.y + 0.25f);
 	pos_buffer[vi++] = pos_.x;
 	pos_buffer[vi++] = pos_.y;
