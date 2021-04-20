@@ -212,9 +212,9 @@ void FluidManager::increment_brightness()
 	//fluidSolver.viscocity = 0;
 	//doIncrementViscocity = true;
 
-	if (!do_increment_velocity_) prev_velocity_ = velocity_mult_;
+	/*if (!do_increment_velocity_) prev_velocity_ = velocity_mult_;
 	velocity_mult_ = 100;
-	do_increment_velocity_ = true;
+	do_increment_velocity_ = true;*/
 }
 
 void FluidManager::random_forces()

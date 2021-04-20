@@ -32,9 +32,9 @@ void Camera::update(const int world_width, const int world_height, const ofVec2f
 void Camera::toggle_zoom_mode()
 {
 	// reset scale/zoom
-	cout << "Zoom reset" << endl;
+	//cout << "Zoom reset" << endl;
 	if ((cam_.getScale().x == 1) && (cam_.getScale().y == 1) && (cam_.getScale().z == 1)) {
-		cam_.setScale(5.5, 5.5, 1);
+		cam_.setScale(2.8, 2.8, 1);
 		follow_player_ = false;
 	}
 	else {
@@ -119,6 +119,6 @@ void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scro
 {
 	if (ctrl_down_) {
 		cam_.setScale(cam_.getScale().x + scroll_y / 10, cam_.getScale().y + scroll_y / 10, 1);
-		cout << "Zoom level: " << cam_.getScale() << endl;
+		//cout << "Zoom level: " << cam_.getScale() << endl;
 	}
 }

@@ -34,6 +34,8 @@ private:
 	// Collisions (pull range)
 	void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 }) override;
 
-	void random_forces();
+	void random_forces() const;
+
+	int emission_frequency_;
 
 };

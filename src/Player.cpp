@@ -1,7 +1,8 @@
 #include "Player.h"
 
 Player::Player(const ofVec2f pos, const ofColor color)
-	:	mouse_down_(false),
+	:	movement_speed(0.10f),
+		mouse_down_(false),
 		mouse_button_(-1),
 		mouse_pos_(0),
 		aiming_boost_(false)
@@ -37,7 +38,7 @@ void Player::update_forces()
 
 void Player::apply_all_forces()
 {
-	if (player_can_move()) apply_force(accel_, get_movement_vector(), true, 0.15);	
+	if (player_can_move()) apply_force(accel_, get_movement_vector(), true, movement_speed);
 }
 
 bool Player::player_can_move() const

@@ -44,6 +44,8 @@ private:
 	void key_released(int key) override;
 
 
+
+	float movement_speed;
 	
 	bool mouse_down_;
 	int mouse_button_;

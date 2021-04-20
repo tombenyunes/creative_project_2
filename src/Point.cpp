@@ -1,6 +1,7 @@
 #include "Point.h"
 
 Point::Point(const ofVec2f pos, const float mass, const float radius)
+	:	emission_frequency_(ofRandom(25, 100))
 {
 	set_type("Point");
 	set_position(pos);
@@ -13,6 +14,8 @@ Point::Point(const ofVec2f pos, const float mass, const float radius)
 	add_module("gravity");
 	add_module("friction");
 	add_module("mouseHover");
+
+	cout << emission_frequency_ << endl;
 }
 
 void Point::update()
@@ -108,15 +111,65 @@ void Point::is_colliding(GameObject* other, ofVec2f node_pos)
 }
 
 // points randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
-void Point::random_forces()
+void Point::random_forces() const
 {
-	if (ofGetFrameNum() % static_cast<int>(ofRandom(25, 100)) == 0)
+	if (ofGetFrameNum() % static_cast<int>(emission_frequency_) == 0)
 	{
 		ofVec2f mapped_pos;
-		mapped_pos.x = ofMap(get_position().x, -WORLD_WIDTH/2, WORLD_WIDTH/2, 0, 1);
-		mapped_pos.y = ofMap(get_position().y, -WORLD_HEIGHT/2, WORLD_HEIGHT/2, 0, 1);
-		const ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.1), ofRandom(-0.001, 0.1));
+		mapped_pos.x = ofMap(get_position().x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+		mapped_pos.y = ofMap(get_position().y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+		ofVec2f vel/* = ofVec2f(ofRandom(-0.001f, 0.1f), ofRandom(-0.001f, 0.1f))*/;
+		/*vel.x = ofRandom(-0.001f, 0.1f);
+		vel.y = ofRandom(-0.001f, 0.1f);*/
+
+
+		// all points direct velocities somewhat towards the centre
+		/*if (get_position().x > 0)
+		{
+			vel.x = ofRandom(-0.1f, 0.001f);
+		}
+		else
+		{
+			vel.x = ofRandom(-0.001f, 0.1f);
+		}
+		if (get_position().y > 0)
+		{
+			vel.y = ofRandom(-0.1f, 0.001f);
+		}
+		else
+		{
+			vel.y = ofRandom(-0.001f, 0.1f);
+		}*/
+
+
+		// randomly select a point and target all velocities towards that point's position
+		vector<ofVec2f> point_positions;
+		for (int i = 0; i < game_objects_->size(); i++)
+		{
+			if ((*game_objects_)[i]->get_type() == "Point")
+			{
+				point_positions.push_back((*game_objects_)[i]->get_position());
+			}
+		}
+		
+		vel = (point_positions[0] - get_position()) / 1000;
+
+		
+
 		fluid_manager_->add_to_fluid(mapped_pos, vel, false,  true, 1);
+
+		// if collectable is within screen bounds increment brightness
+		for (auto& game_object : *game_objects_)
+		{
+			if (game_object->get_type() == "Player")
+			{				
+				if (game_object->get_position().x < get_position().x + 1000 && game_object->get_position().x > get_position().x - 1000 &&
+					game_object->get_position().y < get_position().y + 500 && game_object->get_position().y > get_position().y - 500)
+				{
+					//fluid_manager_->increment_brightness();
+				}
+			}
+		}		
 
 		/*const float pi = 3.14159f;
 		const float radius = 0.01f;
