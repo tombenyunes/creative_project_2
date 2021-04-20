@@ -5,7 +5,7 @@
 #include "GUIManager.h"
 #include "FluidManager.h"
 #include "AudioManager.h"
-#include "GameModeManager.h"
+#include "GamemodeManager.h"
 
 // Entity types
 #include "Player.h"
@@ -18,45 +18,45 @@ class EntityManager {
 public:
 	EntityManager();
 	
-	void init(Controller* _gameController, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _gamemodeManager);
-	vector<GameObject*>* getGameObjects();
-	GameObject* getSelectedGameObject();
-	void addGameObject(GameObject* _gameobject);
+	void init(Controller* game_controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager, GamemodeManager* gamemode_manager);
+	vector<GameObject*>* get_game_objects() const;
+	GameObject* get_selected_game_object() const;
+	void add_game_object(GameObject* _gameobject) const;
 
-	void updateGameObjects();
-	void drawGameObjects();
+	void update_game_objects();
+	void draw_game_objects() const;
 
-	void deleteAll(bool excludePlayer = true);
+	void delete_all(bool exclude_player = true) const;
 
-	void createEntity(string entityType = "");
+	void create_entity(string entity_type = "") const;
 
-	int getPointCount();
+	int get_point_count() const;
 
-	void keyPressed(int key);
-	void keyReleased(int key);
-	void mouseMoved(int x, int y);
-	void mouseDragged(int x, int y, int button);
-	void mousePressed(int x, int y, int button);
-	void mouseScrolled(int x, int y, float scrollX, float scrollY);
-	void mouseReleased(int x, int y, int button);
+	void key_pressed(int key) const;
+	void key_released(int key) const;
+	void mouse_moved(int x, int y);
+	void mouse_dragged(int x, int y, int button) const;
+	void mouse_pressed(int x, int y, int button) const;
+	void mouse_scrolled(int x, int y, float scroll_x, float scroll_y);
+	void mouse_released(int x, int y, int button) const;
 
 private:
 
-	void deleteGameObjects();
+	void delete_game_objects() const;
 	
-	void findSelected();
-	GameObject* selectedGameObject;
-	int selectedGameObjectIndex;
+	void find_selected();
+	GameObject* selected_game_object_;
+	int selected_game_object_index_;
 
-	vector<GameObject*> vec;
-	vector<GameObject*>* GameObjects = &vec; // the main vector of all objects in the scene
+	vector<GameObject*> vec_;
+	vector<GameObject*>* game_objects_ = &vec_; // the main vector of all objects in the scene
 
-	Controller* Game_Controller;
-	GUIManager* GUI_Manager;
-	Camera* cam;
-	FluidManager* Fluid_Manager;
-	AudioManager* Audio_Manager;
-	GameModeManager* GameMode_Manager;
+	Controller* game_controller_;
+	GUIManager* gui_manager_;
+	FluidManager* fluid_manager_;
+	AudioManager* audio_manager_;
+	GamemodeManager* game_mode_manager_;
+	Camera* cam_;
 
 
 };

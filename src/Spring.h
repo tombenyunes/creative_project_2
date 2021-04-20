@@ -7,47 +7,51 @@ class Spring : public GameObject {
 	
 public:
 
-	Spring(ofVec2f _anchorPos, float _nodeRadius1, float _nodeMass1, float _nodeRadius2, float _nodeMass2, float _k, float _damping, float _springmass);
+	Spring(ofVec2f anchor_pos, vector<float> node_radiuses, vector<float> node_masses, float k, float damping, float springmass);
 
-	void createNode(ofVec2f nodePos, ofVec2f nodeVel, ofVec2f nodeAccel, float nodeRadius, float nodeMass);
+private:	
 
-	void update() override;
+	void update() override;	
 
-	//void mouseHover() override;
-	void ellipseCollider() override;
-	void isColliding(GameObject* _other, int _nodeIndex);
+	// Physics/spring calculations
+	void update_forces();
+	void apply_all_forces();
+	ofVec2f update_springs(int node);
+	void add_forces();
+	void reset_forces();
 
+	void drag_nodes();
+	void create_node(ofVec2f node_pos, ofVec2f node_vel, ofVec2f node_accel, float node_radius, float node_mass);
+
+	// Collision
+	void ellipse_collider() override;
+	void is_colliding(GameObject* other, int node_index);
+
+	// GUI
+	void update_gui();
+
+	// Draw
 	void draw() override;
-	void getNodeColor(int _nodeIndex);
-	void drawConnectingLines();
-	float angleBetween(ofVec2f from, ofVec2f to);
-	ofVec2f getPointOnCircle(ofVec2f center, float radians, float  radius);
+	
+	void get_node_color(int node_index);
+	void draw_connecting_lines();
+	float angle_between(ofVec2f from, ofVec2f to) const;
+	ofVec2f get_point_on_circle(ofVec2f center, float radians, float  radius) const;
+	
+	// Events
+	void mouse_pressed(float x, float y, int button) override;
+	void mouse_dragged(float x, float y, int button) override;
+	void mouse_released(float x, float y, int button) override;
+	
+	void key_pressed(int key) override;
 
-	void mousePressed(float _x, float _y, int _button) override;
-	void mouseDragged(float _x, float _y, int _button) override;
-	void mouseReleased(float _x, float _y, int _button) override;
-	void keyPressed(int key) override;
 
-private:
+	
+	float k_;
+	float damping_;
+	float springmass_;
+	float time_step_;	
 
-	void updateForces();
-	void applyAllForces();
-	ofVec2f updateSprings(int _node);
-	void addForces();
-
-	void dragNodes();
-
-	void updateGUI();
-	void resetForces();
-
-	float k;
-	float damping;
-	float springmass;
-	float timeStep;
-
-	ofVec2f posBeforeDrag;
-	bool gui_values_need_to_be_set;	
-
-	bool fillEllipses = false;
+	bool fill_ellipses_;
 
 };

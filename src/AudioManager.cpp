@@ -215,7 +215,7 @@ void AudioManager::setup(ofBaseApp* appPtr) {
 }
 
 //--------------------------------------------------------------
-void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
+void AudioManager::audioOut(float* output, const int bufferSize, const int nChannels) {
 
     stereoMix[0] = 0;
     stereoMix[1] = 0;
@@ -454,7 +454,7 @@ void AudioManager::draw() {
     drawWaveform();
 }
 
-void AudioManager::drawGUI(bool enable) {
+void AudioManager::drawGUI(const bool enable) {
     if (enable) gui.draw();
 }
 
@@ -484,7 +484,7 @@ void AudioManager::playRandomSample() {
 }
 
 //--------------------------------------------------------------
-void AudioManager::keyPressed(int key) {
+void AudioManager::keyPressed(const int key) {
 
     //use for interactions to trigger samples
     if (key == '1') {

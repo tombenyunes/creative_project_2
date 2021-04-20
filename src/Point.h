@@ -7,33 +7,33 @@ class Point : public GameObject {
 
 public:
 
-	Point(ofVec2f _pos, float _mass, float _radius);
-
-	void update() override;
-
-	void mousePressed(float _x, float _y, int _button) override;
-	void mouseDragged(float _x, float _y, int _button) override;
-	void mouseReleased(float _x, float _y, int _button) override;
-
-	void draw() override;
-	void getColor();
+	Point(ofVec2f pos, float mass, float radius);	
 
 private:
 
-	void updateForces();
+	void update() override;
 
-	void moveTowardsPlayer();
-	void dragNodes();
+	// Physics/movement
+	void update_forces();
+	void reset_forces();
+	void drag_nodes();
 
-	void updateGUI();
-	void resetForces();
+	// GUI
+	void update_gui();
+	
+	// Draw
+	void draw() override;
+	
+	void get_color();
 
-	virtual void isColliding(GameObject* _other, ofVec2f _nodePos = { 0, 0 }) override;
+	// Events
+	void mouse_pressed(float x, float y, int button) override;
+	void mouse_dragged(float x, float y, int button) override;
+	void mouse_released(float x, float y, int button) override;	
 
-	bool gui_values_need_to_be_set;
+	// Collision / move towards player
+	void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 }) override;
 
-	ofVec2f posBeforeDrag;
-	bool startedDragging = false;
-
+	void random_forces();
 
 };

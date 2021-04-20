@@ -1,52 +1,48 @@
 #include "Player.h"
 
-Player::Player(ofVec2f _pos, ofColor _color)
+Player::Player(const ofVec2f pos, const ofColor color)
+	:	mouse_down_(false),
+		mouse_button_(-1),
+		mouse_pos_(0),
+		aiming_boost_(false)
 {
-	type = "Player";
-
-	pos.set(_pos);
-	color.set(_color);
-
-	vel.set(0);
-	accel.set(0);
-	radius = 14; // 35
-	mass = 500;
-
-	isPlayer = true;
-	mouse_down = false;
-	mouse_button = -1;	
-	aimingBoost = false;
-
-	// modules are updated automatically
-	AddModule("screenBounce");
-	AddModule("ellipseCollider");
-	AddModule("gravity");
-	AddModule("friction");
+	set_type("Player");
+	set_position(pos);
+	set_color(color);
+	set_velocity(ofVec2f(0));
+	//set_accel(0);
+	set_radius(14); // 35
+	set_mass(500);
+	
+	add_module("screenBounce");
+	add_module("ellipseCollider");
+	add_module("gravity");
+	add_module("friction");
 }
 
 void Player::update()
 {
-	pullPoints();
-	drawParticleTrail();
-	updateForces();
-	updateGUI();
-	resetForces();
+	pull_points();
+	draw_particle_trail();
+	update_forces();
+	update_gui();
+	reset_forces();
 }
 
-void Player::updateForces()
+void Player::update_forces()
 {
-	applyAllForces();
-	addForces(true);
+	apply_all_forces();
+	add_forces(true);
 }
 
-void Player::applyAllForces()
+void Player::apply_all_forces()
 {
-	if (playerCanMove()) applyForce(accel, getMovementVector(), true, 0.15);	
+	if (player_can_move()) apply_force(accel_, get_movement_vector(), true, 0.15);	
 }
 
-bool Player::playerCanMove()
+bool Player::player_can_move() const
 {
-	if (mouse_down && mouse_button == 0) {
+	if (mouse_down_ && mouse_button_ == 0) {
 		return true;
 	}
 	else {
@@ -54,25 +50,30 @@ bool Player::playerCanMove()
 	}
 }
 
-ofVec2f Player::getMovementVector()
+ofVec2f Player::get_movement_vector() const
 {
-	ofVec2f movementVec = pos - mouse_pos;
+	ofVec2f movementVec = pos_ - mouse_pos_;
 	movementVec.scale(5);
 	return movementVec;
 }
 
-void Player::pullPoints()
+void Player::pull_points()
 {
-	for (int i = 0; i < GameObjects->size(); i++) {
-		if ((*GameObjects)[i]->ellipseCollider_enabled) {
-			if ((*GameObjects)[i] != this) {
-				if ((*GameObjects)[i]->type == "Point") {
-					if (CollisionDetector.EllipseCompare(pos, 600, (*GameObjects)[i]->pos, (*GameObjects)[i]->radius)) {
+	for (auto& game_object : *game_objects_)
+	{
+		if (game_object->can_collide())
+		{
+			if (game_object != this)
+			{
+				if (game_object->get_type() == "Point")
+				{
+					if (Collisions::ellipse_compare(pos_, 600, game_object->get_position(), game_object->get_radius()))
+					{											
 						// move points towards player
-						GameObject pullRange;
-						pullRange.pos = pos;
-						pullRange.type == "PullRange";
-						(*GameObjects)[i]->isColliding(&pullRange);
+						GameObject pull_range;
+						pull_range.set_position(pos_);
+						pull_range.set_type("PullRange");
+						game_object->is_colliding(&pull_range);
 					}
 				}
 			}
@@ -80,57 +81,57 @@ void Player::pullPoints()
 	}
 }
 
-void Player::updateGUI()
+void Player::update_gui()
 {
 	static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
 	if (!initiai_values_triggered) {
 		initiai_values_triggered = true;
-		GUI_Manager->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 1);
+		gui_manager_->update_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_, 1);
 	}
 	else {
-		GUI_Manager->updateValues(pos, vel, accel, GUI_Manager->mass, GUI_Manager->infiniteMass, GUI_Manager->radius, GUI_Manager->affectedByGravity, 1); // receiving and updating the results from the GUI_Manager
-		if (infiniteMass) mass = 9999999999999999999; else mass = GUI_Manager->mass;
-		radius = GUI_Manager->radius;
-		infiniteMass = GUI_Manager->infiniteMass;
-		affectedByGravity = GUI_Manager->affectedByGravity;
+		gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->mass, gui_manager_->infinite_mass, gui_manager_->radius, gui_manager_->affected_by_gravity, 1); // receiving and updating the results from the GUI_Manager
+		if (infinite_mass_) mass_ = 9999999999999999999; else mass_ = gui_manager_->mass;
+		radius_ = gui_manager_->radius;
+		infinite_mass_ = gui_manager_->infinite_mass;
+		affected_by_gravity_ = gui_manager_->affected_by_gravity;
 	}
 }
 
-void Player::resetForces()
+void Player::reset_forces()
 {
-	accel.set(0);
+	accel_.set(0);
 }
 
 
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Player::mousePressed(float _x, float _y, int _button)
+void Player::mouse_pressed(const float x, const float y, const int button)
 {
-	mouse_down = true;
-	mouse_button = _button;
-	mouse_pos = { (float)_x, (float)_y };
+	mouse_down_ = true;
+	mouse_button_ = button;
+	mouse_pos_ = { static_cast<float>(x), static_cast<float>(y) };
 }
 
-void Player::mouseDragged(float _x, float _y, int _button)
+void Player::mouse_dragged(const float x, const float y, const int button)
 {
-	mouse_down = true;
-	mouse_button = _button;
-	mouse_pos = { (float)_x, (float)_y };
+	mouse_down_ = true;
+	mouse_button_ = button;
+	mouse_pos_ = { static_cast<float>(x), static_cast<float>(y) };
 }
 
-void Player::mouseReleased(float _x, float _y, int _button)
+void Player::mouse_released(const float x, const float y, const int button)
 {
-	mouse_down = false;
+	mouse_down_ = false;
 }
 
-void Player::keyPressed(int key)
+void Player::key_pressed(const int key)
 {
 	if (key == 114) // r
 	{
-		accel = { 0, 0 };
-		vel = { 0, 0 };
-		pos = { 0, 0 };
+		accel_ = { 0, 0 };
+		vel_ = { 0, 0 };
+		pos_ = { 0, 0 };
 	}
 	if (key == 32)
 	{
@@ -138,7 +139,7 @@ void Player::keyPressed(int key)
 	}
 }
 
-void Player::keyReleased(int key)
+void Player::key_released(const int key)
 {
 	if (key == 32)
 	{
@@ -146,11 +147,11 @@ void Player::keyReleased(int key)
 	}
 }
 
-void Player::boostPlayer()
+void Player::boost_player()
 {
-	aimingBoost = false;
-	if (vel.length() < 5) {
-		applyForce(accel, (pos - ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)), true, 10);
+	aiming_boost_ = false;
+	if (vel_.length() < 5) {
+		apply_force(accel_, (pos_ - ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)), true, 10);
 	}
 }
 
@@ -162,23 +163,24 @@ void Player::draw()
 {
 	ofSetColor(255);
 
-	if (aimingBoost) drawBoostDirection();
+	if (aiming_boost_) draw_boost_direction();
 	//drawParticleTrail();
 
-	ofSetColor(color);
+	ofSetColor(color_);
 	ofFill();
-	ofEllipse(pos.x, pos.y, radius, radius);
+	ofEllipse(pos_.x, pos_.y, radius_, radius_);
 }
 
-void Player::drawBoostDirection() // draws dotted line in the direction the player is aiming
+void Player::draw_boost_direction() const
+// draws dotted line in the direction the player is aiming
 {
 	ofPushMatrix();
 
 	glEnable(GL_LINE_STIPPLE);
 	glLineStipple(8, 0xAAAA);
 	glBegin(GL_LINES);
-	glVertex3f(pos.x, pos.y, 0);
-	glVertex3f(drawVelPath().x, drawVelPath().y, drawVelPath().z);
+	glVertex3f(pos_.x, pos_.y, 0);
+	glVertex3f(draw_vel_path().x, draw_vel_path().y, draw_vel_path().z);
 	glEnd();
 	glDisable(GL_LINE_STIPPLE);
 	glFlush();
@@ -186,15 +188,16 @@ void Player::drawBoostDirection() // draws dotted line in the direction the play
 	ofPopMatrix();
 }
 
-ofVec3f Player::drawVelPath()
+ofVec3f Player::draw_vel_path() const
 {
-	ofVec2f vec = pos - ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
+	const ofVec2f vec = pos_ - ofVec2f(ofGetMouseX() - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
 	return ofVec3f(vec.x * ofGetWidth(), vec.y * ofGetHeight(), 0);
 }
 
-void Player::drawParticleTrail() // draws particle trail following the player when moving
+void Player::draw_particle_trail() const
+// draws particle trail following the player when moving
 {
-	if (mouse_down && mouse_button == 0) {
+	if (mouse_down_ && mouse_button_ == 0) {
 		// draw new particles
 		//float posX = ofMap(pos.x, -ofGetWidth()/2, ofGetWidth()/2, 0, 1);
 		//float posY = ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
@@ -202,16 +205,16 @@ void Player::drawParticleTrail() // draws particle trail following the player wh
 		//ofVec2f mouseVel = ofVec2f(eventPos - pMouse) / ofGetWindowSize();
 		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
 		
-		ofVec2f newPos;
-		newPos.x = ofMap(pos.x/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
-		newPos.y = ofMap(pos.y/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+		ofVec2f new_pos;
+		new_pos.x = ofMap(pos_.x/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+		new_pos.y = ofMap(pos_.y/* + ofRandom(-radius / 4, radius / 4)*/, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
 		
-		ofVec2f newVel;
+		ofVec2f new_vel;
 		//newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
 		//newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
-		newVel.x = ((getMovementVector().x + ofRandom(-1, 1)) / 6400) * -1;
-		newVel.y = ((getMovementVector().y + ofRandom(-1, 1)) / 6400) * -1;
+		new_vel.x = ((get_movement_vector().x + ofRandom(-1, 1)) / 6400) * -1;
+		new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 
-		Fluid_Manager->addToFluid(newPos, newVel, true, true);
+		fluid_manager_->add_to_fluid(new_pos, new_vel, true, true);
 	}
 }

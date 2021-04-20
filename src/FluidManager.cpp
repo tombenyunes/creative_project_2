@@ -1,42 +1,50 @@
 #include "FluidManager.h"
 
-FluidManager::FluidManager()
+FluidManager::FluidManager(): fluid_cells_x_(150),
+                              resize_fluid_(true),
+                              color_mult_(0),
+                              velocity_mult_(0),
+                              draw_fluid_(true),
+                              draw_particles_(true),
+                              tuio_x_scaler_(1),
+                              tuio_y_scaler_(1),
+                              do_increment_brightness_(false),
+                              prev_brightness_(-1),
+                              do_increment_delta_t_(false),
+                              prev_delta_t_(-1),
+                              do_increment_viscocity_(false),
+                              prev_viscocity_(-1),
+                              do_increment_velocity_(false),
+                              prev_velocity_(-1)
+
 {
-	fluidSolver.setup(100, 100);
-	fluidSolver.enableRGB(true).setFadeSpeed(0.002).setDeltaT(0.5).setVisc(0.00015).setColorDiffusion(0);
-	fluidDrawer.setup(&fluidSolver);
+	fluid_solver_.setup(100, 100);
+	fluid_solver_.enableRGB(true).setFadeSpeed(0.002f).setDeltaT(0.5f).setVisc(0.00015f).setColorDiffusion(0);
+	fluid_drawer_.setup(&fluid_solver_);
 
-	fluidCellsX = 150;
+	gui.addSlider("fluidCellsX", fluid_cells_x_, 20, 400);
+	gui.addButton("resizeFluid", resize_fluid_);
+	gui.addSlider("colorMult", color_mult_, 0.0f, 100.0f);
+	gui.addSlider("velocityMult", velocity_mult_, 0.0f, 100.0f);
+	gui.addSlider("fs.viscocity", fluid_solver_.viscocity, 0.0f, 0.01f);
+	gui.addSlider("fs.colorDiffusion", fluid_solver_.colorDiffusion, 0.0f, 0.0003f);
+	gui.addSlider("fs.fadeSpeed", fluid_solver_.fadeSpeed, 0.0f, 0.1f);
+	gui.addSlider("fs.solverIterations", fluid_solver_.solverIterations, 1, 50);
+	gui.addSlider("fs.deltaT", fluid_solver_.deltaT, 0.1f, 5.0f);
+	gui.addComboBox("fd.drawMode", reinterpret_cast<int&>(fluid_drawer_.drawMode), msa::fluid::getDrawModeTitles());
+	gui.addToggle("fs.doRGB", fluid_solver_.doRGB);
+	gui.addToggle("fs.doVorticityConfinement", fluid_solver_.doVorticityConfinement);
+	gui.addToggle("drawFluid", draw_fluid_);
+	gui.addToggle("drawParticles", draw_particles_);
+	gui.addSlider("velDrawMult", fluid_drawer_.velDrawMult, 0.0, 20.0f);
+	gui.addSlider("velDrawThreshold", fluid_drawer_.velDrawThreshold, 0.0, 1.0f);
+	gui.addSlider("brightness", fluid_drawer_.brightness, 0.0, 2.0f);
+	gui.addToggle("useAdditiveBlending", fluid_drawer_.useAdditiveBlending);
 
-	drawFluid = true;
-	drawParticles = true;
-
-	drawParticleGUI = false;
-
-
-	gui.addSlider("fluidCellsX", fluidCellsX, 20, 400);
-	gui.addButton("resizeFluid", resizeFluid);
-	gui.addSlider("colorMult", colorMult, 0, 100);
-	gui.addSlider("velocityMult", velocityMult, 0, 100);
-	gui.addSlider("fs.viscocity", fluidSolver.viscocity, 0.0, 0.01);
-	gui.addSlider("fs.colorDiffusion", fluidSolver.colorDiffusion, 0.0, 0.0003);
-	gui.addSlider("fs.fadeSpeed", fluidSolver.fadeSpeed, 0.0, 0.1);
-	gui.addSlider("fs.solverIterations", fluidSolver.solverIterations, 1, 50);
-	gui.addSlider("fs.deltaT", fluidSolver.deltaT, 0.1, 5);
-	gui.addComboBox("fd.drawMode", (int&)fluidDrawer.drawMode, msa::fluid::getDrawModeTitles());
-	gui.addToggle("fs.doRGB", fluidSolver.doRGB);
-	gui.addToggle("fs.doVorticityConfinement", fluidSolver.doVorticityConfinement);
-	gui.addToggle("drawFluid", drawFluid);
-	gui.addToggle("drawParticles", drawParticles);
-	gui.addSlider("velDrawMult", fluidDrawer.velDrawMult, 0.0, 20);
-	gui.addSlider("velDrawThreshold", fluidDrawer.velDrawThreshold, 0.0, 1);
-	gui.addSlider("brightness", fluidDrawer.brightness, 0.0, 2);
-	gui.addToggle("useAdditiveBlending", fluidDrawer.useAdditiveBlending);
-
-	gui.addToggle("fs.wrapX", fluidSolver.wrap_x);
-	gui.addToggle("fs.wrapY", fluidSolver.wrap_y);
-	gui.addSlider("tuioXScaler", tuioXScaler, 0, 2);
-	gui.addSlider("tuioYScaler", tuioYScaler, 0, 2);
+	gui.addToggle("fs.wrapX", fluid_solver_.wrap_x);
+	gui.addToggle("fs.wrapY", fluid_solver_.wrap_y);
+	gui.addSlider("tuioXScaler", tuio_x_scaler_, 0, 2.0f);
+	gui.addSlider("tuioYScaler", tuio_y_scaler_, 0, 2.0f);
 
 	gui.currentPage().setXMLName("ofxMSAFluidSettings.xml");
 	gui.loadFromXML();
@@ -44,141 +52,157 @@ FluidManager::FluidManager()
 	gui.setAutoSave(false);
 	gui.show();
 
-	resizeFluid = true;
+	fluid_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
+	//fluid_blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
 void FluidManager::update()
 {
-	if (resizeFluid) {
-		fluidSolver.setSize(fluidCellsX, fluidCellsX / msa::getWindowAspectRatio());
-		fluidDrawer.setup(&fluidSolver);
-		resizeFluid = false;
+	if (resize_fluid_)
+	{
+		fluid_solver_.setSize(fluid_cells_x_, fluid_cells_x_ / msa::getWindowAspectRatio());
+		fluid_drawer_.setup(&fluid_solver_);
+		resize_fluid_ = false;
 	}
 
-	fluidSolver.update();
+	fluid_solver_.update();
 
-	if (doIncrementBrightness)
+	if (do_increment_brightness_)
 	{
-		if (fluidDrawer.brightness > prevBrightness)
+		if (fluid_drawer_.brightness > prev_brightness_)
 		{
-			fluidDrawer.brightness -= 0.1;			
+			fluid_drawer_.brightness -= 0.1f;
 		}
 		else
 		{
-			doIncrementBrightness = false;
-			fluidDrawer.brightness = prevBrightness;
+			do_increment_brightness_ = false;
+			fluid_drawer_.brightness = prev_brightness_;
 		}
 	}
-	if (doIncrementDeltaT)
+	if (do_increment_delta_t_)
 	{
-		if (fluidSolver.deltaT < prevDeltaT)
+		if (fluid_solver_.deltaT < prev_delta_t_)
 		{
-			fluidSolver.deltaT += 0.005;
+			fluid_solver_.deltaT += 0.005f;
 		}
 		else
 		{
-			doIncrementDeltaT = false;
-			fluidSolver.deltaT = prevDeltaT;
+			do_increment_delta_t_ = false;
+			fluid_solver_.deltaT = prev_delta_t_;
 		}
 	}
-	if (doIncrementViscocity)
+	if (do_increment_viscocity_)
 	{
-		if (fluidSolver.viscocity < prevViscocity)
+		if (fluid_solver_.viscocity < prev_viscocity_)
 		{
-			fluidSolver.viscocity += 0.000001;
+			fluid_solver_.viscocity += 0.000001f;
 		}
 		else
 		{
-			doIncrementViscocity = false;
-			fluidSolver.viscocity = prevViscocity;
+			do_increment_viscocity_ = false;
+			fluid_solver_.viscocity = prev_viscocity_;
 		}
 	}
-	if (doIncrementVelocity)
+	if (do_increment_velocity_)
 	{
-		if (velocityMult > prevVelocity)
+		if (velocity_mult_ > prev_velocity_)
 		{
-			velocityMult -= 1;
+			velocity_mult_ -= 1;
 		}
 		else
 		{
-			doIncrementVelocity = false;
-			velocityMult = prevVelocity;
+			do_increment_velocity_ = false;
+			velocity_mult_ = prev_velocity_;
 		}
 	}
 
-	//randomForces();
+	random_forces();
+
+	//fluid_blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
+	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
-void FluidManager::renderFluid()
+void FluidManager::render_fluid()
 {
-	if (drawFluid) {
+	fluid_blur_.begin();
+	if (draw_fluid_)
+	{
 		ofBackground(0);
 		ofClear(0);
 		glColor3f(1, 1, 1);
 		ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
-		fluidDrawer.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+		fluid_drawer_.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+	}
+	fluid_blur_.end();
+	fluid_blur_.draw(); // blur only applies to background fluid
+}
+
+void FluidManager::render_particles()
+{
+	if (draw_particles_)
+	{
+		particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_/*, p*/);
 	}
 }
 
-void FluidManager::renderParticles()
+void FluidManager::draw_gui(const bool enable)
 {
-	if (drawParticles) {
-		particleSystem.updateAndDraw(fluidSolver, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), drawFluid/*, p*/);
-	}
-}
-
-void FluidManager::drawGUI(bool enable)
-{
-	if (enable) {
+	if (enable)
+	{
 		gui.show();
 		gui.draw();
 	}
-	else {
+	else
+	{
 		gui.hide();
 	}
 }
 
-void FluidManager::addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count)
+void FluidManager::add_to_fluid(ofVec2f pos, const ofVec2f vel, const bool add_color, const bool add_force, const int count)
 {
 	//vel /= 2;
-	float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
-	if (speed > 0) {
+	const float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
+	if (speed > 0)
+	{
 		pos.x = ofClamp(pos.x, 0.0f, 1.0f);
 		pos.y = ofClamp(pos.y, 0.0f, 1.0f);
 
-		int index = fluidSolver.getIndexForPos(pos);
+		const int index = fluid_solver_.getIndexForPos(pos);
 
-		if (addColor) {
+		if (add_color)
+		{
 			//			Color drawColor(CM_HSV, (getElapsedFrames() % 360) / 360.0f, 1, 1);
-			ofColor drawColor;
-			drawColor.setHsb((ofGetFrameNum() % 255), 255, 255);
+			ofColor draw_color;
+			draw_color.setHsb(ofGetFrameNum() % 255, 255, 255);
 
-			fluidSolver.addColorAtIndex(index, drawColor * colorMult);
+			fluid_solver_.addColorAtIndex(index, draw_color * color_mult_);
 
-			if (drawParticles)
-				particleSystem.addParticles(pos * ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), count);
+			if (draw_particles_)
+				particle_system_.add_particles(pos * ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), count);
 		}
 
-		if (addForce)
-			fluidSolver.addForceAtIndex(index, vel * velocityMult);
+		if (add_force)
+			fluid_solver_.addForceAtIndex(index, vel * velocity_mult_);
 
 	}
 }
 
-void FluidManager::explosion(int count)
+void FluidManager::explosion(const int count)
 {
-	for (int i = 0; i < count; i++) {
-		ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
-		ofVec2f vel = ofVec2f(ofRandom(-0.01, 0.01), ofRandom(-0.01, 0.01));
-		addToFluid(pos, vel, true, true);
+	for (int i = 0; i < count; i++)
+	{
+		const ofVec2f pos = ofVec2f(ofRandom(0, 1), ofRandom(0, 1));
+		const ofVec2f vel = ofVec2f(ofRandom(-0.01f, 0.01f), ofRandom(-0.01f, 0.01f));
+		add_to_fluid(pos, vel, true, true);
 	}
 }
 
-void FluidManager::incrementBrightness()
+void FluidManager::increment_brightness()
 {
-	if (!doIncrementBrightness) prevBrightness = fluidDrawer.brightness;
-	fluidDrawer.brightness = 6;
-	doIncrementBrightness = true;
+	if (!do_increment_brightness_) prev_brightness_ = fluid_drawer_.brightness;
+	fluid_drawer_.brightness = 6;
+	do_increment_brightness_ = true;
 
 	//if (!doIncrementDeltaT) prevDeltaT = fluidSolver.deltaT;
 	//fluidSolver.deltaT = 0;
@@ -188,59 +212,62 @@ void FluidManager::incrementBrightness()
 	//fluidSolver.viscocity = 0;
 	//doIncrementViscocity = true;
 
-	if (!doIncrementVelocity) prevVelocity = velocityMult;
-	velocityMult = 100;
-	doIncrementVelocity = true;
+	if (!do_increment_velocity_) prev_velocity_ = velocity_mult_;
+	velocity_mult_ = 100;
+	do_increment_velocity_ = true;
 }
 
-void FluidManager::randomForces()
+void FluidManager::random_forces()
 {
-	if (ofGetFrameNum() % (int)ofRandom(25, 100) == 0) {
-		ofVec2f pos = ofVec2f(ofRandom(0.25, 0.75), ofRandom(0.25, 0.75));
-		//for (int i = 0; i < 100; i++) {
-		//	//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
-		//	ofVec2f vel = ofVec2f(ofMap(i, 0, 99, -0.001, 0.001), ofMap(i, 0, 99, -0.001, 0.001));
-		//	addToFluid(pos, vel, true, true, 1);
-		//}
-		//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
-		//addToFluid(pos + 0.01, vel, true, true, 1);
-		//cout << "placed" << endl;
-		
-		float pi = 3.14159;
-		float radius = 0.01;
-		for (double angle = 0; angle <= 2 * pi; angle += 0.1) {
+	if (ofGetFrameNum() % static_cast<int>(ofRandom(25, 100)) == 0)
+	{
+		const ofVec2f pos = ofVec2f(ofRandom(0.25, 0.75), ofRandom(0.25, 0.75));
+		/*for (int i = 0; i < 100; i++) {
+			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
+			ofVec2f vel = ofVec2f(ofMap(i, 0, 99, -0.001, 0.001), ofMap(i, 0, 99, -0.001, 0.001));
+			addToFluid(pos, vel, true, true, 1);
+		}*/
+		/*const ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.1), ofRandom(-0.001, 0.1));
+		add_to_fluid(pos + 0.01, vel, false,  true, 1);*/
+
+		/*const float pi = 3.14159f;
+		const float radius = 0.01f;
+		for (double angle = 0; angle <= 2 * pi; angle += 0.1)
+		{
 			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
 			//ofVec2f vel = ofVec2f(-0.0001, 0.0001);
-			ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01, 0.01, -0.001, 0.001), ofMap(radius * sin(angle), -0.01, 0.01, -0.001, 0.001));
+			const ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01f, 0.01f, -0.001f, 0.001f),
+			                            ofMap(radius * sin(angle), -0.01f, 0.01f, -0.001f, 0.001f));
 			//cout << vel << endl;
-			addToFluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
-		}
+			add_to_fluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
+		}*/
 	}
 }
 
-void FluidManager::resetFluid()
+void FluidManager::reset_fluid()
 {
-	fluidSolver.reset();
+	fluid_solver_.reset();
 }
 
-msa::fluid::Solver* FluidManager::getSolver()
+msa::fluid::Solver* FluidManager::get_solver()
 {
-	return &fluidSolver;
+	return &fluid_solver_;
 }
 
-msa::fluid::DrawerGl* FluidManager::getDrawer()
+msa::fluid::DrawerGl* FluidManager::get_drawer()
 {
-	return &fluidDrawer;
+	return &fluid_drawer_;
 }
 
-ParticleSystem* FluidManager::getParticleSystem()
+ParticleSystem* FluidManager::get_particle_system()
 {
-	return &particleSystem;
+	return &particle_system_;
 }
 
-void FluidManager::keyPressed(int key)
+void FluidManager::key_pressed(const int key)
 {
-	if (key == ' ') {
+	if (key == ' ')
+	{
 		explosion(12500);
 	}
 }

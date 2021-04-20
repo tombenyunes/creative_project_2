@@ -1,10 +1,10 @@
 #include "Collisions.h"
 
-bool Collisions::EllipseCompare(ofVec2f _pos1, float _r1, ofVec2f _pos2, float _r2)
+bool Collisions::ellipse_compare(const ofVec2f pos1, const float r1, const ofVec2f pos2, const float r2)
 {
-	float dist = _pos2.distance(_pos1);
+	const float dist = pos2.distance(pos1);
 
-	if (dist <= (_r1 + _r2)/2) {
+	if (dist <= (r1 + r2)/2) {
 		return true;
 	}
 	else {

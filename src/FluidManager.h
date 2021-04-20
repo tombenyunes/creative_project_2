@@ -1,59 +1,61 @@
 #pragma once
 
 #include "MSAFluid.h"
+#include "ofxBlur.h"
 #include "ofxSimpleGuiToo.h"
-#include "ParticleSystem.h"
+
 #include "Controller.h"
+#include "ParticleSystem.h"
 
-class FluidManager {
-
+class FluidManager
+{
 public:
 
 	FluidManager();
+
 	void update();
-	void renderFluid();
-	void renderParticles();
-	void drawGUI(bool enable);
+	void render_fluid();
+	void render_particles();
+	static void draw_gui(bool enable);
 
-	void addToFluid(ofVec2f pos, ofVec2f vel, bool addColor, bool addForce, int count = 10);
+	void add_to_fluid(ofVec2f pos, ofVec2f vel, bool add_color, bool add_force, int count = 10);
 	void explosion(int count = 500);
-	void incrementBrightness();
-	bool doIncrementBrightness = false;
-	float prevBrightness = -1;
-	bool doIncrementDeltaT = false;
-	float prevDeltaT = -1;
-	bool doIncrementViscocity = false;
-	float prevViscocity = -1;
-	bool doIncrementVelocity = false;
-	float prevVelocity = -1;
+	void increment_brightness();
 
-	void randomForces();
+	void random_forces();
 
-	void resetFluid();
+	void reset_fluid();
 
-	msa::fluid::Solver* getSolver();
-	msa::fluid::DrawerGl* getDrawer();
-	ParticleSystem* getParticleSystem();
+	msa::fluid::Solver* get_solver();
+	msa::fluid::DrawerGl* get_drawer();
+	ParticleSystem* get_particle_system();
 
-	void keyPressed(int key);
+	void key_pressed(int key);
 
 private:
 
-	float colorMult;
-	float velocityMult;
-	int fluidCellsX;
-	bool resizeFluid;
-	bool drawFluid;
-	bool drawParticles;
+	int fluid_cells_x_;
+	bool resize_fluid_;
+	float color_mult_;
+	float velocity_mult_;
+	bool draw_fluid_;
+	bool draw_particles_;
+	float tuio_x_scaler_;
+	float tuio_y_scaler_;
 
-	float tuioXScaler = 1;
-	float tuioYScaler = 1;
+	msa::fluid::Solver fluid_solver_;
+	msa::fluid::DrawerGl fluid_drawer_;
 
-	bool drawParticleGUI;
+	ParticleSystem particle_system_;
 
-	msa::fluid::Solver fluidSolver;
-	msa::fluid::DrawerGl fluidDrawer;
+	ofxBlur fluid_blur_;
 
-	ParticleSystem particleSystem;
-
+	bool do_increment_brightness_;
+	float prev_brightness_;
+	bool do_increment_delta_t_;
+	float prev_delta_t_;
+	bool do_increment_viscocity_;
+	float prev_viscocity_;
+	bool do_increment_velocity_;
+	float prev_velocity_;
 };

@@ -13,7 +13,7 @@
     </SliderFloat_colorMult>
     <SliderFloat_velocityMult>
         <name>velocityMult</name>
-        <value>25.000000000</value>
+        <value>7.000000000</value>
     </SliderFloat_velocityMult>
     <SliderFloat_fs.viscocity>
         <name>fs.viscocity</name>
@@ -33,7 +33,7 @@
     </SliderInt_fs.solverIterations>
     <SliderFloat_fs.deltaT>
         <name>fs.deltaT</name>
-        <value>0.500000000</value>
+        <value>0.0</value>
     </SliderFloat_fs.deltaT>
     <ComboBox_fd.drawMode>
         <name>fd.drawMode</name>
@@ -65,7 +65,7 @@
     </SliderFloat_velDrawThreshold>
     <SliderFloat_brightness>
         <name>brightness</name>
-        <value>2.000000000</value>
+        <value>1.000000000</value>
     </SliderFloat_brightness>
     <Toggle_useAdditiveBlending>
         <name>useAdditiveBlending</name>

@@ -6,6 +6,6 @@ class Collisions
 {
 
 public:
-	bool EllipseCompare(ofVec2f _pos1, float _r1, ofVec2f _pos2, float _r2);
+	static bool ellipse_compare(ofVec2f pos1, float r1, ofVec2f pos2, float r2);
 
 };

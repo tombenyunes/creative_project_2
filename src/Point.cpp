@@ -1,103 +1,133 @@
 #include "Point.h"
 
-Point::Point(ofVec2f _pos, float _mass, float _radius)
+Point::Point(const ofVec2f pos, const float mass, const float radius)
 {
-	type = "Point";
+	set_type("Point");
+	set_position(pos);
+	set_color(ofColor(passive_color_));
+	set_mass(mass);
+	set_radius(radius);
 
-	pos.set(_pos);
-	color = ofColor(passiveColor);
-	mass = _mass;
-	radius = _radius;
-
-	gui_values_need_to_be_set = true;
-	mouseDrag = false;
-
-	AddModule("screenBounce");
-	AddModule("ellipseCollider");
-	AddModule("gravity");
-	AddModule("friction");
-	AddModule("mouseHover");
+	add_module("screenBounce");
+	add_module("ellipseCollider");
+	add_module("gravity");
+	add_module("friction");
+	add_module("mouseHover");
 }
 
 void Point::update()
-{	
-	updateForces();
-	dragNodes();
-	updateGUI();
-	resetForces();
+{
+	random_forces();
+	update_forces();
+	drag_nodes();
+	update_gui();
+	reset_forces();
 }
 
-void Point::updateForces()
+void Point::update_forces()
 {
-	addForces(false);
+	add_forces(false);
 }
 
-void Point::dragNodes()
+void Point::drag_nodes()
 {
-	posBeforeDrag.set(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
-	static ofVec2f mousePosBeforeDrag;
-	if (mouseDrag) {
-		ofVec2f prevPos2 = ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y) + mouseOffsetFromCenter;
-
-		ofVec2f newPos;
-		newPos.x = ofLerp(pos.x, prevPos2.x, 0.1);
-		newPos.y = ofLerp(pos.y, prevPos2.y, 0.1);
-
-		pos.set(newPos);
-
-		vel.set(0);
-
-		startedDragging = true;
-		mousePosBeforeDrag = ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
-	}
-	else {
-		if (startedDragging == true) {
-			startedDragging = false;
-			ofVec2f mousespeed = (ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y) - mousePosBeforeDrag) / 3;
-			applyForce(accel, mousespeed, false);
-		}
-	}
-}
-
-void Point::updateGUI()
-{
-	if (GameController->getActive() == this) {
-		if (gui_values_need_to_be_set) {
-			GUI_Manager->updateValues(pos, vel, accel, mass, infiniteMass, radius, affectedByGravity, 2);
-			gui_values_need_to_be_set = false;
-		}
-		else {
-			GUI_Manager->updateValues(pos, vel, accel, GUI_Manager->selected_mass, GUI_Manager->selected_infiniteMass, GUI_Manager->selected_radius, GUI_Manager->selected_affectedByGravity, 2);
-			if (infiniteMass) {
-				mass = 999999999999;
-			}
-			else {
-				mass = GUI_Manager->selected_mass;
-			}
-			radius = GUI_Manager->selected_radius;
-			infiniteMass = GUI_Manager->selected_infiniteMass;
-			affectedByGravity = GUI_Manager->selected_affectedByGravity;
-		}
-	}
-}
-
-void Point::resetForces()
-{
-	accel.set(0);
-}
-
-void Point::isColliding(GameObject* _other, ofVec2f _nodePos)
-{
-	if (_other->type == "")
+	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+	static ofVec2f mouse_pos_before_drag;
+	if (mouse_drag_)
 	{
-		ofVec2f directionToPlayer = _other->pos - pos;
-		applyForce(accel, directionToPlayer, true, 2.75f);
+		const ofVec2f prev_pos2 = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+
+		ofVec2f new_pos;
+		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
+		new_pos.y = ofLerp(pos_.y, prev_pos2.y, 0.1f);
+
+		pos_.set(new_pos);
+
+		vel_.set(0);
+
+		started_dragging_ = true;
+		mouse_pos_before_drag = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
 	}
-	if (_other->type == "Player")
+	else
 	{
-		Fluid_Manager->incrementBrightness();
-		request_to_be_deleted_event = "Collected";
-		request_to_be_deleted = true;
+		if (started_dragging_ == true)
+		{
+			started_dragging_ = false;
+			const ofVec2f mouse_speed = (ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
+			apply_force(accel_, mouse_speed, false);
+		}
+	}
+}
+
+void Point::update_gui()
+{
+	if (game_controller_->get_active() == this)
+	{
+		if (gui_values_need_to_be_set_)
+		{
+			gui_manager_->update_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_, 2);
+			gui_values_need_to_be_set_ = false;
+		}
+		else
+		{
+			gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity, 2);
+			if (infinite_mass_)
+			{
+				mass_ = 999999999999.0f;
+			}
+			else
+			{
+				mass_ = gui_manager_->selected_mass;
+			}
+			radius_ = gui_manager_->selected_radius;
+			infinite_mass_ = gui_manager_->selected_infinite_mass;
+			affected_by_gravity_ = gui_manager_->selected_affected_by_gravity;
+		}
+	}
+}
+
+void Point::reset_forces()
+{
+	accel_.set(0);
+}
+
+void Point::is_colliding(GameObject* other, ofVec2f node_pos)
+{
+	if (other->get_type() == "PullRange")
+	{
+		const ofVec2f direction_to_player = other->get_position() - pos_;
+		apply_force(accel_, direction_to_player, true, 2.75f);
+		other->set_request_to_be_deleted(true);
+	}
+	if (other->get_type() == "Player")
+	{
+		fluid_manager_->increment_brightness();
+		set_request_to_be_deleted_event("Collected");
+		set_request_to_be_deleted(true);
+	}
+}
+
+void Point::random_forces()
+{
+	if (ofGetFrameNum() % static_cast<int>(ofRandom(25, 100)) == 0)
+	{
+		ofVec2f mapped_pos;
+		mapped_pos.x = ofMap(get_position().x, -WORLD_WIDTH/2, WORLD_WIDTH/2, 0, 1);
+		mapped_pos.y = ofMap(get_position().y, -WORLD_HEIGHT/2, WORLD_HEIGHT/2, 0, 1);
+		const ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.1), ofRandom(-0.001, 0.1));
+		fluid_manager_->add_to_fluid(mapped_pos, vel, false,  true, 1);
+
+		/*const float pi = 3.14159f;
+		const float radius = 0.01f;
+		for (double angle = 0; angle <= 2 * pi; angle += 0.1)
+		{
+			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
+			//ofVec2f vel = ofVec2f(-0.0001, 0.0001);
+			const ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01f, 0.01f, -0.001f, 0.001f),
+										ofMap(radius * sin(angle), -0.01f, 0.01f, -0.001f, 0.001f));
+			//cout << vel << endl;
+			add_to_fluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
+		}*/
 	}
 }
 
@@ -105,34 +135,40 @@ void Point::isColliding(GameObject* _other, ofVec2f _nodePos)
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Point::mousePressed(float _x, float _y, int _button)
+void Point::mouse_pressed(const float x, const float y, const int button)
 {
-	if (_button == 2 && mouseOver) {
-		if (GameController->getActive() != this) {
-			GameController->makeActive(this);
-			gui_values_need_to_be_set = true;
+	if (button == 2 && mouse_over_)
+	{
+		if (game_controller_->get_active() != this)
+		{
+			game_controller_->make_active(this);
+			gui_values_need_to_be_set_ = true;
 		}
 	}
 }
 
-void Point::mouseDragged(float _x, float _y, int _button)
+void Point::mouse_dragged(const float x, const float y, const int button)
 {
-	if (_button == 2) {
-		if (mouseOver && GameController->getMouseDragged() == false) {
-			if (posBeforeDrag.distance(ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y)) > 2) {
+	if (button == 2)
+	{
+		if (mouse_over_ && game_controller_->get_mouse_dragged() == false)
+		{
+			if (pos_before_drag_.distance(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y)) > 2)
+			{
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
-				mouseDrag = true;
-				GameController->setMouseDragged(true);
+				mouse_drag_ = true;
+				game_controller_->set_mouse_dragged(true);
 			}
 		}
 	}
 }
 
-void Point::mouseReleased(float _x, float _y, int _button)
+void Point::mouse_released(const float x, const float y, const int button)
 {
-	if (_button == 2) {
-		mouseDrag = false;
-		GameController->setMouseDragged(false);
+	if (button == 2)
+	{
+		mouse_drag_ = false;
+		game_controller_->set_mouse_dragged(false);
 	}
 }
 
@@ -144,12 +180,12 @@ void Point::draw()
 {
 	ofPushStyle();
 
-	getColor();
+	get_color();
 
 	ofNoFill();
-	ofSetLineWidth(ofMap(mass, MINIMUM_MASS, MAXIMUM_MASS, 0.1, 10));
+	ofSetLineWidth(ofMap(mass_, MINIMUM_MASS, MAXIMUM_MASS, 0.1f, 10.0f));
 
-	ofEllipse(pos.x, pos.y, radius, radius);
+	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
 	static bool spraying = false;
 	static bool trig = false;
@@ -159,14 +195,14 @@ void Point::draw()
 		ofResetElapsedTimeCounter();
 	}
 	if (spraying) {
-		if (ofGetElapsedTimef() < 0.1) {
-			static ofVec2f newPos;
-			static ofVec2f newVel;
+		if (ofGetElapsedTimef() < 0.1f) {
+			static ofVec2f new_pos;
+			static ofVec2f new_vel;
 			if (!trig) {
-				newPos.x = ofMap(pos.x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
-				newPos.y = ofMap(pos.y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
-				newVel.x = (ofRandom(-1, 1) / 120);
-				newVel.y = (ofRandom(-1, 1) / 120);
+				new_pos.x = ofMap(pos_.x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
+				new_pos.y = ofMap(pos_.y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+				new_vel.x = (ofRandom(-1, 1) / 120);
+				new_vel.y = (ofRandom(-1, 1) / 120);
 				trig = true;
 			}			
 			//Fluid_Manager->addToFluid(newPos, newVel, true, true);
@@ -179,15 +215,18 @@ void Point::draw()
 	ofPopStyle();
 }
 
-void Point::getColor()
+void Point::get_color()
 {
-	if ((GameController->getActive() == this) || (mouseOver || mouseDrag)) {
-		ofSetColor(selectedColor);
+	if ((game_controller_->get_active() == this) || (mouse_over_ || mouse_drag_))
+	{
+		ofSetColor(selected_color_);
 	}
-	else if (infiniteMass) {
-		ofSetColor(passiveColor);
+	else if (infinite_mass_)
+	{
+		ofSetColor(passive_color_);
 	}
-	else {
-		ofSetColor(color);
+	else
+	{
+		ofSetColor(color_);
 	}
 }

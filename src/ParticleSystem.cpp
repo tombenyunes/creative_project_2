@@ -10,11 +10,11 @@
 #include "ParticleSystem.h"
 
 ParticleSystem::ParticleSystem() {
-	curIndex = 0;
+	cur_index_ = 0;
 }
 
-void ParticleSystem::updateAndDraw(const msa::fluid::Solver &solver, ofVec2f windowSize, bool drawingFluid/*, Player& p*/) {
-    ofVec2f invWindowSize(1.0f / windowSize.x, 1.0f / windowSize.y);
+void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const ofVec2f window_size, const bool drawing_fluid) {
+	const ofVec2f inv_window_size(1.0f / window_size.x, 1.0f / window_size.y);
 
 	glEnable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
@@ -23,18 +23,17 @@ void ParticleSystem::updateAndDraw(const msa::fluid::Solver &solver, ofVec2f win
     ofSetLineWidth(1);
 	
 	for(int i=0; i<MAX_PARTICLES; i++) {
-		if(particles[i].alpha > 0) {
-			particles[i].update(solver, windowSize, invWindowSize);
-			particles[i].updateVertexArrays(drawingFluid, invWindowSize, i, posArray, colArray);
+		if(particles_[i].alpha > 0) {
+			particles_[i].update(a_solver, window_size, inv_window_size);
+			particles_[i].update_vertex_arrays(drawing_fluid, inv_window_size, i, pos_array_, col_array_);
 		}
 	}
-	//p.update(solver, windowSize, invWindowSize);
-
+	
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, posArray);
+	glVertexPointer(2, GL_FLOAT, 0, pos_array_);
 	
 	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(3, GL_FLOAT, 0, colArray);
+	glColorPointer(3, GL_FLOAT, 0, col_array_);
 	
 	glDrawArrays(GL_LINES, 0, MAX_PARTICLES * 2);
 	
@@ -45,15 +44,15 @@ void ParticleSystem::updateAndDraw(const msa::fluid::Solver &solver, ofVec2f win
 }
 
 
-void ParticleSystem::addParticles(const ofVec2f &pos, int count){
+void ParticleSystem::add_particles(const ofVec2f &pos, const int count){
 	for(int i=0; i<count; i++)
 		//addParticle(pos + msa::Rand::randVec2f() * 15);
-		addParticle(pos);
+		add_particle(pos);
 }
 
 
-void ParticleSystem::addParticle(const ofVec2f &pos) {
-	particles[curIndex].init(pos.x, pos.y);
-	curIndex++;
-	if(curIndex >= MAX_PARTICLES) curIndex = 0;
+void ParticleSystem::add_particle(const ofVec2f &pos) {
+	particles_[cur_index_].init(pos.x, pos.y);
+	cur_index_++;
+	if(cur_index_ >= MAX_PARTICLES) cur_index_ = 0;
 }

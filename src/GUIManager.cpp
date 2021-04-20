@@ -1,253 +1,260 @@
 #include "GUIManager.h"
 
 GUIManager::GUIManager()
+	:	multi_node_selected(false),
+		point_count_(0),
+		points_collected_(0),
+		max_point_count_(0),   // buffer between all panels and each other + screen edges
+		buffer_(5),
+		draw_particle_gui_(false),
+		draw_audio_gui_(false)
 {
-	buffer = 5; // buffer between all panels and each other + screen edges
-	string errorMessage = "Error: Updating failed"; // error message will show for all parameters that require but haven't received an update
-	int errorInt = 404;
+	const string error_message = "Error: Updating failed"; // error message will show for all parameters that require but haven't received an update
+	const int error_int = 404;
 
-	ofVec2f kBounds = { 0.1, 20 };
-	ofVec2f dampingBounds = { 0.1, 8 };
-	ofVec2f springmassBounds = { 0.1, 50 };
+	const ofVec2f k_bounds = { 0.1f, 20.0f };
+	const ofVec2f damping_bounds = { 0.1f, 8.0f };
+	ofVec2f springmass_bounds = { 0.1f, 50.0f };
 
-	pointCount = 0;
-	pointsCollected = 0;
-	maxPointCount = 0;
+	new_scene_.addListener(this, &GUIManager::set_clear_all);
 
-	newScene.addListener(this, &GUIManager::setClearAll);
+	world_gui_.setup("World", "", buffer_, buffer_);
+	world_gui_.add(new_scene_.setup("clear all"));
+	world_gui_.add(gravity_.setup("global gravity", false));
+	world_gui_.add(hard_collisions_.setup("hard collisions", false));
 
-	world_gui.setup("World", "", buffer, buffer);
-	world_gui.add(newScene.setup("clear all"));
-	world_gui.add(gravity.setup("global gravity", false));
-	world_gui.add(hardCollisions.setup("hard collisions", false));
-	
-	player_gui.setup("Player", "", world_gui.getPosition().x + world_gui.getWidth() + buffer, buffer);
-	player_gui.add(position.setup("pos", errorMessage));
-	player_gui.add(velocity.setup("vel", errorMessage));
-	player_gui.add(accel.setup("accel", errorMessage));
-	player_gui.add(mass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
-	player_gui.add(infiniteMass.setup("infinite mass", false));
-	player_gui.add(radius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
-	player_gui.add(affectedByGravity.setup("gravity", false));
+	player_gui_.setup("Player", "", world_gui_.getPosition().x + world_gui_.getWidth() + buffer_, buffer_);
+	player_gui_.add(position.setup("pos", error_message));
+	player_gui_.add(velocity.setup("vel", error_message));
+	player_gui_.add(acceleration.setup("acceleration", error_message));
+	player_gui_.add(mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
+	player_gui_.add(infinite_mass.setup("infinite mass", false));
+	player_gui_.add(radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
+	player_gui_.add(affected_by_gravity.setup("gravity", false));
 
-	selected_gui.setup("Selected Object", "", ofGetWidth() - selected_gui.getWidth() - buffer, buffer);
-	selected_gui.add(selected_position.setup("pos", errorMessage));
-	selected_gui.add(selected_velocity.setup("vel", errorMessage));
-	selected_gui.add(selected_accel.setup("accel", errorMessage));
-	selected_gui.add(selected_mass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
-	selected_gui.add(selected_infiniteMass.setup("infinite mass", false));
-	selected_gui.add(selected_radius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
-	selected_gui.add(selected_affectedByGravity.setup("gravity", false));	
+	selected_gui_.setup("Selected Object", "", ofGetWidth() - selected_gui_.getWidth() - buffer_, buffer_);
+	selected_gui_.add(selected_position.setup("pos", error_message));
+	selected_gui_.add(selected_velocity.setup("vel", error_message));
+	selected_gui_.add(selected_accel.setup("acceleration", error_message));
+	selected_gui_.add(selected_mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
+	selected_gui_.add(selected_infinite_mass.setup("infinite mass", false));
+	selected_gui_.add(selected_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
+	selected_gui_.add(selected_affected_by_gravity.setup("gravity", false));
 
-	multi_selection_gui_spring.setup("Spring Settings", "", ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, buffer);
-	multi_selection_gui_spring.add(anchorPos.setup("anchor pos", errorMessage));
-	multi_selection_gui_spring.add(k.setup("springiness", errorInt, kBounds.x, kBounds.y));
-	multi_selection_gui_spring.add(damping.setup("damping", errorInt, dampingBounds.x, dampingBounds.y));
-	multi_selection_gui_spring.add(springmass.setup("springmass", errorInt, MINIMUM_MASS, MAXIMUM_MASS));
-	multi_selection_gui_spring.add(spring_affectedByGravity.setup("gravity", false));
+	multi_selection_gui_spring_.setup("Spring Settings", "", ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, buffer_);
+	multi_selection_gui_spring_.add(anchor_pos.setup("anchor pos", error_message));
+	multi_selection_gui_spring_.add(k.setup("springiness", error_int, k_bounds.x, k_bounds.y));
+	multi_selection_gui_spring_.add(damping.setup("damping", error_int, damping_bounds.x, damping_bounds.y));
+	multi_selection_gui_spring_.add(springmass.setup("springmass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
+	multi_selection_gui_spring_.add(spring_affected_by_gravity.setup("gravity", false));
 
-	multi_selection_gui_node.setup("Selected Node", "", ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_spring.getPosition().y + multi_selection_gui_spring.getHeight() + buffer);
-	multi_selection_gui_node.add(nodePos.setup("pos", errorMessage));
-	multi_selection_gui_node.add(nodeVel.setup("vel", errorMessage));
-	multi_selection_gui_node.add(nodeAccel.setup("accel", errorMessage));
-	multi_selection_gui_node.add(nodeMass.setup("mass", errorInt, MINIMUM_MASS, MAXIMUM_MASS/10));
-	multi_selection_gui_node.add(nodeRadius.setup("radius", errorInt, RADIUS_MINIMUM, RADIUS_MAXIMUM));
+	multi_selection_gui_node_.setup("Selected Node", "", ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, multi_selection_gui_spring_.getPosition().y + multi_selection_gui_spring_.getHeight() + buffer_);
+	multi_selection_gui_node_.add(node_pos.setup("pos", error_message));
+	multi_selection_gui_node_.add(node_vel.setup("vel", error_message));
+	multi_selection_gui_node_.add(node_accel.setup("acceleration", error_message));
+	multi_selection_gui_node_.add(node_mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS / 10));
+	multi_selection_gui_node_.add(node_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 
-	create_node_gui.setup("Create", "", ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
-	create_node_gui.add(howToMove.setup("", "Hold M1 to Move Player"));
-	create_node_gui.add(howToDrag.setup("", "Hold M2 to Drag Node"));
-	create_node_gui.add(howToSelect.setup("", "Press M2 to Select Node"));
-	create_node_gui.add(howToDelete.setup("", "Press 'x' to Delete Node"));
-	create_node_gui.add(howToCreate.setup("", "Press 'c' to Create Node"));
-	create_node_gui.add(howToChangeType.setup("", "MouseWheel Changes Type:"));
-	create_node_gui.add(name.setup("Type", errorMessage));
-
-	drawParticleGUI = false;
-	drawAudioGUI = false;
+	create_node_gui_.setup("Create", "", ofGetWidth() / 2 - create_node_gui_.getWidth() / 2, buffer_);
+	create_node_gui_.add(how_to_move_.setup("", "Hold M1 to Move Player"));
+	create_node_gui_.add(how_to_drag_.setup("", "Hold M2 to Drag Node"));
+	create_node_gui_.add(how_to_select_.setup("", "Press M2 to Select Node"));
+	create_node_gui_.add(how_to_delete_.setup("", "Press 'x' to Delete Node"));
+	create_node_gui_.add(how_to_create_.setup("", "Press 'c' to Create Node"));
+	create_node_gui_.add(how_to_change_type_.setup("", "MouseWheel Changes Type:"));
+	create_node_gui_.add(name_.setup("Type", error_message));
 }
 
-void GUIManager::init(Controller* _controller, FluidManager* _fluidManager, AudioManager* _audioManager, GameModeManager* _GameMode_Manager, Camera* _cam)
+void GUIManager::init(Controller* controller, FluidManager* fluid_manager, AudioManager* audio_manager, GamemodeManager* game_mode_manager, Camera* cam)
 {
-	GameController = _controller;
-	Fluid_Manager = _fluidManager;
-	Audio_Manager = _audioManager;
-	GameMode_Manager = _GameMode_Manager;
+	game_controller_ = controller;
+	fluid_manager_ = fluid_manager;
+	audio_manager_ = audio_manager;
+	game_mode_manager_ = game_mode_manager;
 
-	cam = _cam;
+	cam_ = cam;
 }
 
 void GUIManager::update()
 {	
-	updateWorld();
-	updateCreateNodeValues();
+	update_world();
+	update_create_node_values();
 }
 
-void GUIManager::updateWorld()
+void GUIManager::update_world()
 {
-	GameController->setGravity(gravity);
-	GameController->setUseHardCollisions(hardCollisions);
+	game_controller_->set_gravity(gravity_);
+	game_controller_->set_use_hard_collisions(hard_collisions_);
 }
 
-void GUIManager::updateCreateNodeValues()
+void GUIManager::update_create_node_values()
 {
-	switch (GameController->getNewNodeType()) {
-		case 0:
-			name = "Mass";
-			break;
-		case 1:
-			name = "Spring";
-			break;
-		case 2:
-			name = "Point";
-			break;
+	switch (game_controller_->get_new_node_type())
+	{
+	case 0:
+		name_ = "Mass";
+		break;
+	case 1:
+		name_ = "Spring";
+		break;
+	case 2:
+		name_ = "Point";
+		break;
+	default:
+		cout << "Error -> GUIManager.cpp::update_create_node_values -> New Node Type Not Specified" << endl;
+		break;
 	}
 }
 
-void GUIManager::incPointsCollected()
+void GUIManager::inc_points_collected()
 {
-	pointsCollected++;
+	points_collected_++;
 }
 
-void GUIManager::incMaxPointCount()
+void GUIManager::inc_max_point_count()
 {
-	maxPointCount++;
+	max_point_count_++;
 }
 
-void GUIManager::updatePointCount(int count)
+void GUIManager::update_point_count(const int count)
 {
-	pointCount = count;
+	point_count_ = count;
 }
 
-void GUIManager::updateValues(ofVec2f _pos, ofVec2f _vel, ofVec2f _accel, float _mass, bool _infmass, float _radius, bool _affectedByGravity, int panel)
+void GUIManager::update_values(const ofVec2f node_position, const ofVec2f node_velocity, const ofVec2f node_acceleration, const float _node_mass, const bool infmass, const float _node_radius, const bool is_affected_by_gravity, const int panel)
 {
-	if (panel == 1) {
-		position = ofToString(roundf(_pos.x)) + ", " + ofToString(roundf(_pos.y));
-		velocity = ofToString(roundf(_vel.x * 100) / 100) + ", " + ofToString(roundf(_vel.y * 100) / 100);
-		accel = ofToString(roundf(_accel.x * 10000) / 10000) + ", " + ofToString(roundf(_accel.y * 10000) / 10000);
-		if (_infmass) {
+	if (panel == 1)
+	{
+		position = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
+		velocity = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
+		acceleration = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
+		if (infmass)
+		{
 			mass.setTextColor(0);
-			infiniteMass = true;
+			infinite_mass = true;
 		}
-		else {
+		else
+		{
 			mass.setTextColor(255);
-			mass = _mass;
-			infiniteMass = false;
+			mass = _node_mass;
+			infinite_mass = false;
 		}
-		radius = _radius;
-		affectedByGravity = _affectedByGravity;
+		radius = _node_radius;
+		affected_by_gravity = is_affected_by_gravity;
 
-		player_gui_position = _pos;
+		player_gui_position_ = node_position;
 	}
-	else if (panel == 2) {
-		selected_position = ofToString(roundf(_pos.x)) + ", " + ofToString(roundf(_pos.y));
-		selected_velocity = ofToString(roundf(_vel.x * 100) / 100) + ", " + ofToString(roundf(_vel.y * 100) / 100);
-		selected_accel = ofToString(roundf(_accel.x * 10000) / 10000) + ", " + ofToString(roundf(_accel.y * 10000) / 10000);
-		if (_infmass) {
+	else if (panel == 2)
+	{
+		selected_position = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
+		selected_velocity = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
+		selected_accel = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
+		if (infmass)
+		{
 			selected_mass.setTextColor(0);
-			selected_infiniteMass = true;
+			selected_infinite_mass = true;
 		}
-		else {
+		else
+		{
 			selected_mass.setTextColor(255);
-			selected_mass = _mass;
-			selected_infiniteMass = false;
+			selected_mass = _node_mass;
+			selected_infinite_mass = false;
 		}
-		selected_radius = _radius;
-		selected_affectedByGravity = _affectedByGravity;
+		selected_radius = _node_radius;
+		selected_affected_by_gravity = is_affected_by_gravity;
 		//selected_gui_position = ofVec2f((_pos.x - selected_gui.getWidth() - buffer), (_pos.y - buffer));
-		selected_gui_position = ofVec2f(cam->screenToWorld(ofVec3f(_pos.x, _pos.y, 0)).x, cam->screenToWorld(ofVec3f(_pos.x, _pos.y, 0)).y);
+		selected_gui_position_ = ofVec2f(cam_->screen_to_world(ofVec3f(node_position.x, node_position.y, 0)).x, cam_->screen_to_world(ofVec3f(node_position.x, node_position.y, 0)).y);
 		//cout << selected_gui.getPosition() << endl;
 	}
 }
 
-void GUIManager::updateSpringValues(ofVec2f _anchorpos, float _k, float _damping, float _springmass, bool _affectedByGravity, ofVec2f _selectedNodePos, ofVec2f _selectedNodeVel, ofVec2f _selectedNodeAccel, float _selectedNodeMass, float _selectedNodeRadius)
+void GUIManager::update_spring_values(const ofVec2f spring_anchor_position, const float spring_k, const float spring_damping, const float spring_mass, const bool is_affected_by_gravity, const ofVec2f selected_node_pos, const ofVec2f selected_node_vel, const ofVec2f selected_node_accel, const float selected_node_mass, const float selected_node_radius)
 {
-	anchorPos = ofToString(roundf(_anchorpos.x)) + ", " + ofToString(roundf(_anchorpos.y));
+	anchor_pos = ofToString(roundf(spring_anchor_position.x)) + ", " + ofToString(roundf(spring_anchor_position.y));
 
-	k = _k;
-	damping = _damping;
-	springmass = _springmass;
-	spring_affectedByGravity = _affectedByGravity;
+	k = spring_k;
+	damping = spring_damping;
+	springmass = spring_mass;
+	spring_affected_by_gravity = is_affected_by_gravity;
 
-	if (_selectedNodePos == ofVec2f(-1, -1) && _selectedNodeVel == ofVec2f(-1, -1) && _selectedNodeAccel == ofVec2f(-1, -1) && _selectedNodeMass == -1 && _selectedNodeRadius == -1) {
+	if (selected_node_pos == ofVec2f(-1, -1) && selected_node_vel == ofVec2f(-1, -1) && selected_node_accel == ofVec2f(-1, -1) && selected_node_mass == -1 && selected_node_radius == -1)
+	{
 		// can't draw
-		multiNodeSelected = false;
+		multi_node_selected = false;
 	}
-	else {
-		multiNodeSelected = true;
-		nodePos = ofToString(roundf(_selectedNodePos.x)) + ", " + ofToString(roundf(_selectedNodePos.y));
-		nodeVel = ofToString(roundf(_selectedNodeVel.x * 100) / 100) + ", " + ofToString(roundf(_selectedNodeVel.y * 100) / 100);
-		nodeAccel = ofToString(roundf(_selectedNodeAccel.x * 10000) / 10000) + ", " + ofToString(roundf(_selectedNodeAccel.y * 10000) / 10000);
-		nodeMass = _selectedNodeMass;
-		nodeRadius = _selectedNodeRadius;
+	else
+	{
+		multi_node_selected = true;
+		node_pos = ofToString(roundf(selected_node_pos.x)) + ", " + ofToString(roundf(selected_node_pos.y));
+		node_vel = ofToString(roundf(selected_node_vel.x * 100) / 100) + ", " + ofToString(roundf(selected_node_vel.y * 100) / 100);
+		node_accel = ofToString(roundf(selected_node_accel.x * 10000) / 10000) + ", " + ofToString(roundf(selected_node_accel.y * 10000) / 10000);
+		node_mass = selected_node_mass;
+		node_radius = selected_node_radius;
 	}
 }
 
-void GUIManager::prepareForNewScene()
+void GUIManager::prepare_for_new_scene()
 {
-	maxPointCount = 0;
-	pointsCollected = 0;
+	max_point_count_ = 0;
+	points_collected_ = 0;
 }
 
-void GUIManager::windowResized(int w, int h)
+void GUIManager::window_resized(int w, int h)
 {
-	create_node_gui.setPosition(ofGetWidth() / 2 - create_node_gui.getWidth() / 2, buffer);
-	selected_gui.setPosition(ofGetWidth() - selected_gui.getWidth() - buffer, buffer);
-	multi_selection_gui_spring.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, buffer);
-	multi_selection_gui_node.setPosition(ofGetWidth() - multi_selection_gui_spring.getWidth() - buffer, multi_selection_gui_spring.getPosition().y + multi_selection_gui_spring.getHeight() + buffer);
+	create_node_gui_.setPosition(ofGetWidth() / 2 - create_node_gui_.getWidth() / 2, buffer_);
+	selected_gui_.setPosition(ofGetWidth() - selected_gui_.getWidth() - buffer_, buffer_);
+	multi_selection_gui_spring_.setPosition(ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, buffer_);
+	multi_selection_gui_node_.setPosition(ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, multi_selection_gui_spring_.getPosition().y + multi_selection_gui_spring_.getHeight() + buffer_);
 }
 
-void GUIManager::setClearAll()
+void GUIManager::set_clear_all()
 {
-	GameController->setDeleteAll(true);
+	game_controller_->set_delete_all(true);
 }
 
-void GUIManager::drawRequiredGUI(bool _isSpring)
+void GUIManager::draw_required_gui(const bool is_spring)
 {
-	if (GameController->getGUIVisible() /*|| Event_Manager->playerGUIVisible*/) {
-		
-		ofPushMatrix();
-		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
-		//ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-		//ofVec3f newPos = cam->screenToWorld(ofVec3f(player_gui_position.x, player_gui_position.y, cam->getPosition().z));
-		player_gui.setPosition(player_gui_position.x, player_gui_position.y);
-		player_gui.draw();
-		ofPopMatrix();		
+	if (game_controller_->get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
+	{
+		player_gui_.draw();
 
-		if (GameController->getActive() != nullptr) {
-			if (_isSpring) {	// if an object is a spring then it has multiple gui windows to draw
-				multi_selection_gui_spring.draw();
-				if (multiNodeSelected == true) {
-					multi_selection_gui_node.draw();
+		if (game_controller_->get_active() != nullptr)
+		{
+			if (is_spring)
+			{
+				// if an object is a spring then it has multiple gui windows to draw
+				multi_selection_gui_spring_.draw();
+				if (multi_node_selected == true)
+				{
+					multi_selection_gui_node_.draw();
 				}
 			}
-			else {
-				ofPushMatrix();
-				ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-				selected_gui.setPosition((selected_gui_position).x, (selected_gui_position).y);
-				selected_gui.draw();
-				ofPopMatrix();
+			else
+			{
+				selected_gui_.draw();
 			}
 		}
 	}
-	if (GameController->getGUIVisible()) {
-		world_gui.draw();
-		create_node_gui.draw();
+	if (game_controller_->get_gui_visible())
+	{
+		world_gui_.draw();
+		create_node_gui_.draw();
 	}
 
-	Fluid_Manager->drawGUI(drawParticleGUI);
-	Audio_Manager->drawGUI(drawAudioGUI);	
+	FluidManager::draw_gui(draw_particle_gui_);
+	audio_manager_->drawGUI(draw_audio_gui_);
 
-	drawText();
-	if (GameMode_Manager->getCurrentModeID() == 0) drawBorder();
+	draw_text();
+	if (game_mode_manager_->get_current_mode_id() == 0) draw_border();
 }
 
-void GUIManager::drawText()
+void GUIManager::draw_text() const
 {
-	ofDrawBitmapString("GameMode: " + GameMode_Manager->getCurrentModeString(), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
-	ofDrawBitmapString("Points Found: " + to_string(pointsCollected) + " / " + to_string(maxPointCount), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
+	ofDrawBitmapString("GameMode: " + game_mode_manager_->get_current_mode_string(), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
+	ofDrawBitmapString("Points Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
 }
 
-void GUIManager::drawBorder()
+void GUIManager::draw_border() const
 {
 	ofPushStyle();
 	ofPushMatrix();
@@ -261,36 +268,45 @@ void GUIManager::drawBorder()
 	ofPopStyle();
 }
 
-void GUIManager::keyPressed(int key)
+void GUIManager::key_pressed(const int key)
 {
-	if (key == 57344) { // f1
-		if (GameController->getGUIVisible()) {
-			GameController->setGUIVisible(false);
+	if (key == 57344) // f1
+	{		
+		if (game_controller_->get_gui_visible())
+		{
+			game_controller_->set_gui_visible(false);
 		}
-		else {
-			GameController->setGUIVisible(true);
-			drawParticleGUI = false;
-			drawAudioGUI = false;
-		}
-	}
-	else if (key == 57345) { // f2
-		if (drawParticleGUI) {
-			drawParticleGUI = false;
-		}
-		else {
-			GameController->setGUIVisible(false);
-			drawParticleGUI = true;
-			drawAudioGUI = false;
+		else
+		{
+			game_controller_->set_gui_visible(true);
+			draw_particle_gui_ = false;
+			draw_audio_gui_ = false;
 		}
 	}
-	else if (key == 57346) { // f3
-		if (drawAudioGUI) {
-			drawAudioGUI = false;
+	else if (key == 57345) // f2
+	{		
+		if (draw_particle_gui_)
+		{
+			draw_particle_gui_ = false;
 		}
-		else {
-			GameController->setGUIVisible(false);
-			drawParticleGUI = false;
-			drawAudioGUI = true;
+		else
+		{
+			game_controller_->set_gui_visible(false);
+			draw_particle_gui_ = true;
+			draw_audio_gui_ = false;
+		}
+	}
+	else if (key == 57346) // f3
+	{		
+		if (draw_audio_gui_)
+		{
+			draw_audio_gui_ = false;
+		}
+		else
+		{
+			game_controller_->set_gui_visible(false);
+			draw_particle_gui_ = false;
+			draw_audio_gui_ = true;
 		}
 	}
 }

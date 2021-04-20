@@ -3,34 +3,33 @@
 #include "ofMain.h"
 #include "GameObject.h"
 
-class Mass : public GameObject {
-	
+class Mass : public GameObject
+{
 public:
 
-	Mass(ofVec2f _pos, float _mass, float _radius);
-	
-	void update() override;
-
-	void mousePressed(float _x, float _y, int _button) override;
-	void mouseDragged(float _x, float _y, int _button) override;
-	void mouseReleased(float _x, float _y, int _button) override;
-
-	void draw() override;
-	void getColor();
+	Mass(ofVec2f pos, float mass, float radius);	
 
 private:
 
-	void updateForces();
+	void update() override;		
 
-	void dragNodes();
-
-	void updateGUI();
-	void resetForces();
+	// Physics/movement
+	void update_forces();
+	void reset_forces();
 	
-	bool gui_values_need_to_be_set;
+	void drag_nodes();
 	
-	ofVec2f posBeforeDrag;
-	bool startedDragging = false;
+	// GUI
+	void update_gui();	
 
-
+	// Draw
+	void draw() override;
+	
+	void get_color();
+	
+	// Events
+	void mouse_pressed(float x, float y, int button) override;
+	void mouse_dragged(float x, float y, int button) override;
+	void mouse_released(float x, float y, int button) override;
+	
 };

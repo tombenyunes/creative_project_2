@@ -34,47 +34,47 @@ public:
 	
 	Controller();
 
-	void init(Camera* _cam);
-	Camera* cam;
-
+	void init(Camera* cam);
+	
 	void update();
 
-	ofVec3f getWorldMousePos();
+	ofVec3f get_world_mouse_pos() const;
 
-	void makeActive(GameObject* _this);
-	GameObject* getActive();
+	void make_active(GameObject* _this);
+	GameObject* get_active() const;
 
-	void setGravity(bool _value);
-	bool getGravity();
+	void set_gravity(bool value);
+	bool get_gravity() const;
 
-	void setObjectSelected(bool _value);
-	bool getObjectSelected();
+	void set_object_selected(bool value);
+	bool get_object_selected() const;
 
-	void setMouseDragged(bool _value);
-	bool getMouseDragged();
+	void set_mouse_dragged(bool value);
+	bool get_mouse_dragged() const;
 
-	void setNewNodeType(int _value);
-	int getNewNodeType();
+	void set_new_node_type(int value);
+	int get_new_node_type() const;
 
-	void setUseHardCollisions(bool _value);
-	bool getUseHardCollisions();
+	void set_use_hard_collisions(bool value);
+	bool get_use_hard_collisions() const;
 
-	void setDeleteAll(bool _value);
-	bool getDeleteAll();
+	void set_delete_all(bool value);
+	bool get_delete_all() const;
 
-	void setGUIVisible(bool _value);
-	bool getGUIVisible();
+	void set_gui_visible(bool value);
+	bool get_gui_visible() const;
 
 private:
 
-	ofVec3f MOUSE_POS;
-	GameObject* ACTIVE_OBJECT;
-	bool GRAVITY;
-	bool NEED_TO_DELETE_ALL;
-	bool OBJECT_SELECTED;
-	bool MOUSE_BEING_DRAGGED;
-	int NEW_NODE_ID;
-	bool HARD_COLLISIONS;
-	bool GUI_VISIBLE;
+	Camera* cam_;
+	ofVec3f mouse_pos_;
+	GameObject* active_object_;
+	bool gravity_;
+	bool need_to_delete_all_;
+	bool object_selected_;
+	bool mouse_being_dragged_;
+	int new_node_id_;
+	bool hard_collisions_;
+	bool gui_visible_;
 	
 };

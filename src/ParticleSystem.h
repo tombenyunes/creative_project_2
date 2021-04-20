@@ -1,30 +1,24 @@
-/*
- *  ParticleSystem.h
- *  ofxMSAFluid Demo
- *
- *  Created by Mehmet Akten on 02/05/2009.
- *  Copyright 2009 MSA Visuals Ltd.. All rights reserved.
- *
- */
 #pragma once
 
 #include "Particle.h"
-//#include "Player.h"
 
 #define MAX_PARTICLES		12500 // 50000
 
-class ParticleSystem {
-public:	
-	
-    float posArray[MAX_PARTICLES * 2 * 2];
-    float colArray[MAX_PARTICLES * 3 * 2];
-    int curIndex;
-	
-    Particle particles[MAX_PARTICLES];
-	
+class ParticleSystem
+{
+public:
+
 	ParticleSystem();
 
-    void updateAndDraw(const msa::fluid::Solver &aSolver, ofVec2f windowSize, bool drawingFluid/*, Player& p*/);
-	void addParticles(const ofVec2f &pos, int count);
-	void addParticle(const ofVec2f &pos);
+	void update_and_draw(const msa::fluid::Solver& a_solver, ofVec2f window_size, bool drawing_fluid);
+	void add_particles(const ofVec2f& pos, int count);
+	void add_particle(const ofVec2f& pos);
+
+private:
+
+	float pos_array_[MAX_PARTICLES * 2 * 2];
+	float col_array_[MAX_PARTICLES * 3 * 2];
+	int cur_index_;
+
+	Particle particles_[MAX_PARTICLES];
 };

@@ -1,78 +1,79 @@
-#include "GameModeManager.h"
+#include "GamemodeManager.h"
 
-GameModeManager::GameModeManager(int gameModeID)
+GamemodeManager::GamemodeManager(const int game_mode_id) : request_for_new_scene(false),
+														   current_mode_id_(game_mode_id)
 {
-	currentModeID = gameModeID;
-	request_for_new_scene = false;
-	
-	logCurrentMode();
+	log_current_mode();
 }
 
-void GameModeManager::init()
+void GamemodeManager::init()
 {
 }
 
-int GameModeManager::getCurrentModeID()
+int GamemodeManager::get_current_mode_id() const
 {
-	return currentModeID;
+	return current_mode_id_;
 }
 
-string GameModeManager::getCurrentModeString()
+string GamemodeManager::get_current_mode_string() const
 {
-	string modeText;
-	switch (currentModeID)
+	string mode_text;
+	switch (current_mode_id_)
 	{
 	case 0:
-		modeText = "Sandbox";
+		mode_text = "Sandbox";
 		break;
 	case 1:
-		modeText = "Procedural";
+		mode_text = "Procedural";
 		break;
 	default:
-		modeText = "[MODE ID UNDEFINED]";
+		mode_text = "[MODE ID UNDEFINED]";
 		break;
 	}
-	return modeText;
+	return mode_text;
 }
 
-void GameModeManager::setCurrentModeID(int gameModeID)
+void GamemodeManager::set_current_mode_id(const int game_mode_id)
 {
-	currentModeID = gameModeID;
+	current_mode_id_ = game_mode_id;
 
-	logCurrentMode();
+	log_current_mode();
 }
 
-void GameModeManager::logCurrentMode()
+void GamemodeManager::log_current_mode() const
 {
-	string modeText;
-	switch (currentModeID)
+	string mode_text;
+	switch (current_mode_id_)
 	{
 	case 0:
-		modeText = "Sandbox";
+		mode_text = "Sandbox";
 		break;
 	case 1:
-		modeText = "Procedural";
+		mode_text = "Procedural";
 		break;
 	default:
-		modeText = "[MODE ID UNDEFINED]";
+		mode_text = "[MODE ID UNDEFINED]";
 		break;
 	}
-	cout << "----------GameModeManager.cpp--------" << endl;
-	cout << " - Game Mode: " << modeText << endl;
+	cout << "----------GamemodeManager.cpp--------" << endl;
+	cout << " - Game Mode: " << mode_text << endl;
 	cout << "----------------------------------------" << endl;
 }
 
-void GameModeManager::keyPressed(int key)
+void GamemodeManager::key_pressed(const int key)
 {
-	if (key == 57347) { // f4
-		int newID = -1;
-		if (currentModeID == 0) { // toggles between modes
-			newID = 1;
+	if (key == 57347) // f4 toggles between modes
+	{
+		int new_id = -1;
+		if (current_mode_id_ == 0)
+		{
+			new_id = 1;
 			request_for_new_scene = true;
 		}
-		else if (currentModeID == 1) {
-			newID = 0;
+		else if (current_mode_id_ == 1)
+		{
+			new_id = 0;
 		}
-		setCurrentModeID(newID);
+		set_current_mode_id(new_id);
 	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "GameObject.h"
 
 class Camera {
 
@@ -9,32 +8,30 @@ public:
 	
 	Camera();
 	
-	void update(int width, int height, ofVec2f _playerPos);
+	void update(int world_width, int world_height, ofVec2f player_pos);
 
-	void toggleZoomMode();
+	void toggle_zoom_mode();
 
-	glm::mat4 getLocalTransformMatrix();
-	glm::mat4 getGlobalTransformMatrix();
-	glm::mat4 getProjectionMatrix();
-	glm::mat4 getModelViewMatrix();
-	glm::mat4 getModelViewProjectionMatrix();
-	ofVec3f getPosition();
+	glm::mat4 get_local_transform_matrix() const;
+	glm::mat4 get_global_transform_matrix() const;
+	glm::mat4 get_projection_matrix() const;
+	glm::mat4 get_model_view_matrix() const;
+	glm::mat4 get_model_view_projection_matrix() const;
+	ofVec3f get_position() const;
 	void begin();
 	void end();
-	ofVec3f screenToWorld(ofVec3f _view);
+	ofVec3f screen_to_world(ofVec3f view) const;
 
-	void keyPressed(int key);
-	void keyReleased(int key);
-	void mouseDragged(int x, int y, int button);
-	void mousePressed(int x, int y, int button);
-	void mouseScrolled(int x, int y, float scrollX, float scrollY);
+	void key_pressed(int key);
+	void key_released(int key);
+	void mouse_dragged(int x, int y, int button);
+	void mouse_pressed(int x, int y, int button);
+	void mouse_scrolled(int x, int y, float scroll_x, float scroll_y);
 
 private:
 
-	ofEasyCam cam;
-	float zoomDistance;
-	float scale;
-	bool ctrlDown = false;
-	bool followPlayer;
+	ofEasyCam cam_;
+	bool ctrl_down_ = false;
+	bool follow_player_;
 	
 };

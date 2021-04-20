@@ -1,100 +1,101 @@
 #include "GameObject.h"
 
-GameObject::GameObject(ofVec2f _pos, ofColor _color)
+GameObject::GameObject(const ofVec2f pos, const ofColor color)
+	:	game_objects_(nullptr),
+		game_controller_(nullptr),
+		gui_manager_(nullptr),
+		fluid_manager_(nullptr),
+		audio_manager_(nullptr),
+		cam_(nullptr),
+		pos_(pos),
+		prev_pos_(99999, 99999),
+		mass_(10),
+		radius_(35),
+		vel_(0),
+		accel_(0),
+		color_(color),
+		infinite_mass_(false),
+		affected_by_gravity_(false),
+		gravity_mult_(1),
+		collision_mult_(1),
+		mouse_over_(false),
+		mouse_over_index_(0),
+		selected_node_index_(0),
+		mouse_drag_(false),
+		mouse_offset_from_center_(0),
+		pos_before_drag_(0),
+		started_dragging_(false),
+		passive_color_(ofColor(255)),
+		selected_color_(ofColor(255, 165, 0)),
+		delete_key_down_(false),
+		request_to_be_deleted_(false),
+		request_to_be_selected_(false),
+		is_selected_(false),
+		gui_values_need_to_be_set_(true),
+		screen_wrap_enabled_(false),
+		screen_bounce_enabled_(false),
+		gravity_enabled_(false),
+		friction_enabled_(false),
+		mouse_hover_enabled_(false),
+		ellipse_collider_enabled_(false)
 {
-	pos.set(_pos);
-	prevPos.set(99999, 99999);
-	color.set(_color);
-
-	vel.set(0);
-	accel.set(0);
-	radius = 35;
-	mass = 10;
-	infiniteMass = false;
-	affectedByGravity = false;
-
-	passiveColor = ofColor(255);
-	selectedColor = ofColor(255, 165, 0);
-
-	request_to_be_deleted = false;
-	mouseOver = false;
-	mouseOffsetFromCenter.set(0);
-
-	isPlayer = false;
-	isSpring = false;
-
-	deleteKeyDown = false;
-
-	screenWrap_enabled = false;
-	screenBounce_enabled = false;
-	gravity_enabled = false;
-	friction_enabled = false;
-	ellipseCollider_enabled = false;
-	mouseHover_enabled = false;
-
-	requestToBeSelected = false;
-	request_to_be_deleted_event = "";
-	isSelected = false;
 }
 
-void GameObject::init(vector<GameObject*>* _gameobjects, Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager)
+void GameObject::init(vector<GameObject*>* gameobjects, Controller* controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager)
 {
-	GameObjects = _gameobjects;
-	GameController = _controller;
-	GUI_Manager = _GUIManager;
-	Fluid_Manager = _fluidManager;
-	Audio_Manager = _audioManager;
+	game_objects_ = gameobjects;
+	game_controller_ = controller;
+	gui_manager_ = gui_manager;
+	fluid_manager_ = fluid_manager;
+	audio_manager_ = audio_manager;
 
-	cam = _cam;
+	cam_ = cam;
 }
 
 // root update is called prir to the main update function of a gameobject and is responsible for handling object deletion and updating user-added modules - it automatically updates the main update funcion
 void GameObject::root_update()
 {
-
-	if (deleteKeyDown) {
-		if (mouseOver) {
-			request_to_be_deleted = true;
-		}		
+	if (delete_key_down_)
+	{
+		if (mouse_over_)
+		{
+			request_to_be_deleted_ = true;
+		}
 	}
-	if (!request_to_be_deleted) {
-
-
-		if (screenWrap_enabled) {
-			screenWrap();
+	if (!request_to_be_deleted_)
+	{
+		if (screen_wrap_enabled_)
+		{
+			screen_wrap();
 		}
-		if (screenBounce_enabled) {
-			screenBounce();
+		if (screen_bounce_enabled_)
+		{
+			screen_bounce();
 		}
-		if (gravity_enabled) {
+		if (gravity_enabled_)
+		{
 			gravity();
 		}
-		if (friction_enabled) {
+		if (friction_enabled_)
+		{
 			friction();
 		}
-		if (ellipseCollider_enabled) {
-			ellipseCollider();
+		if (ellipse_collider_enabled_)
+		{
+			ellipse_collider();
 		}
-		if (mouseHover_enabled) {
-			mouseHover();
+		if (mouse_hover_enabled_)
+		{
+			mouse_hover();
 		}
 
-		prevPos = pos;
-		
+		prev_pos_ = pos_;
+
 		update(); // <--- user defined update function for every gameobject
 	}
-	else {		
-		//cout << "Error: 'Dead' GameObject is still being updated" << endl;
-	}
-}
-
-void GameObject::update()
-{
-	static bool initialized = false;
-	if (!initialized)
+	else
 	{
-		//cout << "Error: User hasn't defined unique 'update' function for a GameObject" << endl;
-		initialized = true;
+		//cout << "Error: 'Dead' GameObject is still being updated" << endl;
 	}
 }
 
@@ -104,100 +105,127 @@ void GameObject::update()
 
 // Simply including `AddModule("module-name")` to the constructor of a new gameobject will cause this module to be updated
 
-void GameObject::AddModule(string _id)
+void GameObject::add_module(const string id)
 {
-	if (_id == "screenWrap") {
-		screenWrap_enabled = true;
+	if (id == "screenWrap")
+	{
+		screen_wrap_enabled_ = true;
 	}
-	else if (_id == "screenBounce") {
-		screenBounce_enabled = true;
+	else if (id == "screenBounce")
+	{
+		screen_bounce_enabled_ = true;
 	}
-	else if (_id == "gravity") {
-		gravity_enabled = true;
+	else if (id == "gravity")
+	{
+		gravity_enabled_ = true;
 	}
-	else if (_id == "friction") {
-		friction_enabled = true;
+	else if (id == "friction")
+	{
+		friction_enabled_ = true;
 	}
-	else if (_id == "ellipseCollider") {
-		ellipseCollider_enabled = true;
+	else if (id == "ellipseCollider")
+	{
+		ellipse_collider_enabled_ = true;
 	}
-	else if (_id == "mouseHover") {
-		mouseHover_enabled = true;
+	else if (id == "mouseHover")
+	{
+		mouse_hover_enabled_ = true;
 	}
-	else {
+	else
+	{
 		cout << "Error: Module ID is invalid" << endl;
 	}
 }
 
 // upon reaching the screen edge, the object is placed at the opposite edge
-void GameObject::screenWrap()
+void GameObject::screen_wrap()
 {
-	if (pos.x > 0 + (WORLD_WIDTH / 2)) {
-		pos.x = 0 - (WORLD_WIDTH / 2);
+	if (pos_.x > 0 + (WORLD_WIDTH / 2))
+	{
+		pos_.x = 0 - (WORLD_WIDTH / 2);
 	}
-	if (pos.x < 0 - (WORLD_WIDTH / 2)) {
-		pos.x = 0 + (WORLD_WIDTH / 2);
+	if (pos_.x < 0 - (WORLD_WIDTH / 2))
+	{
+		pos_.x = 0 + (WORLD_WIDTH / 2);
 	}
-	if (pos.y < 0 - (WORLD_HEIGHT / 2)) {
-		pos.y = 0 + (WORLD_HEIGHT / 2);
+	if (pos_.y < 0 - (WORLD_HEIGHT / 2))
+	{
+		pos_.y = 0 + (WORLD_HEIGHT / 2);
 	}
-	if (pos.y > 0 + (WORLD_HEIGHT / 2)) {
-		pos.y = 0 - (WORLD_HEIGHT / 2);
+	if (pos_.y > 0 + (WORLD_HEIGHT / 2))
+	{
+		pos_.y = 0 - (WORLD_HEIGHT / 2);
 	}
 }
 
 // object 'bounce' when hitting the screen edge
-void GameObject::screenBounce()
+void GameObject::screen_bounce()
 {
-	if (nodePositions.size() == 0) {
-		if (pos.x > 0 + (WORLD_WIDTH / 2) - (radius) / 2) {
-			vel.x *= -1;
-			pos.x = 0 + (WORLD_WIDTH / 2) - (radius) / 2;
+	if (node_positions_.empty())
+	{
+		if (pos_.x > 0 + (WORLD_WIDTH / 2) - (radius_) / 2)
+		{
+			vel_.x *= -1;
+			pos_.x = 0 + (WORLD_WIDTH / 2) - (radius_) / 2;
 		}
-		if (pos.x < 0 - (WORLD_WIDTH / 2) + (radius) / 2) {
-			vel.x *= -1;
-			pos.x = 0 - (WORLD_WIDTH / 2) + (radius) / 2;
+		if (pos_.x < 0 - (WORLD_WIDTH / 2) + (radius_) / 2)
+		{
+			vel_.x *= -1;
+			pos_.x = 0 - (WORLD_WIDTH / 2) + (radius_) / 2;
 		}
-		if (pos.y < 0 - (WORLD_HEIGHT / 2) + (radius) / 2) {
-			vel.y *= -1;
-			pos.y = 0 - (WORLD_HEIGHT / 2) + (radius) / 2;
+		if (pos_.y < 0 - (WORLD_HEIGHT / 2) + (radius_) / 2)
+		{
+			vel_.y *= -1;
+			pos_.y = 0 - (WORLD_HEIGHT / 2) + (radius_) / 2;
 		}
-		if (pos.y > 0 + (WORLD_HEIGHT / 2) - (radius) / 2) {
-			vel.y *= -1;
-			pos.y = 0 + (WORLD_HEIGHT / 2) - (radius) / 2;
+		if (pos_.y > 0 + (WORLD_HEIGHT / 2) - (radius_) / 2)
+		{
+			vel_.y *= -1;
+			pos_.y = 0 + (WORLD_HEIGHT / 2) - (radius_) / 2;
 		}
 	}
-	else {
-		for (int i = 0; i < nodePositions.size(); i++) {
-			if (nodePositions[i].x > 0 + (WORLD_WIDTH / 2) - (nodeRadiuses[i]) / 2) {
-				nodeVelocities[i].x *= -1;
-				nodePositions[i].x = 0 + (WORLD_WIDTH / 2) - (nodeRadiuses[i]) / 2;
+	else
+	{
+		for (int i = 0; i < node_positions_.size(); i++)
+		{
+			if (node_positions_[i].x > 0 + (WORLD_WIDTH / 2) - (node_radiuses_[i]) / 2)
+			{
+				node_velocities_[i].x *= -1;
+				node_positions_[i].x = 0 + (WORLD_WIDTH / 2) - (node_radiuses_[i]) / 2;
 			}
-			if (nodePositions[i].x < 0 - (WORLD_WIDTH / 2) + (nodeRadiuses[i]) / 2) {
-				nodeVelocities[i].x *= -1;
-				nodePositions[i].x = 0 - (WORLD_WIDTH / 2) + (nodeRadiuses[i]) / 2;
+			if (node_positions_[i].x < 0 - (WORLD_WIDTH / 2) + (node_radiuses_[i]) / 2)
+			{
+				node_velocities_[i].x *= -1;
+				node_positions_[i].x = 0 - (WORLD_WIDTH / 2) + (node_radiuses_[i]) / 2;
 			}
-			if (nodePositions[i].y < 0 - (WORLD_HEIGHT / 2) + (nodeRadiuses[i]) / 2) {
-				nodeVelocities[i].y *= -1;
-				nodePositions[i].y = 0 - (WORLD_HEIGHT / 2) + (nodeRadiuses[i]) / 2;
+			if (node_positions_[i].y < 0 - (WORLD_HEIGHT / 2) + (node_radiuses_[i]) / 2)
+			{
+				node_velocities_[i].y *= -1;
+				node_positions_[i].y = 0 - (WORLD_HEIGHT / 2) + (node_radiuses_[i]) / 2;
 			}
-			if (nodePositions[i].y > 0 + (WORLD_HEIGHT / 2) - (nodeRadiuses[i]) / 2) {
-				nodeVelocities[i].y *= -1;
-				nodePositions[i].y = 0 + (WORLD_HEIGHT / 2) - (nodeRadiuses[i]) / 2;
+			if (node_positions_[i].y > 0 + (WORLD_HEIGHT / 2) - (node_radiuses_[i]) / 2)
+			{
+				node_velocities_[i].y *= -1;
+				node_positions_[i].y = 0 + (WORLD_HEIGHT / 2) - (node_radiuses_[i]) / 2;
 			}
 		}
 	}
 }
 
 // simple ellipse collision detection
-void GameObject::ellipseCollider()
+void GameObject::ellipse_collider()
 {
-	for (int i = 0; i < GameObjects->size(); i++) {
-		if ((*GameObjects)[i]->ellipseCollider_enabled) {
-			if ((*GameObjects)[i] != this) {
-				if ((*GameObjects)[i]->isSpring == false) {
-					if (CollisionDetector.EllipseCompare(pos, radius, (*GameObjects)[i]->pos, (*GameObjects)[i]->radius)) {
-						isColliding((*GameObjects)[i]);
+	for (auto& game_object : *game_objects_)
+	{
+		if (game_object->ellipse_collider_enabled_)
+		{
+			if (game_object != this)
+			{
+				if (game_object->type_ != "Spring")
+				{
+					if (Collisions::ellipse_compare(pos_, radius_, game_object->pos_, game_object->radius_))
+					{
+						is_colliding(game_object);
 					}
 				}
 			}
@@ -205,41 +233,50 @@ void GameObject::ellipseCollider()
 	}
 }
 // called when an object is currently colliding
-void GameObject::isColliding(GameObject* _other, ofVec2f _nodePos)
+void GameObject::is_colliding(GameObject* other, const ofVec2f node_pos)
 {
-	ofVec2f otherPos;
-	if (_other->isSpring) {
-		otherPos = _nodePos;
+	ofVec2f other_pos;
+	if (other->type_ == "Spring")
+	{
+		other_pos = node_pos;
 	}
-	else {
-		otherPos = _other->pos;
+	else
+	{
+		other_pos = other->pos_;
 	}
 
-	if (GameController->getUseHardCollisions()) {
-		ofVec2f forceVec = pos - otherPos;
-		if (prevPos != ofVec2f(99999, 99999)) pos = prevPos;
+	if (game_controller_->get_use_hard_collisions())
+	{
+		const ofVec2f force_vec = pos_ - other_pos;
+		if (prev_pos_ != ofVec2f(99999, 99999)) pos_ = prev_pos_;
 		//vel.set(0);
-		applyForce(accel, (forceVec / mass), false);
+		apply_force(accel_, (force_vec / mass_), false);
 	}
-	else {
-		ofVec2f forceVec = pos - otherPos;
-		applyForce(accel, (forceVec / mass), true);
+	else
+	{
+		const ofVec2f force_vec = pos_ - other_pos;
+		apply_force(accel_, (force_vec / mass_), true);
 	}
 }
 
 void GameObject::gravity()
 {
-	if (nodePositions.size() == 0) {
-		if (GameController->getGravity() == 1 || affectedByGravity) {
-			ofVec2f newForce = { 0, (float)GRAVITY_FORCE * gravityMult * mass };
-			applyForce(accel, newForce, false);
+	if (node_positions_.empty())
+	{
+		if (game_controller_->get_gravity() == 1 || affected_by_gravity_)
+		{
+			const ofVec2f new_force = {0, static_cast<float>(GRAVITY_FORCE) * gravity_mult_ * mass_};
+			apply_force(accel_, new_force, false);
 		}
 	}
-	else {
-		for (int i = 0; i < nodePositions.size(); i++) {
-			if (GameController->getGravity() == 1 || affectedByGravity) {
-				ofVec2f newForce = { 0, (float)GRAVITY_FORCE * gravityMult * nodeMasses[i] };
-				applyForce(nodeAccelerations[i], newForce, false);
+	else
+	{
+		for (int i = 0; i < node_positions_.size(); i++)
+		{
+			if (game_controller_->get_gravity() == 1 || affected_by_gravity_)
+			{
+				const ofVec2f new_force = {0, static_cast<float>(GRAVITY_FORCE) * gravity_mult_ * node_masses_[i]};
+				apply_force(node_accelerations_[i], new_force, false);
 			}
 		}
 	}
@@ -247,51 +284,61 @@ void GameObject::gravity()
 
 void GameObject::friction()
 {
-	if (nodePositions.size() == 0) {
-		ofVec2f friction = vel * -1;
+	if (node_positions_.empty())
+	{
+		ofVec2f friction = vel_ * -1;
 		friction *= FRICTION_FORCE;
-		applyForce(accel, friction, true);
+		apply_force(accel_, friction, true);
 	}
-	else {
-		for (int i = 0; i < nodePositions.size(); i++) {
-			ofVec2f friction = nodeVelocities[i] * -1;
+	else
+	{
+		for (int i = 0; i < node_positions_.size(); i++)
+		{
+			ofVec2f friction = node_velocities_[i] * -1;
 			friction *= FRICTION_FORCE;
-			applyForce(accel, friction, false);
+			apply_force(accel_, friction, false);
 		}
 	}
 }
 
 // determines if the mouse is over an object
-void GameObject::mouseHover()
+void GameObject::mouse_hover()
 {
-	if (nodePositions.size() == 0) {
-		if (GameController->getMouseDragged() == false) {
-			if (CollisionDetector.EllipseCompare(pos, radius, ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y), 0)) {
-					mouseOver = true;
-					mouseOffsetFromCenter = pos - ofVec2f(GameController->getWorldMousePos().x, GameController->getWorldMousePos().y);
+	if (node_positions_.empty())
+	{
+		if (game_controller_->get_mouse_dragged() == false)
+		{
+			if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y), 0))
+			{
+					mouse_over_ = true;
+					mouse_offset_from_center_ = pos_ - ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
 			}
 			else {
-				mouseOver = false;			
+				mouse_over_ = false;			
 			}
 		}
 	}
 	else {
-		if (GameController->getMouseDragged() == false) {
-			for (int i = 0; i < nodePositions.size(); i++) {
-				if (CollisionDetector.EllipseCompare(nodePositions[i], nodeRadiuses[i], GameController->getWorldMousePos(), 0)) {
-					mouseOver = true;
-					mouseOverIndex = i;
-					mouseOffsetFromCenter = nodePositions[i] - GameController->getWorldMousePos();
+		if (game_controller_->get_mouse_dragged() == false)
+		{
+			for (int i = 0; i < node_positions_.size(); i++)
+			{
+				if (Collisions::ellipse_compare(node_positions_[i], node_radiuses_[i], game_controller_->get_world_mouse_pos(), 0))
+				{
+					mouse_over_ = true;
+					mouse_over_index_ = i;
+					mouse_offset_from_center_ = node_positions_[i] - game_controller_->get_world_mouse_pos();
 					break;
 				}
-				else if (CollisionDetector.EllipseCompare(pos, radius, GameController->getWorldMousePos(), 0)) {
-					mouseOver = true;
-					mouseOverIndex = -1;
-					mouseOffsetFromCenter = pos - GameController->getWorldMousePos();
+				else if (Collisions::ellipse_compare(pos_, radius_, game_controller_->get_world_mouse_pos(), 0))
+				{
+					mouse_over_ = true;
+					mouse_over_index_ = -1;
+					mouse_offset_from_center_ = pos_ - game_controller_->get_world_mouse_pos();
 					break;
 				}
 				else {
-					mouseOver = false;
+					mouse_over_ = false;
 				}
 			}
 		}
@@ -302,31 +349,37 @@ void GameObject::mouseHover()
 // Shared physics functions
 
 
-void GameObject::applyForce(ofVec2f& _accel, ofVec2f _force, bool _limit, float _limitAmount)
+void GameObject::apply_force(ofVec2f& accel, ofVec2f force, const bool limit, const float limit_amount)
 {
-	if (_limit) {
-		_force.limit(_limitAmount);
-		_accel += _force;
+	if (limit)
+	{
+		force.limit(limit_amount);
+		accel += force;
 	}
-	else {
-		_accel += _force;
-		addForces(false);
+	else
+	{
+		accel += force;
+		add_forces(false);
 	}
 }
 
-void GameObject::addForces(bool _interpPos)
+void GameObject::add_forces(const bool interp_pos)
 {
-	if (nodePositions.size() == 0) {
-		vel += accel;
-		vel.limit(MAXIMUM_VELOCITY);
-		if (_interpPos) {
-			pos = getInterpolatedPosition();
+	if (node_positions_.empty())
+	{
+		vel_ += accel_;
+		vel_.limit(MAXIMUM_VELOCITY);
+		if (interp_pos)
+		{
+			pos_ = get_interpolated_position();
 		}
-		else {
-			pos += vel;
+		else
+		{
+			pos_ += vel_;
 		}
 	}
-	else {
+	else
+	{
 		/*for (int i = 0; i < nodePositions.size(); i++) {
 			nodeVelocities[i] += nodeAccelerations[i];
 			nodePositions[i] += nodeVelocities[i] * 0.28;
@@ -334,59 +387,40 @@ void GameObject::addForces(bool _interpPos)
 	}
 }
 
-ofVec2f GameObject::getInterpolatedPosition()
+ofVec2f GameObject::get_interpolated_position()
 {
-	int progress = (ofGetFrameNum() % 100) / 100;
-	ofVec2f powInterpIn;
-	powInterpIn.x = ofNextPow2(progress);
-	powInterpIn.y = ofNextPow2(progress);
+	const int progress = (ofGetFrameNum() % 100) / 100;
+	ofVec2f pow_interp_in;
+	pow_interp_in.x = ofNextPow2(progress);
+	pow_interp_in.y = ofNextPow2(progress);
 
-	ofVec2f newPos;
-	newPos.x = ofLerp(pos.x, pos.x + vel.x, powInterpIn.x);
-	newPos.y = ofLerp(pos.y, pos.y + vel.y, powInterpIn.y);
-	return newPos;
+	ofVec2f new_pos;
+	new_pos.x = ofLerp(pos_.x, pos_.x + vel_.x, pow_interp_in.x);
+	new_pos.y = ofLerp(pos_.y, pos_.y + vel_.y, pow_interp_in.y);
+	return new_pos;
 }
 
 
 // ----- EVENT FUNCTIONS ----- //
 
 
-// it is necessary for these functions to be declared here, as they are called on every gameobject
-void GameObject::mousePressed(float _x, float _y, int _button)
+// functions in the same way as root_update
+void GameObject::root_key_pressed(const int key)
 {
-}
-
-void GameObject::mouseDragged(float _x, float _y, int _button)
-{
-}
-
-void GameObject::mouseReleased(float _x, float _y, int _button)
-{
-}
-
-// functions the same as root_update
-void GameObject::root_keyPressed(int key)
-{
-	if (key == 120) {
-		deleteKeyDown = true;
+	if (key == 120)
+	{
+		delete_key_down_ = true;
 	}
-	keyPressed(key);
+	key_pressed(key);
 }
 
-void GameObject::keyPressed(int key)
+void GameObject::root_key_released(const int key)
 {
-}
-// ^^
-void GameObject::root_keyReleased(int key)
-{
-	if (key == 120) {
-		deleteKeyDown = false;
+	if (key == 120)
+	{
+		delete_key_down_ = false;
 	}
-	keyReleased(key);
-}
-
-void GameObject::keyReleased(int key)
-{
+	key_released(key);
 }
 
 
@@ -395,20 +429,8 @@ void GameObject::keyReleased(int key)
 
 void GameObject::root_draw()
 {
-	if (!request_to_be_deleted) {
-		draw();
-	}
-	else {
-		//cout << "Error: 'Dead' GameObject is still being rendered" << endl;
-	}
-}
-
-void GameObject::draw()
-{
-	static bool initialized = false;
-	if (!initialized)
+	if (!request_to_be_deleted_)
 	{
-		//cout << "Error: User hasn't defined unique 'draw' function for a GameObject" << endl;
-		initialized = true;
+		draw();
 	}
 }

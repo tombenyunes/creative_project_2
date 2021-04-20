@@ -1,95 +1,110 @@
 #include "Controller.h"
 
-Controller::Controller()
+Controller::Controller(): cam_(nullptr),
+                          active_object_(nullptr),
+                          gravity_(false),
+                          need_to_delete_all_(false),
+                          object_selected_(false),
+                          mouse_being_dragged_(false),
+                          new_node_id_(0),
+                          hard_collisions_(false),
+                          gui_visible_(false)
 {
-	ACTIVE_OBJECT = nullptr;
-	GRAVITY = 0;
-	NEED_TO_DELETE_ALL = false;
-	OBJECT_SELECTED = false;
-	MOUSE_BEING_DRAGGED = false;
-	NEW_NODE_ID = 0;
-	HARD_COLLISIONS = false;
-	GUI_VISIBLE = false;
 }
 
-void Controller::init(Camera* _cam)
+void Controller::init(Camera* cam)
 {
-	cam = _cam;
+	cam_ = cam;
 }
 
 void Controller::update()
 {
-	ofVec3f localPos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
-	ofVec3f worldPos = cam->screenToWorld(localPos);
-	MOUSE_POS = worldPos;
+	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
+	const ofVec3f world_pos = cam_->screen_to_world(local_pos);
+	mouse_pos_ = world_pos;
 }
 
-ofVec3f Controller::getWorldMousePos()
+ofVec3f Controller::get_world_mouse_pos() const
 {
-	return MOUSE_POS;
+	return mouse_pos_;
 }
 
-void Controller::makeActive(GameObject* _this)
+void Controller::make_active(GameObject* _this)
 {
-	ACTIVE_OBJECT = _this;
+	active_object_ = _this;
 }
-GameObject* Controller::getActive()
+
+GameObject* Controller::get_active() const
 {
-	return ACTIVE_OBJECT;
+	return active_object_;
 }
-void Controller::setGravity(bool _value)
+
+void Controller::set_gravity(const bool value)
 {
-	(_value == 1) ? GRAVITY = 1 : GRAVITY = 0;
+	(value == 1) ? gravity_ = true : gravity_ = false;
 }
-bool Controller::getGravity()
+
+bool Controller::get_gravity() const
 {
-	return GRAVITY;
+	return gravity_;
 }
-void Controller::setDeleteAll(bool _value)
+
+void Controller::set_delete_all(const bool value)
 {
-	(_value == 1) ? NEED_TO_DELETE_ALL = 1 : NEED_TO_DELETE_ALL = 0;
+	(value == 1) ? need_to_delete_all_ = true : need_to_delete_all_ = false;
 }
-bool Controller::getDeleteAll()
+
+bool Controller::get_delete_all() const
 {
-	return NEED_TO_DELETE_ALL;
+	return need_to_delete_all_;
 }
-void Controller::setObjectSelected(bool _value)
+
+void Controller::set_object_selected(const bool value)
 {
-	(_value == 1) ? OBJECT_SELECTED = 1 : OBJECT_SELECTED = 0;
+	(value == 1) ? object_selected_ = true : object_selected_ = false;
 }
-bool Controller::getObjectSelected()
+
+bool Controller::get_object_selected() const
 {
-	return OBJECT_SELECTED;
+	return object_selected_;
 }
-void Controller::setMouseDragged(bool _value)
+
+void Controller::set_mouse_dragged(const bool value)
 {
-	(_value == 1) ? MOUSE_BEING_DRAGGED = 1 : MOUSE_BEING_DRAGGED = 0;
+	(value == 1) ? mouse_being_dragged_ = true : mouse_being_dragged_ = false;
 }
-bool Controller::getMouseDragged()
+
+bool Controller::get_mouse_dragged() const
 {
-	return MOUSE_BEING_DRAGGED;
+	return mouse_being_dragged_;
 }
-void Controller::setNewNodeType(int _value)
+
+void Controller::set_new_node_type(const int value)
 {
-	NEW_NODE_ID = _value;
+	new_node_id_ = value;
 }
-int Controller::getNewNodeType()
+
+int Controller::get_new_node_type() const
 {
-	return NEW_NODE_ID;
+	return new_node_id_;
 }
-void Controller::setUseHardCollisions(bool _value)
+
+void Controller::set_use_hard_collisions(const bool value)
 {
-	(_value == 1) ? HARD_COLLISIONS = 1 : HARD_COLLISIONS = 0;
+	(value == 1) ? hard_collisions_ = true : hard_collisions_ = false;
 }
-bool Controller::getUseHardCollisions()
+
+bool Controller::get_use_hard_collisions() const
 {
-	return HARD_COLLISIONS;
+	return hard_collisions_;
 }
-void Controller::setGUIVisible(bool _value)
+
+void Controller::set_gui_visible(const bool value)
 {
-	(_value == 1) ? GUI_VISIBLE = 1 : GUI_VISIBLE = 0;
+	(value == 1) ? gui_visible_ = true : gui_visible_ = false;
 }
-bool Controller::getGUIVisible()
+
+bool Controller::get_gui_visible() const
 {
-	return GUI_VISIBLE;
+	return gui_visible_;
 }

@@ -7,41 +7,48 @@ class Player : public GameObject {
 
 public:
 
-	Player(ofVec2f _pos = { 0, 0 }, ofColor _color = ofColor(255));
-
-	void update() override;
-
-	void mousePressed(float _x, float _y, int _button) override;
-	void mouseDragged(float _x, float _y, int _button) override;
-	void mouseReleased(float _x, float _y, int _button) override;
-	void keyPressed(int key) override;
-	void keyReleased(int key) override;
-
-	void draw() override;
+	Player(ofVec2f pos = { 0, 0 }, ofColor color = ofColor(255));
 
 private:
 	
-	void updateForces();
-	void applyAllForces();
+	void update() override;
 
-	bool playerCanMove();
-	ofVec2f getMovementVector();
-
-	void pullPoints();
-
-	void updateGUI();
-	void resetForces();
-
-	void boostPlayer();
-
-	void drawBoostDirection();
-	ofVec3f drawVelPath();
-	void drawParticleTrail();
-
-	bool mouse_down;
-	int mouse_button;
-	ofVec2f mouse_pos;
+	// Physics/movement
+	void update_forces();
+	void apply_all_forces();
+	void reset_forces();
 	
-	bool aimingBoost;
+	bool player_can_move() const;
+	ofVec2f get_movement_vector() const;
+
+	// Misc
+	void pull_points();
+	void boost_player();
+
+	// GUI
+	void update_gui();
+
+	// Draw
+	void draw() override;
+	
+	void draw_boost_direction() const;
+	ofVec3f draw_vel_path() const;
+	void draw_particle_trail() const;
+
+	// Events
+	void mouse_pressed(float x, float y, int button) override;
+	void mouse_dragged(float x, float y, int button) override;
+	void mouse_released(float x, float y, int button) override;
+	
+	void key_pressed(int key) override;
+	void key_released(int key) override;
+
+
+	
+	bool mouse_down_;
+	int mouse_button_;
+	ofVec2f mouse_pos_;
+	
+	bool aiming_boost_;
 
 };

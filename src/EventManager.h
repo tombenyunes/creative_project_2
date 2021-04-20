@@ -1,50 +1,43 @@
 #pragma once
 
 #include "Controller.h"
-#include "GameObject.h"
-#include "Mass.h"
-#include "Spring.h"
 #include "EntityManager.h"
 
 class EventManager
 {
-
 public:
-	
+
 	EventManager();
 
 	void init(Controller* _gameController, EntityManager* _entityManager);
 
 	void setup();
 	void update();
-	void drawTutorial();
+	void draw_tutorial();
 
-	void keyPressed(int _key);
+	void key_pressed(int key);
 
-	void showTutorial(bool _value);
-	bool tutorialEnabled;
+	void show_tutorial(bool value);
 
-	bool isEventAllowed(string event, int button = -1);
+	bool is_event_allowed(string event, int button = -1) const;
 
-	bool playerGUIVisible;	
+	bool player_gui_visible;
 
 private:
 
-	vector<GameObject*>* GameObjects;
-	Controller* Game_Controller;
-	EntityManager* Entity_Manager;
+	Controller* game_controller_;
+	EntityManager* entity_manager_;
 
-	vector<string> dialogues;
-	vector<ofVec2f> positions;
-	int currentIndex;
-	ofTrueTypeFont PottaOne_main;
-	ofTrueTypeFont PottaOne_context;
+	vector<string> dialogues_;
+	vector<ofVec2f> positions_;
+	int current_index_;
+	ofTrueTypeFont potta_one_main_;
+	ofTrueTypeFont potta_one_context_;
 
-	bool canLMB;
-	bool canSelect;
-	bool canDrag;
-	bool canKeypress;
-	bool fullInput;
-
+	bool tutorial_enabled_;
+	bool can_lmb_;
+	bool can_select_;
+	bool can_drag_;
+	bool can_keypress_;
+	bool full_input_;
 };
-

@@ -2,23 +2,22 @@
 
 #include "ofMain.h"
 
-class GameModeManager {
-
+class GamemodeManager
+{
 public:
 
-	GameModeManager(int gameModeID = 0);
+	GamemodeManager(int game_mode_id = 0);
 	void init();
-	int getCurrentModeID();
-	string getCurrentModeString();
-	void setCurrentModeID(int gameModeID);
-	void logCurrentMode();
+	int get_current_mode_id() const;
+	string get_current_mode_string() const;
+	void set_current_mode_id(int game_mode_id);
+	void log_current_mode() const;
 
-	void keyPressed(int key);
+	void key_pressed(int key);
 
 	bool request_for_new_scene;
 
 private:
 
-	int currentModeID;
-
+	int current_mode_id_;
 };

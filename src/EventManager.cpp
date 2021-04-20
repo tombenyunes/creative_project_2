@@ -1,122 +1,142 @@
 #include "EventManager.h"
 
-EventManager::EventManager()
+EventManager::EventManager(): player_gui_visible(false),
+                              game_controller_(nullptr),
+                              entity_manager_(nullptr),
+                              current_index_(0),
+                              tutorial_enabled_(false),
+                              can_lmb_(false),
+                              can_select_(false),
+                              can_drag_(false),
+                              can_keypress_(false),
+                              full_input_(false)
 {
-	tutorialEnabled = false;
 }
 
 void EventManager::init(Controller* _gameController, EntityManager* _entityManager)
 {
-	Game_Controller = _gameController;
-	Entity_Manager = _entityManager;
+	game_controller_ = _gameController;
+	entity_manager_ = _entityManager;
 }
-															// IGNORE ALL THIS STUFF FOR NOW
+
 void EventManager::setup()
 {
-	if (tutorialEnabled) {
-		currentIndex = 0;
-		PottaOne_main.load("PottaOne-Regular.ttf", 12, true, true);
-		PottaOne_context.load("PottaOne-Regular.ttf", 10, true, true);
-		
-		dialogues = {
+	if (tutorial_enabled_)
+	{
+		potta_one_main_.load("PottaOne-Regular.ttf", 12, true, true);
+		potta_one_context_.load("PottaOne-Regular.ttf", 10, true, true);
+
+		dialogues_ = {
 			"example dialogue",
 			"example dialogue 2",
 		};
-		positions = {
-			{ (float)(3.95 * (float)(dialogues[0].length()) * -1), -125 },
-			{ (float)(3.95 * (float)(dialogues[1].length()) * -1), -125 },
+		positions_ = {
+			{static_cast<float>(3.95 * static_cast<float>(dialogues_[0].length()) * -1), -125},
+			{static_cast<float>(3.95 * static_cast<float>(dialogues_[1].length()) * -1), -125},
 		};
-
-		playerGUIVisible = false;
-		canLMB = false;
-		canSelect = false;
-		canDrag = false;
-		canKeypress = false;
-		fullInput = false;
 	}
 }
 
 void EventManager::update()
 {
-	if (tutorialEnabled) {
+	if (tutorial_enabled_)
+	{
 		static bool i0 = false;
-		if (!i0) {
+		if (!i0)
+		{
 			i0 = true;
-			Game_Controller->setGUIVisible(false);
+			game_controller_->set_gui_visible(false);
 		}
 		static bool i1 = false;
-		if (currentIndex >= 1 && !i1) {
+		if (current_index_ >= 1 && !i1)
+		{
 			i1 = true;
-			Game_Controller->setGUIVisible(true);
-			canKeypress = true;
-			fullInput = true;
+			game_controller_->set_gui_visible(true);
+			can_keypress_ = true;
+			full_input_ = true;
 		}
 	}
-	else {
+	else
+	{
 		static bool t;
-		if (!t) {
+		if (!t)
+		{
 			t = true;
-			fullInput = true;
+			full_input_ = true;
 		}
 	}
 }
 
-void EventManager::drawTutorial()
+void EventManager::draw_tutorial()
 {
-	if (tutorialEnabled) {
-		PottaOne_main.drawString(dialogues[currentIndex], positions[currentIndex].x, positions[currentIndex].y);
-		if (currentIndex <= 0) PottaOne_context.drawString("Use left/right arrow keys to navigate the tutorial", -177, 490);
+	if (tutorial_enabled_)
+	{
+		potta_one_main_.drawString(dialogues_[current_index_], positions_[current_index_].x, positions_[current_index_].y);
+		if (current_index_ <= 0) potta_one_context_.drawString("Use left/right arrow keys to navigate the tutorial", -177, 490);
 	}
 }
 
-void EventManager::keyPressed(int _key)
+void EventManager::key_pressed(const int key)
 {
-	if (tutorialEnabled) {
-		if (_key == 57356 && currentIndex != 0) {
-			currentIndex--;
+	if (tutorial_enabled_)
+	{
+		if (key == 57356 && current_index_ != 0)
+		{
+			current_index_--;
 		}
-		else if (_key == 57358 && currentIndex != dialogues.size() - 1) {
-			currentIndex++;
+		else if (key == 57358 && current_index_ != dialogues_.size() - 1)
+		{
+			current_index_++;
 		}
 	}
 }
 
-void EventManager::showTutorial(bool _value)
+void EventManager::show_tutorial(const bool value)
 {
-	(_value == 0) ? tutorialEnabled = false : tutorialEnabled = true;
+	(value == 0) ? tutorial_enabled_ = false : tutorial_enabled_ = true;
 }
 
-bool EventManager::isEventAllowed(string event, int button)
+bool EventManager::is_event_allowed(const string event, const int button) const
 {
-	if (event == "keyPressed") {
-		if ((fullInput) || (canKeypress)) {
+	if (event == "key_pressed")
+	{
+		if ((full_input_) || (can_keypress_))
+		{
 			return true;
 		}
 	}
-	else if (event == "keyReleased") {
-		if ((fullInput) || (canKeypress)) {
+	else if (event == "key_released")
+	{
+		if ((full_input_) || (can_keypress_))
+		{
 			return true;
 		}
 	}
-	else if (event == "mouseMoved") {
+	else if (event == "mouse_dragged")
+	{
+		if ((full_input_) || (button == 0 && can_lmb_) || (button == 2 && can_drag_))
+		{
+			return true;
+		}
+	}
+	else if (event == "mouse_pressed")
+	{
+		if ((full_input_) || (button == 0 && can_lmb_) || (button == 2 && can_select_))
+		{
+			return true;
+		}
+	}
+	else if (event == "mouse_scrolled")
+	{
+		return true;
+	}
+	else if (event == "mouse_released")
+	{
+		if ((full_input_) || (button == 0 && can_lmb_) || (button == 2 && can_select_))
+		{
+			return true;
+		}
+	}
 
-	}
-	else if (event == "mouseDragged") {
-		if ((fullInput) || (button == 0 && canLMB) || (button == 2 && canDrag)) {
-			return true;
-		}
-	}
-	else if (event == "mousePressed") {
-		if ((fullInput) || (button == 0 && canLMB) || (button == 2 && canSelect)) {
-			return true;
-		}
-	}
-	else if (event == "mouseScrolled") {
-
-	}
-	else if (event == "mouseReleased") {
-		if ((fullInput) || (button == 0 && canLMB) || (button == 2 && canSelect)) {
-			return true;
-		}
-	}
+	return false;
 }

@@ -1,125 +1,124 @@
 #include "Camera.h"
 
-Camera::Camera()
+Camera::Camera(): follow_player_(true)
 {
-	cam.disableMouseInput();
-	cam.setVFlip(true);  // flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked
-	cam.enableOrtho();
+	cam_.disableMouseInput();
+	cam_.setVFlip(true);
+	// flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked
+	cam_.enableOrtho();
 	//cam.setScale(1);
-	cam.setPosition(0 + ofGetWidth() / 2, 0 + ofGetHeight() / 2, 1305);
+	cam_.setPosition(0 + (ofGetWidth() / 2), 0 + (ofGetHeight() / 2), 1305);
 
 	//zoomDistance = 1080.0f; 
 
-	cam.removeAllInteractions();
+	cam_.removeAllInteractions();
 	//cam.addInteraction(ofEasyCam::TRANSFORM_SCALE, OF_MOUSE_BUTTON_RIGHT);
-	cam.addInteraction(ofEasyCam::TRANSFORM_TRANSLATE_Z, OF_MOUSE_BUTTON_RIGHT);
+	cam_.addInteraction(ofEasyCam::TRANSFORM_TRANSLATE_Z, OF_MOUSE_BUTTON_RIGHT);
 
 	//cam.setNearClip(-1000000);
 	//cam.setFarClip(1000000);
-	
-	followPlayer = true;
 }
 
-void Camera::update(int worldWidth, int worldHeight, ofVec2f _playerPos)
+void Camera::update(const int world_width, const int world_height, const ofVec2f player_pos)
 {
-	if (followPlayer) {
-		cam.setPosition(_playerPos.x, _playerPos.y, cam.getPosition().z); // camera follows player
+	if (follow_player_) {
+		cam_.setPosition(player_pos.x, player_pos.y, cam_.getPosition().z); // camera follows player
 	}
 	else {
-		cam.setPosition(0 + worldWidth / 2, 0 + worldHeight / 2, cam.getPosition().z); // camera follows player
+		cam_.setPosition(0 + (world_width / 2), 0 + (world_height / 2), cam_.getPosition().z); // camera follows player
 	}
 }
 
-void Camera::toggleZoomMode()
+void Camera::toggle_zoom_mode()
 {
 	// reset scale/zoom
 	cout << "Zoom reset" << endl;
-	if ((cam.getScale().x == 1) && (cam.getScale().y == 1) && (cam.getScale().z == 1)) {
-		cam.setScale(5.5, 5.5, 1);
-		followPlayer = false;
+	if ((cam_.getScale().x == 1) && (cam_.getScale().y == 1) && (cam_.getScale().z == 1)) {
+		cam_.setScale(5.5, 5.5, 1);
+		follow_player_ = false;
 	}
 	else {
-		cam.setScale(1);
-		followPlayer = true;
+		cam_.setScale(1);
+		follow_player_ = true;
 	}
 }
 
-glm::mat4 Camera::getModelViewMatrix()
+glm::mat4 Camera::get_model_view_matrix() const
 {
-	return cam.getModelViewMatrix();	
+	return cam_.getModelViewMatrix();	
 }
 
-glm::mat4 Camera::getLocalTransformMatrix()
+glm::mat4 Camera::get_local_transform_matrix() const
 {
-	return cam.getLocalTransformMatrix();		
+	return cam_.getLocalTransformMatrix();		
 }
 
-glm::mat4 Camera::getGlobalTransformMatrix()
+glm::mat4 Camera::get_global_transform_matrix() const
 {
-	return cam.getGlobalTransformMatrix();
+	return cam_.getGlobalTransformMatrix();
 }
 
-glm::mat4 Camera::getProjectionMatrix()
+glm::mat4 Camera::get_projection_matrix() const
 {	
-	return cam.getProjectionMatrix();
+	return cam_.getProjectionMatrix();
 }
 
-glm::mat4 Camera::getModelViewProjectionMatrix()
+glm::mat4 Camera::get_model_view_projection_matrix() const
 {
-	return cam.getModelViewProjectionMatrix();
+	return cam_.getModelViewProjectionMatrix();
 }
 
-ofVec3f Camera::getPosition()
+ofVec3f Camera::get_position() const
 {
-	return cam.getPosition();
+	return cam_.getPosition();
 }
 
 void Camera::begin()
 {
-	cam.begin();
+	cam_.begin();
 }
 
 void Camera::end()
 {
-	cam.end();
+	cam_.end();
 }
 
-ofVec3f Camera::screenToWorld(ofVec3f _view)
+ofVec3f Camera::screen_to_world(const ofVec3f view) const
 {
-	return cam.screenToWorld(_view);
+	return cam_.screenToWorld(view);
 }
 
-void Camera::keyPressed(int key)
+void Camera::key_pressed(const int key)
 {
 	if (key == 'z') {
-		toggleZoomMode();
+		toggle_zoom_mode();
 	}
 	else if (key == 3682) {
-		ctrlDown = true;
+		ctrl_down_ = true;
 	}
 }
 
-void Camera::keyReleased(int key)
+void Camera::key_released(const int key)
 {
 	if (key == 3682) {
-		ctrlDown = false;
+		ctrl_down_ = false;
 	}
 }
 
-void Camera::mouseDragged(int x, int y, int button)
+void Camera::mouse_dragged(int x, int y, int button)
 {
 
 }
 
-void Camera::mousePressed(int x, int y, int button)
+void Camera::mouse_pressed(int x, int y, int button)
 {
 
 }
 
-void Camera::mouseScrolled(int x, int y, float scrollX, float scrollY)
+void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scroll_y)
 {
-	if (ctrlDown) {
-		cam.setScale(cam.getScale().x + scrollY / 10, cam.getScale().y + scrollY / 10, 1);
-		cout << "Zoom level: " << cam.getScale() << endl;
+	if (ctrl_down_) {
+		cam_.setScale(cam_.getScale().x + scroll_y / 10, cam_.getScale().y + scroll_y / 10, 1);
+		cout << "Zoom level: " << cam_.getScale() << endl;
 	}
 }

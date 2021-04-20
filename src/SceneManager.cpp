@@ -1,6 +1,12 @@
 #include "SceneManager.h"
 
-SceneManager::SceneManager()
+SceneManager::SceneManager(): game_controller_(nullptr),
+							  gui_manager_(nullptr),
+							  fluid_manager_(nullptr),
+                              audio_manager_(nullptr),
+                              entity_manager_(nullptr),
+                              gamemode_manager_(nullptr),
+                              cam_(nullptr)
 {
 	cout << "------------SceneManager.cpp------------" << endl;
 	cout << " - Press '1-4' to load preset scenes" << endl;
@@ -9,146 +15,166 @@ SceneManager::SceneManager()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::init(Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, EntityManager* _entityManager, GameModeManager* _gamemodeManager)
+void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager, EntityManager* entity_manager, GamemodeManager* gamemode_manager)
 {
-	GameController = _controller;
-	GUI_Manager = _GUIManager;
-	Fluid_Manager = _fluidManager;
-	Audio_Manager = _audioManager;
-	Entity_Manager = _entityManager;
-	GameMode_Manager = _gamemodeManager;
+	game_controller_ = game_controller;
+	gui_manager_ = gui_manager;
+	fluid_manager_ = fluid_manager;
+	audio_manager_ = audio_manager;
+	entity_manager_ = entity_manager;
+	gamemode_manager_ = gamemode_manager;
 	
-	cam = _cam;
+	cam_ = cam;
 }
 
-void SceneManager::update()
+void SceneManager::update() const
 {
-	if (GameMode_Manager->request_for_new_scene) {
-		loadProceduralScene();
-		GameMode_Manager->request_for_new_scene = false;
+	if (gamemode_manager_->request_for_new_scene) {
+		load_procedural_scene();
+		gamemode_manager_->request_for_new_scene = false;
 	}
 
-	if (GameMode_Manager->getCurrentModeID() == 1) {
-		if (Entity_Manager->getPointCount() <= 0) {			
-			loadProceduralScene();
+	if (gamemode_manager_->get_current_mode_id() == 1) {
+		if (entity_manager_->get_point_count() <= 0) {			
+			load_procedural_scene();
 		}
 	}
 }
 
-void SceneManager::saveScene(string _sceneName)
+void SceneManager::save_scene(const string scene_name)
 {	
 	cout << "------------SceneManager.cpp------------" << endl;
 
-	xml1.popTag();
-	xml1.clear();
+	xml1_.popTag();
+	xml1_.clear();
 
-	xml1.addTag("Scene");
-	xml1.pushTag("Scene");
+	xml1_.addTag("Scene");
+	xml1_.pushTag("Scene");
 
-	xml1.addValue("name", _sceneName);
+	xml1_.addValue("name", scene_name);
 
-	xml1.addTag("Fluid");
-	xml1.pushTag("Fluid", 0);
-	xml1.addValue("mode", (int&)(Fluid_Manager->getDrawer()->drawMode));
-	xml1.popTag();
+	xml1_.addTag("Fluid");
+	xml1_.pushTag("Fluid", 0);
+	xml1_.addValue("mode", reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode));
+	xml1_.popTag();
 
-	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
-		xml1.addTag("GameObject");
-		xml1.pushTag("GameObject", i);
-		xml1.addValue("type", (*Entity_Manager->getGameObjects())[i]->type);
-		xml1.addValue("pos.x", (*Entity_Manager->getGameObjects())[i]->pos.x);
-		xml1.addValue("pos.y", (*Entity_Manager->getGameObjects())[i]->pos.y);
-		xml1.addValue("mass", (*Entity_Manager->getGameObjects())[i]->mass);
-		xml1.addValue("radius", (*Entity_Manager->getGameObjects())[i]->radius);
-		if ((*Entity_Manager->getGameObjects())[i]->type == "Spring") {
-			xml1.addValue("mass1", (*Entity_Manager->getGameObjects())[i]->nodeMasses[0]);
-			xml1.addValue("mass2", (*Entity_Manager->getGameObjects())[i]->nodeMasses[1]);
-			xml1.addValue("radius1", (*Entity_Manager->getGameObjects())[i]->nodeRadiuses[0]);
-			xml1.addValue("radius2", (*Entity_Manager->getGameObjects())[i]->nodeRadiuses[1]);
+	for (int i = 0; i < entity_manager_->get_game_objects()->size(); i++)
+	{
+		xml1_.addTag("GameObject");
+		xml1_.pushTag("GameObject", i);
+		xml1_.addValue("type", (*entity_manager_->get_game_objects())[i]->get_type());
+		xml1_.addValue("pos.x", (*entity_manager_->get_game_objects())[i]->get_position().x);
+		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
+		xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
+		xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_radius());
+		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Spring")
+		{
+			xml1_.addValue("node_count", static_cast<int>((*entity_manager_->get_game_objects())[i]->get_multiple_masses().size()));
+			
+			for (int j = 0; j < (*entity_manager_->get_game_objects())[i]->get_multiple_masses().size(); j++)
+			{
+				xml1_.addValue("mass" + to_string(j + 1), (*entity_manager_->get_game_objects())[i]->get_multiple_masses()[j]);
+				xml1_.addValue("radius" + to_string(j + 1), (*entity_manager_->get_game_objects())[i]->get_multiple_radiuses()[j]);
+			}
 		}
-		xml1.popTag();
+		xml1_.popTag();
 	}
 
-	xml1.save(_sceneName + ".xml");
+	xml1_.save(scene_name + ".xml");
 
 	cout << " [ Current Scene Saved ]" << endl;
-	cout << " - Scene Name: " << _sceneName << endl;
+	cout << " - Scene Name: " << scene_name << endl;
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::getReadyForNewScene()
+void SceneManager::get_ready_for_new_scene() const
 {
-	destroyCurrentScene();
-	resetFluid();
+	destroy_current_scene();
+	reset_fluid();
 
-	GUI_Manager->prepareForNewScene();
+	gui_manager_->prepare_for_new_scene();
 }
 
-void SceneManager::loadScene(string _path)
+void SceneManager::load_scene(const string path)
 {
-	getReadyForNewScene();
+	get_ready_for_new_scene();
 
-	if (xml.loadFile(_path + ".xml")) {
-		xml.pushTag("Scene");
+	if (xml_.loadFile(path + ".xml")) {
+		xml_.pushTag("Scene");
 
 		cout << "------------SceneManager.cpp------------" << endl;
 		cout << " [ Scene Loaded ]" << endl;
-		cout << " - Scene Name: " << xml.getValue("name", "N/A") << endl;
+		cout << " - Scene Name: " << xml_.getValue("name", "N/A") << endl;
 
-		int FluidCount = xml.getNumTags("Fluid");
-		for (int i = 0; i < FluidCount; i++) {
-			xml.pushTag("Fluid", i);
-			(int&)Fluid_Manager->getDrawer()->drawMode = xml.getValue("mode", -1);
-			cout << "- Fluid Mode: " << xml.getValue("mode", -1) << endl;
-			xml.popTag();
+		const int fluid_count = xml_.getNumTags("Fluid");
+		for (int i = 0; i < fluid_count; i++) {
+			xml_.pushTag("Fluid", i);
+			reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode) = xml_.getValue("mode", -1);
+			cout << "- Fluid Mode: " << xml_.getValue("mode", -1) << endl;
+			xml_.popTag();
 		}
 		int count = 0;
-		int GameObjectCount = xml.getNumTags("GameObject");
-		for (int i = 0; i < GameObjectCount; i++) {
+		const int game_object_count = xml_.getNumTags("GameObject");
+		for (int i = 0; i < game_object_count; i++)
+		{
 			count++;
-			xml.pushTag("GameObject", i);
+			xml_.pushTag("GameObject", i);
 
-			string type = (xml.getValue("type", "N/A"));
+			string type = xml_.getValue("type", "N/A");
 			ofVec2f pos;
-			pos.x = (xml.getValue("pos.x", -1));
-			pos.y = (xml.getValue("pos.y", -1));
+			pos.x = xml_.getValue("pos.x", -1);
+			pos.y = xml_.getValue("pos.y", -1);
 
-			if (type == "Player") {
-				float mass = (xml.getValue("mass", -1));
-				float radius = (xml.getValue("radius", -1));
+			if (type == "Player")
+			{
+				float mass = xml_.getValue("mass", -1);
+				float radius = xml_.getValue("radius", -1);
 
 				GameObject* player = new Player;
-				player->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				Entity_Manager->addGameObject(player);
+				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
+				             audio_manager_);
+				entity_manager_->add_game_object(player);
 			}
-			else if (type == "Mass") {
-				float mass = (xml.getValue("mass", -1));
-				float radius = (xml.getValue("radius", -1));
+			else if (type == "Mass")
+			{
+				const float mass = xml_.getValue("mass", -1);
+				const float radius = xml_.getValue("radius", -1);
 
 				GameObject* object = new Mass(pos, mass, radius);
-				object->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				Entity_Manager->addGameObject(object);
+				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
+				             audio_manager_);
+				entity_manager_->add_game_object(object);
 			}
-			else if (type == "Spring") {
-				float mass1 = (xml.getValue("mass1", -1));
-				float mass2 = (xml.getValue("mass2", -1));
-				float radius1 = (xml.getValue("radius1", -1));
-				float radius2 = (xml.getValue("radius2", -1));
+			else if (type == "Spring")
+			{
+				vector<float> masses;
+				vector<float> radiuses;
 
-				GameObject* spring = new Spring(pos, radius1, mass1, radius2, mass2, 2, 2, 22);
-				spring->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				Entity_Manager->addGameObject(spring);
+				const float node_count = xml_.getValue("node_count", -1);
+
+				for (int i = 0; i < node_count; i++)
+				{
+					masses.push_back(xml_.getValue("mass" + to_string(i + 1), -1));
+					radiuses.push_back(xml_.getValue("radius" + to_string(i + 1), -1));
+				}							
+				
+				GameObject* spring = new Spring(pos, radiuses, masses, 2, 2, 22);
+				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
+				             audio_manager_);
+				entity_manager_->add_game_object(spring);
 			}
-			else if (type == "Point") {
-				float mass = (xml.getValue("mass", -1));
-				float radius = (xml.getValue("radius", -1));
+			else if (type == "Point")
+			{
+				const float mass = xml_.getValue("mass", -1);
+				const float radius = xml_.getValue("radius", -1);
 
 				GameObject* point = new Point(pos, mass, radius);
-				point->init(Entity_Manager->getGameObjects(), GameController, GUI_Manager, cam, Fluid_Manager, Audio_Manager);
-				Entity_Manager->addGameObject(point);
+				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
+				            audio_manager_);
+				entity_manager_->add_game_object(point);
 			}
 
-			xml.popTag();
+			xml_.popTag();
 		}
 
 		cout << " - GameObject count: " << count << endl;
@@ -157,16 +183,16 @@ void SceneManager::loadScene(string _path)
 	}
 }
 
-void SceneManager::loadProceduralScene()
+void SceneManager::load_procedural_scene() const
 {
-	getReadyForNewScene();
+	get_ready_for_new_scene();
 
-	Fluid_Manager->explosion(500);
+	fluid_manager_->explosion(500);
 
-	Entity_Manager->createEntity("Player");
+	entity_manager_->create_entity("Player");
 
 	for (int i = 0; i < 5; i++) {
-		Entity_Manager->createEntity("Point");
+		entity_manager_->create_entity("Point");
 	}	
 
 	cout << "------------SceneManager.cpp------------" << endl;
@@ -174,57 +200,58 @@ void SceneManager::loadProceduralScene()
 	cout << "----------------------------------------" << endl;
 }
 
-void SceneManager::destroyCurrentScene()
+void SceneManager::destroy_current_scene() const
 {
-	for (int i = 0; i < Entity_Manager->getGameObjects()->size(); i++) {
-		(*Entity_Manager->getGameObjects())[i]->request_to_be_deleted = true;
+	for (auto& i : *entity_manager_->get_game_objects())
+	{
+		i->set_request_to_be_deleted(true);
 	}
 }
 
-void SceneManager::resetFluid()
+void SceneManager::reset_fluid() const
 {
-	Fluid_Manager->resetFluid();
+	fluid_manager_->reset_fluid();
 }
 
-void SceneManager::keyPressed(int key)
+void SceneManager::key_pressed(const int key)
 {
-	if (GameMode_Manager->getCurrentModeID() == 0) {
+	if (gamemode_manager_->get_current_mode_id() == 0) {
 		if (key == '1') {
 			// load scene 1
-			loadScene("Scenes/Scene1");
+			load_scene("Scenes/Scene1");
 
-			Fluid_Manager->explosion(500);
+			fluid_manager_->explosion(500);
 		}
 		else if (key == '2') {
 			// load scene 2
-			loadScene("Scenes/Scene2");
+			load_scene("Scenes/Scene2");
 
-			Fluid_Manager->explosion(500);
+			fluid_manager_->explosion(500);
 		}
 		else if (key == '3') {
 			// load scene 2
-			loadScene("Scenes/Scene3");
+			load_scene("Scenes/Scene3");
 
-			Fluid_Manager->explosion(500);
+			fluid_manager_->explosion(500);
 		}
 		else if (key == '4') {
 			// load scene 2
-			loadScene("Scenes/Scene4");
+			load_scene("Scenes/Scene4");
 
-			Fluid_Manager->explosion(500);
+			fluid_manager_->explosion(500);
 		}
 		else if (key == '9') {
 			// load saved scene
-			loadScene("Scenes/newScene");
+			load_scene("Scenes/newScene");
 
-			Fluid_Manager->explosion(500);
+			fluid_manager_->explosion(500);
 		}
 	}
 	if (key == '0') {
 		// save scene
-		saveScene("Scenes/newScene");
+		save_scene("Scenes/newScene");
 	}
 	else if (key == 'p') {
-		loadProceduralScene();
+		load_procedural_scene();
 	}
 }

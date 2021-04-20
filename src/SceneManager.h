@@ -1,41 +1,40 @@
 #pragma once
 
-#include "ofMain.h"
-
 #include "ofxXmlSettings.h"
-#include "MSAFluid.h"
+
 #include "EntityManager.h"
-#include "GameModeManager.h"
+#include "GamemodeManager.h"
 
 class SceneManager {
 public:
 
 		SceneManager();
-		void init(Controller* _controller, GUIManager* _GUIManager, Camera* _cam, FluidManager* _fluidManager, AudioManager* _audioManager, EntityManager* _entityManager, GameModeManager* _gamemodeManager);
+		void init(Controller* game_controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager, EntityManager* entity_manager, GamemodeManager* gamemode_manager);
 
-		void update();
+		void update() const;
 
-		void saveScene(string _sceneName);
-		void getReadyForNewScene();
-		void loadScene(string _path);
-		void loadProceduralScene();
-		void destroyCurrentScene();
-		void resetFluid();
+		void save_scene(string scene_name);
+		void get_ready_for_new_scene() const;
+		void load_scene(string path);
+		void load_procedural_scene() const;
+		void destroy_current_scene() const;
+		void reset_fluid() const;
 
-		void keyPressed(int key);
-
-		ofxXmlSettings xml;
-		ofxXmlSettings xml1;
+		void key_pressed(int key);
+		
 
 private:
 
-		Controller* GameController;
-		GUIManager* GUI_Manager;
-		FluidManager* Fluid_Manager;
-		AudioManager* Audio_Manager;
-		EntityManager* Entity_Manager;
-		GameModeManager* GameMode_Manager;
+		Controller* game_controller_;
+		GUIManager* gui_manager_;
+		FluidManager* fluid_manager_;
+		AudioManager* audio_manager_;
+		EntityManager* entity_manager_;
+		GamemodeManager* gamemode_manager_;
 
-		Camera* cam;
+		Camera* cam_;
 
+		ofxXmlSettings xml_;
+		ofxXmlSettings xml1_;
+	
 };
