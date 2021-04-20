@@ -154,7 +154,7 @@ void Collectable::random_forces() const
 
 		
 
-		fluid_manager_->add_to_fluid(mapped_pos, vel, false,  true, 1);
+		fluid_manager_->add_to_fluid(mapped_pos, vel, true,  true, 1);
 
 		// if collectable is within screen bounds increment brightness
 		for (auto& game_object : *game_objects_)

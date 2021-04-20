@@ -20,7 +20,11 @@ void Controller::init(Camera* cam)
 void Controller::update()
 {
 	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
-	const ofVec3f world_pos = cam_->screen_to_world(local_pos);
+	ofVec3f world_pos = cam_->screen_to_world(local_pos);	
+	
+	world_pos.x += (WORLD_WIDTH)  * ofMap(cam_->get_scale().x, 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.y += (WORLD_HEIGHT) * ofMap(cam_->get_scale().y, 1.0f, 3.0f, 0.0f, 1.0f);
+	
 	mouse_pos_ = world_pos;
 }
 

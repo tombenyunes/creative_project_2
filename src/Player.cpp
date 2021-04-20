@@ -111,14 +111,14 @@ void Player::mouse_pressed(const float x, const float y, const int button)
 {
 	mouse_down_ = true;
 	mouse_button_ = button;
-	mouse_pos_ = { static_cast<float>(x), static_cast<float>(y) };
+	mouse_pos_ = { x, y };
 }
 
 void Player::mouse_dragged(const float x, const float y, const int button)
 {
 	mouse_down_ = true;
 	mouse_button_ = button;
-	mouse_pos_ = { static_cast<float>(x), static_cast<float>(y) };
+	mouse_pos_ = { x, y };
 }
 
 void Player::mouse_released(const float x, const float y, const int button)

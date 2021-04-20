@@ -18,10 +18,13 @@ public:
 	glm::mat4 get_model_view_matrix() const;
 	glm::mat4 get_model_view_projection_matrix() const;
 	ofVec3f get_position() const;
+	glm::vec3 get_scale() const;
 	void begin();
 	void end();
 	ofVec3f screen_to_world(ofVec3f view) const;
 
+	void draw() const;
+	
 	void key_pressed(int key);
 	void key_released(int key);
 	void mouse_dragged(int x, int y, int button);

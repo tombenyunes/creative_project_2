@@ -218,20 +218,16 @@ void EntityManager::mouse_moved(const int x, const int y)
 void EntityManager::mouse_dragged(const int x, const int y, const int button) const
 {
 	for (auto& i : *get_game_objects())
-	{
-		const ofVec3f local_view = ofVec3f(x - (static_cast<float>(WORLD_WIDTH) / 2), y - (static_cast<float>(WORLD_HEIGHT) / 2), cam_->get_position().z);
-		const ofVec3f world_view = cam_->screen_to_world(local_view);
-		i->mouse_dragged(world_view.x, world_view.y, button);
+	{																   
+		i->mouse_dragged(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
 	}
 }
 
 void EntityManager::mouse_pressed(const int x, const int y, const int button) const
 {
 	for (auto& i : *get_game_objects())
-	{
-		const ofVec3f local_view = ofVec3f(x - (WORLD_WIDTH / 2), y - (WORLD_HEIGHT / 2), cam_->get_position().z);
-		const ofVec3f world_view = cam_->screen_to_world(local_view);
-		i->mouse_pressed(world_view.x, world_view.y, button);
+	{																   
+		i->mouse_pressed(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
 	}
 }
 
@@ -243,6 +239,6 @@ void EntityManager::mouse_released(const int x, const int y, const int button) c
 {
 	for (auto& i : *get_game_objects())
 	{
-		i->mouse_released(x - (static_cast<float>(WORLD_WIDTH) / 2), y - (static_cast<float>(WORLD_HEIGHT) / 2), button);
+		i->mouse_released(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
 	}
 }
