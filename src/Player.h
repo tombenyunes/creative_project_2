@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "GameObject.h"
+#include "PlayerTrail.h"
 
 class Player : public GameObject {
 
@@ -33,6 +34,7 @@ private:
 	
 	void draw_boost_direction() const;
 	ofVec3f draw_vel_path() const;
+	void draw_fluid_trail() const;
 	void draw_particle_trail() const;
 
 	// Events

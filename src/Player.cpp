@@ -24,7 +24,7 @@ Player::Player(const ofVec2f pos, const ofColor color)
 void Player::update()
 {
 	pull_points();
-	draw_particle_trail();
+	draw_fluid_trail();
 	update_forces();
 	update_gui();
 	reset_forces();
@@ -53,9 +53,9 @@ bool Player::player_can_move() const
 
 ofVec2f Player::get_movement_vector() const
 {
-	ofVec2f movementVec = pos_ - mouse_pos_;
-	movementVec.scale(5);
-	return movementVec;
+	ofVec2f movement_vec = pos_ - mouse_pos_;
+	movement_vec.scale(5);
+	return movement_vec;
 }
 
 void Player::pull_points()
@@ -91,7 +91,7 @@ void Player::update_gui()
 	}
 	else {
 		gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->mass, gui_manager_->infinite_mass, gui_manager_->radius, gui_manager_->affected_by_gravity, 1); // receiving and updating the results from the GUI_Manager
-		if (infinite_mass_) mass_ = 9999999999999999999; else mass_ = gui_manager_->mass;
+		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->mass;
 		radius_ = gui_manager_->radius;
 		infinite_mass_ = gui_manager_->infinite_mass;
 		affected_by_gravity_ = gui_manager_->affected_by_gravity;
@@ -165,11 +165,11 @@ void Player::draw()
 	ofSetColor(255);
 
 	if (aiming_boost_) draw_boost_direction();
-	//drawParticleTrail();
+	draw_particle_trail();
 
 	ofSetColor(color_);
 	ofFill();
-	ofEllipse(pos_.x, pos_.y, radius_, radius_);
+	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 }
 
 void Player::draw_boost_direction() const
@@ -195,10 +195,11 @@ ofVec3f Player::draw_vel_path() const
 	return ofVec3f(vec.x * ofGetWidth(), vec.y * ofGetHeight(), 0);
 }
 
-void Player::draw_particle_trail() const
+void Player::draw_fluid_trail() const
 // draws particle trail following the player when moving
 {
-	if (mouse_down_ && mouse_button_ == 0) {
+	if (mouse_down_ && mouse_button_ == 0)
+	{
 		// draw new particles
 		//float posX = ofMap(pos.x, -ofGetWidth()/2, ofGetWidth()/2, 0, 1);
 		//float posY = ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
@@ -217,5 +218,18 @@ void Player::draw_particle_trail() const
 		new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 
 		fluid_manager_->add_to_fluid(new_pos, new_vel, true, true);
+	}
+}
+
+void Player::draw_particle_trail() const
+{
+	if (mouse_down_ && mouse_button_ == 0)
+	{
+		for (int i = 0; i < 1; i++)
+		{
+			GameObject* particle = new PlayerTrail{ get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), get_movement_vector() * -1, ofRandom(1, 4), ofColor(255), 255 };
+			particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+			game_objects_->push_back(particle);
+		}
 	}
 }
