@@ -163,12 +163,12 @@ void SceneManager::load_scene(const string path)
 				             audio_manager_);
 				entity_manager_->add_game_object(spring);
 			}
-			else if (type == "Point")
+			else if (type == "Collectable")
 			{
 				const float mass = xml_.getValue("mass", -1);
 				const float radius = xml_.getValue("radius", -1);
 
-				GameObject* point = new Point(pos, mass, radius);
+				GameObject* point = new Collectable(pos, mass, radius);
 				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
 				            audio_manager_);
 				entity_manager_->add_game_object(point);
@@ -192,7 +192,7 @@ void SceneManager::load_procedural_scene() const
 	entity_manager_->create_entity("Player");
 
 	for (int i = 0; i < 5; i++) {
-		entity_manager_->create_entity("Point");
+		entity_manager_->create_entity("Collectable");
 	}	
 
 	cout << "------------SceneManager.cpp------------" << endl;

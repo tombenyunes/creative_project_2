@@ -1,9 +1,9 @@
-#include "Point.h"
+#include "Collectable.h"
 
-Point::Point(const ofVec2f pos, const float mass, const float radius)
-	:	emission_frequency_(ofRandom(25, 100))
+Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
+	:	emission_frequency_(static_cast<int>(ofRandom(25, 100)))
 {
-	set_type("Point");
+	set_type("Collectable");
 	set_position(pos);
 	set_color(ofColor(passive_color_));
 	set_mass(mass);
@@ -14,11 +14,9 @@ Point::Point(const ofVec2f pos, const float mass, const float radius)
 	add_module("gravity");
 	add_module("friction");
 	add_module("mouseHover");
-
-	cout << emission_frequency_ << endl;
 }
 
-void Point::update()
+void Collectable::update()
 {
 	random_forces();
 	update_forces();
@@ -27,12 +25,12 @@ void Point::update()
 	reset_forces();
 }
 
-void Point::update_forces()
+void Collectable::update_forces()
 {
 	add_forces(false);
 }
 
-void Point::drag_nodes()
+void Collectable::drag_nodes()
 {
 	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
 	static ofVec2f mouse_pos_before_drag;
@@ -62,7 +60,7 @@ void Point::drag_nodes()
 	}
 }
 
-void Point::update_gui()
+void Collectable::update_gui()
 {
 	if (game_controller_->get_active() == this)
 	{
@@ -89,12 +87,12 @@ void Point::update_gui()
 	}
 }
 
-void Point::reset_forces()
+void Collectable::reset_forces()
 {
 	accel_.set(0);
 }
 
-void Point::is_colliding(GameObject* other, ofVec2f node_pos)
+void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 {
 	if (other->get_type() == "PullRange")
 	{
@@ -110,8 +108,8 @@ void Point::is_colliding(GameObject* other, ofVec2f node_pos)
 	}
 }
 
-// points randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
-void Point::random_forces() const
+// collectables randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
+void Collectable::random_forces() const
 {
 	if (ofGetFrameNum() % static_cast<int>(emission_frequency_) == 0)
 	{
@@ -123,7 +121,7 @@ void Point::random_forces() const
 		vel.y = ofRandom(-0.001f, 0.1f);*/
 
 
-		// all points direct velocities somewhat towards the centre
+		// all collectables direct velocities somewhat towards the centre
 		/*if (get_position().x > 0)
 		{
 			vel.x = ofRandom(-0.1f, 0.001f);
@@ -142,11 +140,11 @@ void Point::random_forces() const
 		}*/
 
 
-		// randomly select a point and target all velocities towards that point's position
+		// randomly select a collectables and target all velocities towards that point's position
 		vector<ofVec2f> point_positions;
 		for (int i = 0; i < game_objects_->size(); i++)
 		{
-			if ((*game_objects_)[i]->get_type() == "Point")
+			if ((*game_objects_)[i]->get_type() == "Collectable")
 			{
 				point_positions.push_back((*game_objects_)[i]->get_position());
 			}
@@ -189,7 +187,7 @@ void Point::random_forces() const
 // ----- EVENT FUNCTIONS ----- //
 
 
-void Point::mouse_pressed(const float x, const float y, const int button)
+void Collectable::mouse_pressed(const float x, const float y, const int button)
 {
 	if (button == 2 && mouse_over_)
 	{
@@ -201,7 +199,7 @@ void Point::mouse_pressed(const float x, const float y, const int button)
 	}
 }
 
-void Point::mouse_dragged(const float x, const float y, const int button)
+void Collectable::mouse_dragged(const float x, const float y, const int button)
 {
 	if (button == 2)
 	{
@@ -217,7 +215,7 @@ void Point::mouse_dragged(const float x, const float y, const int button)
 	}
 }
 
-void Point::mouse_released(const float x, const float y, const int button)
+void Collectable::mouse_released(const float x, const float y, const int button)
 {
 	if (button == 2)
 	{
@@ -230,7 +228,7 @@ void Point::mouse_released(const float x, const float y, const int button)
 // ----- RENDER LOOP ----- //
 
 
-void Point::draw()
+void Collectable::draw()
 {
 	ofPushStyle();
 
@@ -269,7 +267,7 @@ void Point::draw()
 	ofPopStyle();
 }
 
-void Point::get_color()
+void Collectable::get_color()
 {
 	if ((game_controller_->get_active() == this) || (mouse_over_ || mouse_drag_))
 	{

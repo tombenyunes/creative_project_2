@@ -3,11 +3,11 @@
 #include "ofMain.h"
 #include "GameObject.h"
 
-class Point : public GameObject {
+class Collectable : public GameObject {
 
 public:
 
-	Point(ofVec2f pos, float mass, float radius);	
+	Collectable(ofVec2f pos, float mass, float radius);	
 
 private:
 

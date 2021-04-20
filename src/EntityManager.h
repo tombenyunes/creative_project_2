@@ -11,7 +11,7 @@
 #include "Player.h"
 #include "Mass.h"
 #include "Spring.h"
-#include "Point.h"
+#include "Collectable.h"
 
 class EntityManager {
 	

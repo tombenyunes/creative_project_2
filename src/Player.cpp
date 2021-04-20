@@ -66,7 +66,7 @@ void Player::pull_points()
 		{
 			if (game_object != this)
 			{
-				if (game_object->get_type() == "Point")
+				if (game_object->get_type() == "Collectable")
 				{
 					if (Collisions::ellipse_compare(pos_, 600, game_object->get_position(), game_object->get_radius()))
 					{											

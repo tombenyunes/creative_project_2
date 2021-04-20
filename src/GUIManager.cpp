@@ -98,7 +98,7 @@ void GUIManager::update_create_node_values()
 		name_ = "Spring";
 		break;
 	case 2:
-		name_ = "Point";
+		name_ = "Collectable";
 		break;
 	default:
 		cout << "Error -> GUIManager.cpp::update_create_node_values -> New Node Type Not Specified" << endl;
@@ -251,7 +251,7 @@ void GUIManager::draw_required_gui(const bool is_spring)
 void GUIManager::draw_text() const
 {
 	ofDrawBitmapString("GameMode: " + game_mode_manager_->get_current_mode_string(), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
-	ofDrawBitmapString("Points Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
+	ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
 }
 
 void GUIManager::draw_border() const
