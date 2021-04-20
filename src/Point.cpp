@@ -107,6 +107,7 @@ void Point::is_colliding(GameObject* other, ofVec2f node_pos)
 	}
 }
 
+// points randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
 void Point::random_forces()
 {
 	if (ofGetFrameNum() % static_cast<int>(ofRandom(25, 100)) == 0)

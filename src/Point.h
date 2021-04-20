@@ -31,7 +31,7 @@ private:
 	void mouse_dragged(float x, float y, int button) override;
 	void mouse_released(float x, float y, int button) override;	
 
-	// Collision / move towards player
+	// Collisions (pull range)
 	void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 }) override;
 
 	void random_forces();
