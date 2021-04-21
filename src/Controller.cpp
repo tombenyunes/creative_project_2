@@ -1,7 +1,6 @@
 #include "Controller.h"
 
-Controller::Controller(): cam_(nullptr),
-                          active_object_(nullptr),
+Controller::Controller(): active_object_(nullptr),
                           gravity_(false),
                           need_to_delete_all_(false),
                           object_selected_(false),
@@ -10,27 +9,6 @@ Controller::Controller(): cam_(nullptr),
                           hard_collisions_(false),
                           gui_visible_(false)
 {
-}
-
-void Controller::init(Camera* cam)
-{
-	cam_ = cam;
-}
-
-void Controller::update()
-{
-	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - WORLD_WIDTH / 2, ofGetMouseY() - WORLD_HEIGHT / 2, 0);
-	ofVec3f world_pos = cam_->screen_to_world(local_pos);	
-	
-	world_pos.x += (WORLD_WIDTH)  * ofMap(cam_->get_scale().x, 1.0f, 3.0f, 0.0f, 1.0f);
-	world_pos.y += (WORLD_HEIGHT) * ofMap(cam_->get_scale().y, 1.0f, 3.0f, 0.0f, 1.0f);
-	
-	mouse_pos_ = world_pos;
-}
-
-ofVec3f Controller::get_world_mouse_pos() const
-{
-	return mouse_pos_;
 }
 
 void Controller::make_active(GameObject* _this)

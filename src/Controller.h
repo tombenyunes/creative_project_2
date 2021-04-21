@@ -14,31 +14,26 @@
 #define RADIUS_LOWER_BOUND 25
 #define RADIUS_UPPER_BOUND 250
 
-#define MAXIMUM_ACCELERATION 0.15 // 0.15
+#define MAXIMUM_ACCELERATION 0.15f // 0.15
 #define MAXIMUM_VELOCITY 100 // 15
 
-#define FRICTION_FORCE 0.015
-#define GRAVITY_FORCE 0.0001
+#define FRICTION_FORCE 0.015f
+#define GRAVITY_FORCE 0.0001f
 
-#define WORLD_WIDTH 2000*2
-#define WORLD_HEIGHT 1500*2
+#define WORLD_WIDTH (2000 * 2)
+#define WORLD_HEIGHT (1500 * 2)
+
+#define HALF_WORLD_WIDTH (WORLD_WIDTH / 2)
+#define HALF_WORLD_HEIGHT (WORLD_HEIGHT / 2)
+
 
 class GameObject;
-
-#include "Camera.h"
-
 
 class Controller {
 
 public:
 	
 	Controller();
-
-	void init(Camera* cam);
-	
-	void update();
-
-	ofVec3f get_world_mouse_pos() const;
 
 	void make_active(GameObject* _this);
 	GameObject* get_active() const;
@@ -65,9 +60,7 @@ public:
 	bool get_gui_visible() const;
 
 private:
-
-	Camera* cam_;
-	ofVec3f mouse_pos_;
+		
 	GameObject* active_object_;
 	bool gravity_;
 	bool need_to_delete_all_;

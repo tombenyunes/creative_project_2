@@ -1,43 +1,44 @@
 #include "GameObject.h"
 
 GameObject::GameObject(const ofVec2f pos, const ofColor color)
-	:	game_objects_(nullptr),
-		game_controller_(nullptr),
-		gui_manager_(nullptr),
-		fluid_manager_(nullptr),
-		audio_manager_(nullptr),
-		cam_(nullptr),
-		pos_(pos),
-		prev_pos_(99999, 99999),
-		mass_(10),
-		radius_(35),
-		vel_(0),
-		accel_(0),
-		color_(color),
-		infinite_mass_(false),
-		affected_by_gravity_(false),
-		gravity_mult_(1),
-		collision_mult_(1),
-		mouse_over_(false),
-		mouse_over_index_(0),
-		selected_node_index_(0),
-		mouse_drag_(false),
-		mouse_offset_from_center_(0),
-		pos_before_drag_(0),
-		started_dragging_(false),
-		passive_color_(ofColor(255)),
-		selected_color_(ofColor(255, 165, 0)),
-		delete_key_down_(false),
-		request_to_be_deleted_(false),
-		request_to_be_selected_(false),
-		is_selected_(false),
-		gui_values_need_to_be_set_(true),
-		screen_wrap_enabled_(false),
-		screen_bounce_enabled_(false),
-		gravity_enabled_(false),
-		friction_enabled_(false),
-		mouse_hover_enabled_(false),
-		ellipse_collider_enabled_(false)
+	: game_objects_(nullptr),
+	  game_controller_(nullptr),
+	  gui_manager_(nullptr),
+	  fluid_manager_(nullptr),
+	  audio_manager_(nullptr),
+	  cam_(nullptr),
+	  pos_(pos),
+	  prev_pos_(99999, 99999),
+	  mass_(10),
+	  radius_(35),
+	  vel_(0),
+	  accel_(0),
+	  color_(color),
+	  infinite_mass_(false),
+	  affected_by_gravity_(false),
+	  gravity_mult_(1),
+	  collision_mult_(1),
+	  mouse_over_(false),
+	  mouse_over_index_(0),
+	  selected_node_index_(0),
+	  mouse_drag_(false),
+	  mouse_offset_from_center_(0),
+	  local_mouse_pos_before_drag_(0),
+	  pixel_buffer_before_drag_(0),
+	  started_dragging_(false),
+	  passive_color_(ofColor(255)),
+	  selected_color_(ofColor(255, 165, 0)),
+	  delete_key_down_(false),
+	  request_to_be_deleted_(false),
+	  request_to_be_selected_(false),
+	  is_selected_(false),
+	  gui_values_need_to_be_set_(true),
+	  screen_wrap_enabled_(false),
+	  screen_bounce_enabled_(false),
+	  gravity_enabled_(false),
+	  friction_enabled_(false),
+	  mouse_hover_enabled_(false),
+	  ellipse_collider_enabled_(false)
 {
 }
 
@@ -140,21 +141,21 @@ void GameObject::add_module(const string id)
 // upon reaching the screen edge, the object is placed at the opposite edge
 void GameObject::screen_wrap()
 {
-	if (pos_.x > 0 + (WORLD_WIDTH / 2))
+	if (pos_.x > 0 + (HALF_WORLD_WIDTH))
 	{
-		pos_.x = 0 - (WORLD_WIDTH / 2);
+		pos_.x = 0 - (HALF_WORLD_WIDTH);
 	}
-	if (pos_.x < 0 - (WORLD_WIDTH / 2))
+	if (pos_.x < 0 - (HALF_WORLD_WIDTH))
 	{
-		pos_.x = 0 + (WORLD_WIDTH / 2);
+		pos_.x = 0 + (HALF_WORLD_WIDTH);
 	}
-	if (pos_.y < 0 - (WORLD_HEIGHT / 2))
+	if (pos_.y < 0 - (HALF_WORLD_HEIGHT))
 	{
-		pos_.y = 0 + (WORLD_HEIGHT / 2);
+		pos_.y = 0 + (HALF_WORLD_HEIGHT);
 	}
-	if (pos_.y > 0 + (WORLD_HEIGHT / 2))
+	if (pos_.y > 0 + (HALF_WORLD_HEIGHT))
 	{
-		pos_.y = 0 - (WORLD_HEIGHT / 2);
+		pos_.y = 0 - (HALF_WORLD_HEIGHT);
 	}
 }
 
@@ -163,50 +164,50 @@ void GameObject::screen_bounce()
 {
 	if (node_positions_.empty())
 	{
-		if (pos_.x > 0 + (WORLD_WIDTH / 2) - (radius_) / 2)
+		if (pos_.x > 0 + (HALF_WORLD_WIDTH) - (radius_) / 2)
 		{
 			vel_.x *= -1;
-			pos_.x = 0 + (WORLD_WIDTH / 2) - (radius_) / 2;
+			pos_.x = 0 + (HALF_WORLD_WIDTH) - (radius_) / 2;
 		}
-		if (pos_.x < 0 - (WORLD_WIDTH / 2) + (radius_) / 2)
+		if (pos_.x < 0 - (HALF_WORLD_WIDTH) + (radius_) / 2)
 		{
 			vel_.x *= -1;
-			pos_.x = 0 - (WORLD_WIDTH / 2) + (radius_) / 2;
+			pos_.x = 0 - (HALF_WORLD_WIDTH) + (radius_) / 2;
 		}
-		if (pos_.y < 0 - (WORLD_HEIGHT / 2) + (radius_) / 2)
+		if (pos_.y < 0 - (HALF_WORLD_HEIGHT) + (radius_) / 2)
 		{
 			vel_.y *= -1;
-			pos_.y = 0 - (WORLD_HEIGHT / 2) + (radius_) / 2;
+			pos_.y = 0 - (HALF_WORLD_HEIGHT) + (radius_) / 2;
 		}
-		if (pos_.y > 0 + (WORLD_HEIGHT / 2) - (radius_) / 2)
+		if (pos_.y > 0 + (HALF_WORLD_HEIGHT) - (radius_) / 2)
 		{
 			vel_.y *= -1;
-			pos_.y = 0 + (WORLD_HEIGHT / 2) - (radius_) / 2;
+			pos_.y = 0 + (HALF_WORLD_HEIGHT) - (radius_) / 2;
 		}
 	}
 	else
 	{
 		for (int i = 0; i < node_positions_.size(); i++)
 		{
-			if (node_positions_[i].x > 0 + (WORLD_WIDTH / 2) - (node_radiuses_[i]) / 2)
+			if (node_positions_[i].x > 0 + (HALF_WORLD_WIDTH) - (node_radiuses_[i]) / 2)
 			{
 				node_velocities_[i].x *= -1;
-				node_positions_[i].x = 0 + (WORLD_WIDTH / 2) - (node_radiuses_[i]) / 2;
+				node_positions_[i].x = 0 + (HALF_WORLD_WIDTH) - (node_radiuses_[i]) / 2;
 			}
-			if (node_positions_[i].x < 0 - (WORLD_WIDTH / 2) + (node_radiuses_[i]) / 2)
+			if (node_positions_[i].x < 0 - (HALF_WORLD_WIDTH) + (node_radiuses_[i]) / 2)
 			{
 				node_velocities_[i].x *= -1;
-				node_positions_[i].x = 0 - (WORLD_WIDTH / 2) + (node_radiuses_[i]) / 2;
+				node_positions_[i].x = 0 - (HALF_WORLD_WIDTH) + (node_radiuses_[i]) / 2;
 			}
-			if (node_positions_[i].y < 0 - (WORLD_HEIGHT / 2) + (node_radiuses_[i]) / 2)
+			if (node_positions_[i].y < 0 - (HALF_WORLD_HEIGHT) + (node_radiuses_[i]) / 2)
 			{
 				node_velocities_[i].y *= -1;
-				node_positions_[i].y = 0 - (WORLD_HEIGHT / 2) + (node_radiuses_[i]) / 2;
+				node_positions_[i].y = 0 - (HALF_WORLD_HEIGHT) + (node_radiuses_[i]) / 2;
 			}
-			if (node_positions_[i].y > 0 + (WORLD_HEIGHT / 2) - (node_radiuses_[i]) / 2)
+			if (node_positions_[i].y > 0 + (HALF_WORLD_HEIGHT) - (node_radiuses_[i]) / 2)
 			{
 				node_velocities_[i].y *= -1;
-				node_positions_[i].y = 0 + (WORLD_HEIGHT / 2) - (node_radiuses_[i]) / 2;
+				node_positions_[i].y = 0 + (HALF_WORLD_HEIGHT) - (node_radiuses_[i]) / 2;
 			}
 		}
 	}
@@ -308,10 +309,10 @@ void GameObject::mouse_hover()
 	{
 		if (game_controller_->get_mouse_dragged() == false)
 		{
-			if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y), 0))
+			if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
 			{
 					mouse_over_ = true;
-					mouse_offset_from_center_ = pos_ - ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+					mouse_offset_from_center_ = pos_ - ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 			}
 			else {
 				mouse_over_ = false;			
@@ -323,18 +324,18 @@ void GameObject::mouse_hover()
 		{
 			for (int i = 0; i < node_positions_.size(); i++)
 			{
-				if (Collisions::ellipse_compare(node_positions_[i], node_radiuses_[i], game_controller_->get_world_mouse_pos(), 0))
+				if (Collisions::ellipse_compare(node_positions_[i], node_radiuses_[i], cam_->get_world_mouse_pos(), 0))
 				{
 					mouse_over_ = true;
 					mouse_over_index_ = i;
-					mouse_offset_from_center_ = node_positions_[i] - game_controller_->get_world_mouse_pos();
+					mouse_offset_from_center_ = node_positions_[i] - cam_->get_world_mouse_pos();
 					break;
 				}
-				else if (Collisions::ellipse_compare(pos_, radius_, game_controller_->get_world_mouse_pos(), 0))
+				else if (Collisions::ellipse_compare(pos_, radius_, cam_->get_world_mouse_pos(), 0))
 				{
 					mouse_over_ = true;
 					mouse_over_index_ = -1;
-					mouse_offset_from_center_ = pos_ - game_controller_->get_world_mouse_pos();
+					mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
 					break;
 				}
 				else {

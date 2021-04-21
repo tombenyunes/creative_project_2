@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "GameObject.h"
+#include "PlayerTrail.h"
 
 class Collectable : public GameObject {
 
@@ -34,8 +35,11 @@ private:
 	// Collisions (pull range)
 	void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 }) override;
 
-	void random_forces() const;
+	void random_forces();
+	void pulse_radius();
+	void draw_particle_burst() const;
 
 	int emission_frequency_;
-
+	bool needs_to_pulse_radius_;
+	bool player_within_bounds_;
 };

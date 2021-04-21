@@ -19,14 +19,34 @@ Camera::Camera(): follow_player_(true)
 	//cam.setFarClip(1000000);
 }
 
-void Camera::update(const int world_width, const int world_height, const ofVec2f player_pos)
+void Camera::update(const ofVec2f player_pos)
 {
 	if (follow_player_) {
 		cam_.setPosition(player_pos.x, player_pos.y, cam_.getPosition().z); // camera follows player
 	}
 	else {
-		cam_.setPosition(0 + (world_width / 2), 0 + (world_height / 2), cam_.getPosition().z); // camera follows player
+		cam_.setPosition(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT, cam_.getPosition().z); // camera follows player
 	}
+	
+	// calculate local + world mouse positions
+	
+	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - HALF_WORLD_WIDTH, ofGetMouseY() - HALF_WORLD_HEIGHT, 0);
+	ofVec3f world_pos = screen_to_world(local_pos);
+	world_pos.x += WORLD_WIDTH * ofMap(get_scale().x, 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.y += WORLD_HEIGHT * ofMap(get_scale().y, 1.0f, 3.0f, 0.0f, 1.0f);
+
+	local_mouse_pos_ = ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
+	world_mouse_pos_ = world_pos;
+}
+
+ofVec3f Camera::get_local_mouse_pos() const
+{
+	return local_mouse_pos_;
+}
+
+ofVec3f Camera::get_world_mouse_pos() const
+{
+	return world_mouse_pos_;
 }
 
 void Camera::toggle_zoom_mode()

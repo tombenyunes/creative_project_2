@@ -14,6 +14,8 @@ Mass::Mass(const ofVec2f pos, const float mass, const float radius)
 	add_module("gravity");
 	add_module("friction");
 	add_module("mouseHover");
+
+	pixel_buffer_before_drag_ = 2;
 }
 
 void Mass::update()
@@ -31,12 +33,12 @@ void Mass::update_forces()
 
 void Mass::drag_nodes()
 {
-	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+	local_mouse_pos_before_drag_.set(cam_->get_local_mouse_pos());
 	static ofVec2f mouse_pos_before_drag;
 	
 	if (mouse_drag_)
 	{
-		const ofVec2f prev_pos2 = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
 
 		ofVec2f new_pos;
 		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
@@ -46,14 +48,14 @@ void Mass::drag_nodes()
 		set_velocity(ofVec2f(0));
 
 		started_dragging_ = true;
-		mouse_pos_before_drag = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+		mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 	}
 	else
 	{
 		if (started_dragging_ == true)
 		{
 			started_dragging_ = false;
-			const ofVec2f mouse_speed = (ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
+			const ofVec2f mouse_speed = (ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
 			apply_force(accel_, mouse_speed, false);
 		}
 	}
@@ -112,7 +114,7 @@ void Mass::mouse_dragged(const float x, const float y, const int button)
 	{
 		if (mouse_over_ && game_controller_->get_mouse_dragged() == false)
 		{
-			if (pos_before_drag_.distance(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y)) > 2)
+			if (local_mouse_pos_before_drag_.distance(ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)) > pixel_buffer_before_drag_)
 			{
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;

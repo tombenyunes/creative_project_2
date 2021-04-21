@@ -37,7 +37,7 @@ void EntityManager::add_game_object(GameObject* _gameobject) const
 	game_objects_->push_back(_gameobject);
 }
 
-void EntityManager::update_game_objects()
+void EntityManager::update()
 {
 	delete_game_objects();
 	find_selected();
@@ -49,12 +49,12 @@ void EntityManager::update_game_objects()
 	}
 }
 
-void EntityManager::delete_game_objects() const
+void EntityManager::delete_game_objects()
 {
 	// erase objects that need to be deleted and free memory
 	for (int i = 0; i < get_game_objects()->size(); i++) {
 		if ((*get_game_objects())[i]->get_type() == "Player") {
-			cam_->update(WORLD_WIDTH, WORLD_HEIGHT, ofVec2f((*get_game_objects())[i]->get_position().x + WORLD_WIDTH / 2, (*get_game_objects())[i]->get_position().y + WORLD_HEIGHT / 2));
+			set_player_position(ofVec2f((*get_game_objects())[i]->get_position().x + HALF_WORLD_WIDTH, (*get_game_objects())[i]->get_position().y + HALF_WORLD_HEIGHT));
 		}
 		if ((*get_game_objects())[i]->get_request_to_be_deleted() == true) {
 			if ((*get_game_objects())[i] == game_controller_->get_active()) {
@@ -144,13 +144,13 @@ void EntityManager::create_entity(const string entity_type) const
 	}
 	if (type_id == 0 || entity_type == "Mass") {
 		cout << "Mass created" << endl;
-		GameObject* object = new Mass(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		GameObject* object = new Mass(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
 		object->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(object);
 	}
 	else if (type_id == 1 || entity_type == "Spring") {
 		cout << "Spring created" << endl;
-		GameObject* spring = new Spring(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y), { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
+		GameObject* spring = new Spring(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
 		spring->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(spring);
 	}
@@ -174,6 +174,16 @@ int EntityManager::get_point_count() const
 	}
 	gui_manager_->update_point_count(pointCount);
 	return pointCount;
+}
+
+ofVec2f EntityManager::get_player_position() const
+{
+	return player_position_;
+}
+
+void EntityManager::set_player_position(const ofVec2f pos)
+{
+	player_position_ = pos;
 }
 
 void EntityManager::key_pressed(const int key) const
@@ -219,7 +229,7 @@ void EntityManager::mouse_dragged(const int x, const int y, const int button) co
 {
 	for (auto& i : *get_game_objects())
 	{																   
-		i->mouse_dragged(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
+		i->mouse_dragged(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y, button);
 	}
 }
 
@@ -227,7 +237,7 @@ void EntityManager::mouse_pressed(const int x, const int y, const int button) co
 {
 	for (auto& i : *get_game_objects())
 	{																   
-		i->mouse_pressed(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
+		i->mouse_pressed(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y, button);
 	}
 }
 
@@ -239,6 +249,6 @@ void EntityManager::mouse_released(const int x, const int y, const int button) c
 {
 	for (auto& i : *get_game_objects())
 	{
-		i->mouse_released(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y, button);
+		i->mouse_released(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y, button);
 	}
 }

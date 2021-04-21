@@ -413,7 +413,7 @@ void AudioManager::drawWaveform() {
 
     ofPushMatrix();
 
-    ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, -1000);
+    ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, -1000);
 
     //ofBeginShape();
     for (int i = 0; i < 255; i++) {

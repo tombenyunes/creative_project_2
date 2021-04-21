@@ -1,7 +1,8 @@
 #include "Collectable.h"
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
-	:	emission_frequency_(static_cast<int>(ofRandom(25, 100)))
+	:	emission_frequency_(static_cast<int>(ofRandom(25, 100))),
+		needs_to_pulse_radius_(false)
 {
 	set_type("Collectable");
 	set_position(pos);
@@ -14,11 +15,15 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("gravity");
 	add_module("friction");
 	add_module("mouseHover");
+
+	pixel_buffer_before_drag_ = 2;
 }
 
 void Collectable::update()
 {
 	random_forces();
+	pulse_radius();
+	
 	update_forces();
 	drag_nodes();
 	update_gui();
@@ -32,11 +37,11 @@ void Collectable::update_forces()
 
 void Collectable::drag_nodes()
 {
-	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+	local_mouse_pos_before_drag_.set(cam_->get_local_mouse_pos());
 	static ofVec2f mouse_pos_before_drag;
 	if (mouse_drag_)
 	{
-		const ofVec2f prev_pos2 = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
 
 		ofVec2f new_pos;
 		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
@@ -47,14 +52,14 @@ void Collectable::drag_nodes()
 		vel_.set(0);
 
 		started_dragging_ = true;
-		mouse_pos_before_drag = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+		mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 	}
 	else
 	{
 		if (started_dragging_ == true)
 		{
 			started_dragging_ = false;
-			const ofVec2f mouse_speed = (ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
+			const ofVec2f mouse_speed = (ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
 			apply_force(accel_, mouse_speed, false);
 		}
 	}
@@ -109,13 +114,13 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 }
 
 // collectables randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
-void Collectable::random_forces() const
+void Collectable::random_forces()
 {
 	if (ofGetFrameNum() % static_cast<int>(emission_frequency_) == 0)
 	{
 		ofVec2f mapped_pos;
-		mapped_pos.x = ofMap(get_position().x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
-		mapped_pos.y = ofMap(get_position().y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+		mapped_pos.x = ofMap(get_position().x, -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+		mapped_pos.y = ofMap(get_position().y, -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
 		ofVec2f vel/* = ofVec2f(ofRandom(-0.001f, 0.1f), ofRandom(-0.001f, 0.1f))*/;
 		/*vel.x = ofRandom(-0.001f, 0.1f);
 		vel.y = ofRandom(-0.001f, 0.1f);*/
@@ -155,6 +160,7 @@ void Collectable::random_forces() const
 		
 
 		fluid_manager_->add_to_fluid(mapped_pos, vel, true,  true, 1);
+		needs_to_pulse_radius_ = true;
 
 		// if collectable is within screen bounds increment brightness
 		for (auto& game_object : *game_objects_)
@@ -165,6 +171,11 @@ void Collectable::random_forces() const
 					game_object->get_position().y < get_position().y + 500 && game_object->get_position().y > get_position().y - 500)
 				{
 					//fluid_manager_->increment_brightness();
+					player_within_bounds_ = true;
+				}
+				else
+				{
+					player_within_bounds_ = false;
 				}
 			}
 		}		
@@ -180,6 +191,35 @@ void Collectable::random_forces() const
 			//cout << vel << endl;
 			add_to_fluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
 		}*/
+	}
+}
+
+void Collectable::pulse_radius()
+{
+	static float starting_radius = get_radius();
+	
+	if (needs_to_pulse_radius_)
+	{
+		set_radius(get_radius() * 2);
+		draw_particle_burst();
+		needs_to_pulse_radius_ = false;
+	}
+	else if (get_radius() > starting_radius)
+	{
+		set_radius(get_radius()-1);
+	}
+}
+
+void Collectable::draw_particle_burst() const
+{
+	if (player_within_bounds_)
+	{
+		for (int i = 0; i < 30; i++)
+		{
+			GameObject* particle = new PlayerTrail{ get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1)), ofRandom(1, 4), ofColor(255), 255 };
+			particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+			game_objects_->push_back(particle);
+		}
 	}
 }
 
@@ -205,7 +245,7 @@ void Collectable::mouse_dragged(const float x, const float y, const int button)
 	{
 		if (mouse_over_ && game_controller_->get_mouse_dragged() == false)
 		{
-			if (pos_before_drag_.distance(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y)) > 2)
+			if (local_mouse_pos_before_drag_.distance(ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)) > pixel_buffer_before_drag_)
 			{
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;
@@ -251,8 +291,8 @@ void Collectable::draw()
 			static ofVec2f new_pos;
 			static ofVec2f new_vel;
 			if (!trig) {
-				new_pos.x = ofMap(pos_.x, -WORLD_WIDTH / 2, WORLD_WIDTH / 2, 0, 1);
-				new_pos.y = ofMap(pos_.y, -WORLD_HEIGHT / 2, WORLD_HEIGHT / 2, 0, 1);
+				new_pos.x = ofMap(pos_.x, -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+				new_pos.y = ofMap(pos_.y, -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
 				new_vel.x = (ofRandom(-1, 1) / 120);
 				new_vel.y = (ofRandom(-1, 1) / 120);
 				trig = true;

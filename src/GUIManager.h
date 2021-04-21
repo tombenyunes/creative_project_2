@@ -2,6 +2,7 @@
 
 #include "AudioManager.h"
 #include "Controller.h"
+#include "Camera.h"
 #include "FluidManager.h"
 #include "GamemodeManager.h"
 #include "ofMain.h"

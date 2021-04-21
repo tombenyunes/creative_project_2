@@ -3,6 +3,7 @@
 #include "AudioManager.h"
 #include "Collisions.h"
 #include "Controller.h"
+#include "Camera.h"
 #include "FluidManager.h"
 #include "GUIManager.h"
 #include "ofMain.h"
@@ -111,7 +112,8 @@ protected:
 
 	bool mouse_drag_;
 	ofVec2f mouse_offset_from_center_;
-	ofVec2f pos_before_drag_;
+	ofVec2f local_mouse_pos_before_drag_;
+	float pixel_buffer_before_drag_;
 	bool started_dragging_;
 
 	ofColor passive_color_;

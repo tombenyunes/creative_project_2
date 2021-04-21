@@ -23,7 +23,7 @@ public:
 	GameObject* get_selected_game_object() const;
 	void add_game_object(GameObject* _gameobject) const;
 
-	void update_game_objects();
+	void update();
 	void draw_game_objects() const;
 
 	void delete_all(bool exclude_player = true) const;
@@ -31,6 +31,8 @@ public:
 	void create_entity(string entity_type = "") const;
 
 	int get_point_count() const;
+	ofVec2f get_player_position() const;
+	void set_player_position(ofVec2f pos);
 
 	void key_pressed(int key) const;
 	void key_released(int key) const;
@@ -42,7 +44,7 @@ public:
 
 private:
 
-	void delete_game_objects() const;
+	void delete_game_objects();
 	
 	void find_selected();
 	GameObject* selected_game_object_;
@@ -57,6 +59,8 @@ private:
 	AudioManager* audio_manager_;
 	GamemodeManager* game_mode_manager_;
 	Camera* cam_;
+
+	ofVec2f player_position_;
 
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Controller.h"
 
 class Camera {
 
@@ -8,8 +9,11 @@ public:
 	
 	Camera();
 	
-	void update(int world_width, int world_height, ofVec2f player_pos);
+	void update(ofVec2f player_pos);
 
+	ofVec3f get_local_mouse_pos() const;
+	ofVec3f get_world_mouse_pos() const;
+	
 	void toggle_zoom_mode();
 
 	glm::mat4 get_local_transform_matrix() const;
@@ -36,5 +40,7 @@ private:
 	ofEasyCam cam_;
 	bool ctrl_down_ = false;
 	bool follow_player_;
+	ofVec3f local_mouse_pos_;
+	ofVec3f world_mouse_pos_;
 	
 };

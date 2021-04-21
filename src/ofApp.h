@@ -2,52 +2,28 @@
 
 #include "ofMain.h"
 
-#include "SceneManager.h"
-#include "EntityManager.h"
-#include "GUIManager.h"
-#include "FluidManager.h"
-#include "EventManager.h"
-#include "AudioManager.h"
-#include "GamemodeManager.h"
-
-#include "Controller.h"
-#include "Camera.h"
-
-using namespace glm;
+#include "Iota.h"
 
 class ofApp : public ofBaseApp
 {
 public:
-	void setup() override;
+	void setup();
+	void audioOut(float* output, int bufferSize, int nChannels);
+	void update();
+	void draw();
 
-	void audioOut(float* output, int bufferSize, int nChannels) override;
+	void keyPressed(int key);
+	void keyReleased(int key);
+	void mouseMoved(int x, int y);
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseScrolled(int x, int y, float scrollX, float scrollY);
+	void mouseReleased(int x, int y, int button);
+	void mouseEntered(int x, int y);
+	void mouseExited(int x, int y);
+	void windowResized(int w, int h);
+	void dragEvent(ofDragInfo dragInfo);
+	void gotMessage(ofMessage msg);
 
-	void update() override;
-
-	void draw() override;
-
-	void keyPressed(int key) override;
-	void keyReleased(int key) override;
-	void mouseMoved(int x, int y) override;
-	void mouseDragged(int x, int y, int button) override;
-	void mousePressed(int x, int y, int button) override;
-	void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
-	void mouseReleased(int x, int y, int button) override;
-	void mouseEntered(int x, int y) override;
-	void mouseExited(int x, int y) override;
-	void windowResized(int w, int h) override;
-	void dragEvent(ofDragInfo dragInfo) override;
-	void gotMessage(ofMessage msg) override;
-
-	EntityManager entity_manager;
-	Controller game_controller; // controls global game properties
-	GUIManager gui_manager;
-	SceneManager scene_manager;
-	GamemodeManager gamemode_manager{1};
-	EventManager event_manager; // will be used for starting tutorial
-	AudioManager audio_manager;
-
-	Camera cam;
-
-	FluidManager fluid_manager;
+	Iota iota_app;
 };

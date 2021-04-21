@@ -12,21 +12,22 @@ Spring::Spring(const ofVec2f anchor_pos, vector<float> node_radiuses, vector<flo
 	set_color(passive_color_);
 	set_position(anchor_pos);
 	set_radius(8);	// radius of anchor
-	
-	affected_by_gravity_ = true; // by default spring have 'local' gravity (the anchor doesn't) to make springiness noticible
-	gravity_mult_ = 400;
-	collision_mult_ = 4;
+
+	add_module("screenBounce");
+	add_module("ellipseCollider");
+	add_module("gravity");
+	add_module("friction");
+	add_module("mouseHover");	
 
 	for (int i = 0; i < node_masses.size(); i++)
 	{
 		create_node(ofVec2f(pos_.x + ofRandom(-50.0f, 50.0f), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses[i], node_masses[i]);
 	}
-	
-	add_module("screenBounce");
-	add_module("ellipseCollider");
-	add_module("gravity");
-	add_module("friction");
-	add_module("mouseHover");
+
+	affected_by_gravity_ = true; // by default spring have 'local' gravity (the anchor doesn't) to make springiness noticible
+	gravity_mult_ = 400;
+	collision_mult_ = 4;
+	pixel_buffer_before_drag_ = 0.5f;
 }
 
 void Spring::create_node(const ofVec2f node_pos, const ofVec2f node_vel, const ofVec2f node_accel, const float node_radius, const float node_mass)
@@ -114,13 +115,13 @@ ofVec2f Spring::update_springs(const int node)
 
 void Spring::drag_nodes()
 {
-	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+	local_mouse_pos_before_drag_.set(cam_->get_local_mouse_pos());
 	static ofVec2f mouse_pos_before_drag;
 
 	if (mouse_drag_)
 	{
 		if (mouse_over_index_ != -1) {
-			const ofVec2f prev_pos2 = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+			const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
 
 			ofVec2f new_pos; 
 			new_pos.x = ofLerp(node_positions_[mouse_over_index_].x, prev_pos2.x, 0.1f);
@@ -130,11 +131,11 @@ void Spring::drag_nodes()
 			node_velocities_[mouse_over_index_].set(0);
 
 			started_dragging_ = true;
-			mouse_pos_before_drag = ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+			mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 		}
 		else
 		{
-			pos_.set(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y));
+			pos_.set(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
 		}
 	}
 	else
@@ -142,7 +143,7 @@ void Spring::drag_nodes()
 		if (started_dragging_ == true)
 		{
 			started_dragging_ = false;
-			const ofVec2f mouse_speed = (ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
+			const ofVec2f mouse_speed = (ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) - mouse_pos_before_drag) / 3;
 			apply_force(accel_, mouse_speed, false);
 		}
 	}
@@ -150,18 +151,18 @@ void Spring::drag_nodes()
 
 /*void Spring::drag_nodes()
 {
-	pos_before_drag_.set(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y);
+	local_mouse_pos_before_drag_.set(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 
 	if (mouse_drag_)
 	{
 		if (mouse_over_index_ != -1)
 		{
-			node_positions_[mouse_over_index_].set(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y) + mouse_offset_from_center_);
+			node_positions_[mouse_over_index_].set(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_);
 			node_velocities_[mouse_over_index_].set(0);
 		}
 		else
 		{
-			pos_.set(ofVec2f(game_controller_->get_world_mouse_pos().x, game_controller_->get_world_mouse_pos().y));
+			pos_.set(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
 		}
 	}
 }*/
@@ -273,7 +274,7 @@ void Spring::mouse_dragged(const float x, const float y, const int button)
 	{
 		if (mouse_over_ && game_controller_->get_mouse_dragged() == false)
 		{
-			if (pos_before_drag_.distance(ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)) > 2)
+			if (local_mouse_pos_before_drag_.distance(ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2)) > pixel_buffer_before_drag_)
 			{
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;
