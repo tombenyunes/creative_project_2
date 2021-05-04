@@ -26,7 +26,7 @@ public:
 	void key_released(int key);
 	void mouse_moved(int x, int y);
 	void mouse_dragged(int x, int y, int button) const;
-	void mouse_pressed(int x, int y, int button) const;
+	void mouse_pressed(int x, int y, int button);
 	void mouse_scrolled(int x, int y, float scroll_x, float scroll_y);
 	void mouse_released(int x, int y, int button) const;
 	void mouse_entered(int x, int y);

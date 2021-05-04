@@ -38,7 +38,10 @@ void Player::update_forces()
 
 void Player::apply_all_forces()
 {
-	if (player_can_move()) apply_force(accel_, get_movement_vector(), true, movement_speed);
+	if (player_can_move())
+	{
+		apply_force(accel_, get_movement_vector(), true, movement_speed);
+	}
 }
 
 bool Player::player_can_move() const
@@ -55,7 +58,7 @@ ofVec2f Player::get_movement_vector() const
 {
 	ofVec2f movement_vec = pos_ - mouse_pos_;
 	movement_vec.scale(5);
-	return movement_vec;
+	return movement_vec;	
 }
 
 void Player::pull_points()
@@ -87,10 +90,10 @@ void Player::update_gui()
 	static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
 	if (!initiai_values_triggered) {
 		initiai_values_triggered = true;
-		gui_manager_->update_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_, 1);
+		gui_manager_->update_values("Player", pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
 	}
 	else {
-		gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->mass, gui_manager_->infinite_mass, gui_manager_->radius, gui_manager_->affected_by_gravity, 1); // receiving and updating the results from the GUI_Manager
+		gui_manager_->update_values("Player", pos_, vel_, accel_, gui_manager_->mass, gui_manager_->infinite_mass, gui_manager_->radius, gui_manager_->affected_by_gravity); // receiving and updating the results from the GUI_Manager
 		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->mass;
 		radius_ = gui_manager_->radius;
 		infinite_mass_ = gui_manager_->infinite_mass;

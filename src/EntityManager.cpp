@@ -245,11 +245,19 @@ void EntityManager::mouse_dragged(const int x, const int y, const int button) co
 	}
 }
 
-void EntityManager::mouse_pressed(const int x, const int y, const int button) const
+void EntityManager::mouse_pressed(const int x, const int y, const int button)
 {
 	for (auto& i : *get_game_objects())
 	{																   
 		i->mouse_pressed(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y, button);
+	}
+	if (button == 2)
+	{
+		if (selected_game_object_ != nullptr)
+		{
+			get_selected_game_object()->set_is_selected(false);
+			selected_game_object_ = nullptr;
+		}
 	}
 }
 

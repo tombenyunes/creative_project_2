@@ -175,11 +175,11 @@ void Spring::update_gui()
 		{
 			if (selected_node_index_ != -1)
 			{
-				gui_manager_->update_spring_values(pos_, k_, damping_, springmass_, affected_by_gravity_, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], node_masses_[selected_node_index_], node_radiuses_[selected_node_index_]);
+				gui_manager_->update_multiple_values(pos_, k_, damping_, springmass_, affected_by_gravity_, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], node_masses_[selected_node_index_], node_radiuses_[selected_node_index_]);
 			}
 			else
 			{
-				gui_manager_->update_spring_values(pos_, k_, damping_, springmass_, affected_by_gravity_);
+				gui_manager_->update_multiple_values(pos_, k_, damping_, springmass_, affected_by_gravity_);
 			}
 			gui_values_need_to_be_set_ = false;
 		}
@@ -187,13 +187,13 @@ void Spring::update_gui()
 		{
 			if (selected_node_index_ != -1)
 			{
-				gui_manager_->update_spring_values(pos_, k_, damping_, springmass_, affected_by_gravity_, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->node_mass, gui_manager_->node_radius);
+				gui_manager_->update_multiple_values(pos_, k_, damping_, springmass_, affected_by_gravity_, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->node_mass, gui_manager_->node_radius);
 				node_masses_[selected_node_index_] = gui_manager_->node_mass;
 				node_radiuses_[selected_node_index_] = gui_manager_->node_radius;
 			}
 			else
 			{
-				gui_manager_->update_spring_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity);
+				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity);
 				k_ = gui_manager_->k;
 				damping_ = gui_manager_->damping;
 				springmass_ = gui_manager_->springmass;

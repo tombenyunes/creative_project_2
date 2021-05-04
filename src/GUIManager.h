@@ -17,13 +17,15 @@ public:
 	GUIManager();
 
 	void init(Controller* controller, FluidManager* fluid_manager, AudioManager* audio_manager, GamemodeManager* game_mode_manager, Camera* cam);
-	void update();
 	
-	// Update Values
+	void update();
 	void update_world();
-	void update_values(ofVec2f node_position, ofVec2f node_velocity, ofVec2f node_acceleration, float _node_mass, bool infmass, float _node_radius, bool is_affected_by_gravity, int panel);
-	void update_spring_values(ofVec2f spring_anchor_position, float spring_k, float spring_damping, float spring_mass, bool is_affected_by_gravity, ofVec2f selected_node_pos = ofVec2f(-1, -1), ofVec2f selected_node_vel = ofVec2f(-1, -1), ofVec2f selected_node_accel = ofVec2f(-1, -1), float selected_node_mass = -1, float selected_node_radius = -1);
-	void update_create_node_values();
+	void update_create_node_id();
+	
+	// Update Values	
+	void update_values(const string entity_type, const ofVec2f node_position, const ofVec2f node_velocity, const ofVec2f node_acceleration, const float _node_mass, const bool infmass, const float _node_radius, const bool is_affected_by_gravity, const int emmision_frequency = -1);
+	void update_multiple_values(ofVec2f spring_anchor_position, float spring_k, float spring_damping, float spring_mass, bool is_affected_by_gravity, ofVec2f selected_node_pos = ofVec2f(-1, -1), ofVec2f selected_node_vel = ofVec2f(-1, -1), ofVec2f selected_node_accel = ofVec2f(-1, -1), float selected_node_mass = -1, float selected_node_radius = -1);	
+	
 	void inc_points_collected();
 	void inc_max_point_count();
 	void update_point_count(int count);
@@ -57,6 +59,7 @@ public:
 	ofxToggle selected_infinite_mass;
 	ofxFloatSlider selected_radius;
 	ofxToggle selected_affected_by_gravity;
+	ofxFloatSlider selected_emission_frequency;
 
 
 	// Multiple Selected Nodes

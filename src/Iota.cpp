@@ -114,7 +114,7 @@ void Iota::mouse_dragged(const int x, const int y, const int button) const
 	}
 }
 
-void Iota::mouse_pressed(const int x, const int y, const int button) const
+void Iota::mouse_pressed(const int x, const int y, const int button)
 {
 	if (event_manager.is_event_allowed("mouse_pressed", button)) {
 		entity_manager.mouse_pressed(x, y, button);

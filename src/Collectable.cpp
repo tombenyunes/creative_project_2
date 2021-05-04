@@ -1,8 +1,9 @@
 #include "Collectable.h"
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
-	:	emission_frequency_(static_cast<int>(ofRandom(25, 100))),
-		needs_to_pulse_radius_(false)
+	:	starting_radius_(get_radius())
+	,	emission_frequency_(static_cast<int>(ofRandom(25, 100)))
+	,	needs_to_pulse_radius_(false)
 {
 	set_type("Collectable");
 	set_position(pos);
@@ -71,12 +72,12 @@ void Collectable::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_, 2);
+			gui_manager_->update_values("Collectable", pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else
 		{
-			gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity, 2);
+			gui_manager_->update_values("Collectable", pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity, gui_manager_->selected_emission_frequency);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
@@ -85,9 +86,10 @@ void Collectable::update_gui()
 			{
 				mass_ = gui_manager_->selected_mass;
 			}
-			radius_ = gui_manager_->selected_radius;
+			starting_radius_ = gui_manager_->selected_radius;
 			infinite_mass_ = gui_manager_->selected_infinite_mass;
 			affected_by_gravity_ = gui_manager_->selected_affected_by_gravity;
+			emission_frequency_ = gui_manager_->selected_emission_frequency;
 		}
 	}
 }
@@ -159,7 +161,7 @@ void Collectable::random_forces()
 
 		
 
-		fluid_manager_->add_to_fluid(mapped_pos, vel, true,  true, 1);
+		fluid_manager_->add_to_fluid(mapped_pos, vel, true,  true, 100);
 		needs_to_pulse_radius_ = true;
 
 		// if collectable is within screen bounds increment brightness
@@ -195,18 +197,16 @@ void Collectable::random_forces()
 }
 
 void Collectable::pulse_radius()
-{
-	static float starting_radius = get_radius();
-	
+{	
 	if (needs_to_pulse_radius_)
 	{
-		set_radius(get_radius() * 2);
+		set_radius(starting_radius_ * 2);
 		draw_particle_burst();
 		needs_to_pulse_radius_ = false;
 	}
-	else if (get_radius() > starting_radius)
+	else if (get_radius() > starting_radius_)
 	{
-		set_radius(get_radius()-1);
+		set_radius(get_radius() - ((((starting_radius_ * 2) - starting_radius_) / emission_frequency_)));
 	}
 }
 

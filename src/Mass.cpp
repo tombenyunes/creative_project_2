@@ -67,11 +67,11 @@ void Mass::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_, 2);
+			gui_manager_->update_values("Mass", pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else {
-			gui_manager_->update_values(pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity, 2);
+			gui_manager_->update_values("Mass", pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
