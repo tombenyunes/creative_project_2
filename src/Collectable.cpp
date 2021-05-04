@@ -67,7 +67,7 @@ void Collectable::drag_nodes()
 
 void Collectable::update_gui()
 {
-	if (game_controller_->get_active() == this)
+	if (get_is_selected() == true)
 	{
 		if (gui_values_need_to_be_set_)
 		{
@@ -235,10 +235,15 @@ void Collectable::mouse_pressed(const float x, const float y, const int button)
 {
 	if (button == 2 && mouse_over_)
 	{
-		if (game_controller_->get_active() != this)
+		if (get_is_selected() == false)
 		{
-			game_controller_->make_active(this);
+			set_request_to_be_selected(true);
+			
 			gui_values_need_to_be_set_ = true;
+		}
+		else
+		{
+			set_request_to_be_deselected(true);
 		}
 	}
 }
@@ -311,9 +316,9 @@ void Collectable::draw()
 	ofPopStyle();
 }
 
-void Collectable::get_color()
+void Collectable::get_color() const
 {
-	if ((game_controller_->get_active() == this) || (mouse_over_ || mouse_drag_))
+	if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
 	{
 		ofSetColor(selected_color_);
 	}

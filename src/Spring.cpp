@@ -169,7 +169,7 @@ void Spring::drag_nodes()
 
 void Spring::update_gui()
 {
-	if (game_controller_->get_active() == this)
+	if (get_is_selected() == true)
 	{
 		if (gui_values_need_to_be_set_)
 		{
@@ -258,13 +258,26 @@ void Spring::is_colliding(GameObject* other, const int node_index)
 void Spring::mouse_pressed(const float x, const float y, const int button)
 {
 	if (button == 2 && mouse_over_)
-	{
-		if (game_controller_->get_active() != this)
+	{		
+		if (get_is_selected() == false)
 		{
-			game_controller_->make_active(this);
+			// select object
+			set_request_to_be_selected(true);
+			
+			selected_node_index_ = mouse_over_index_; // index of selected node
+			
+			gui_values_need_to_be_set_ = true;
 		}
-		gui_values_need_to_be_set_ = true;
-		selected_node_index_ = mouse_over_index_;
+		else if (mouse_over_index_ != selected_node_index_)
+		{
+			selected_node_index_ = mouse_over_index_; // index of selected node
+
+			gui_values_need_to_be_set_ = true;
+		}
+		else
+		{
+			set_request_to_be_deselected(true);
+		}					
 	}
 }
 
@@ -338,7 +351,7 @@ void Spring::draw()
 
 void Spring::get_node_color(const int node_index)
 {
-	if ((game_controller_->get_active() == this) && (selected_node_index_ == -1 || selected_node_index_ == node_index || ((mouse_over_ || mouse_drag_) && mouse_over_index_ == node_index)))
+	if ((get_is_selected() == true) && (selected_node_index_ == -1 || selected_node_index_ == node_index || ((mouse_over_ || mouse_drag_) && mouse_over_index_ == node_index)))
 	{
 		ofSetColor(selected_color_);
 	}

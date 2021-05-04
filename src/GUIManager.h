@@ -8,6 +8,8 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 
+class GameObject;
+
 class GUIManager
 {
 public:
@@ -27,7 +29,7 @@ public:
 	void update_point_count(int count);
 
 	// Draw
-	void draw_required_gui(bool is_spring);
+	void draw_required_gui(GameObject* selected_object, const bool is_spring);
 
 	// Events
 	void key_pressed(int key);

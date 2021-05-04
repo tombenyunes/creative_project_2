@@ -51,7 +51,9 @@ public:
 	void set_request_to_be_deleted_event(const string event) { request_to_be_deleted_event_ = event; }
 
 	bool get_request_to_be_selected() const                  { return request_to_be_selected_; }
+	bool get_request_to_be_deselected() const                { return request_to_be_deselected_; }
 	void set_request_to_be_selected(const bool req)          { request_to_be_selected_ = req; }
+	void set_request_to_be_deselected(const bool req)        { request_to_be_deselected_ = req; }
 	bool get_is_selected() const                             { return is_selected_; }
 	void set_is_selected(const bool val)                     { is_selected_ = val; }
 
@@ -124,6 +126,7 @@ protected:
 	bool request_to_be_deleted_;
 	string request_to_be_deleted_event_;
 	bool request_to_be_selected_;
+	bool request_to_be_deselected_;
 	bool is_selected_;
 
 	bool gui_values_need_to_be_set_;

@@ -64,11 +64,11 @@ void Iota::draw()
 
 	cam.end();
 
-	if (game_controller.get_active() != nullptr && game_controller.get_active()->get_type() == "Spring") {
-		gui_manager.draw_required_gui(true);
+	if (entity_manager.get_selected_game_object() != nullptr && entity_manager.get_selected_game_object()->get_type() == "Spring") {
+		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), true);
 	}
 	else {
-		gui_manager.draw_required_gui(false);
+		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), false);
 	}
 }
 

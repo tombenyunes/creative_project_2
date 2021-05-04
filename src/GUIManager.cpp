@@ -48,7 +48,7 @@ GUIManager::GUIManager()
 	multi_selection_gui_spring_.add(springmass.setup("springmass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
 	multi_selection_gui_spring_.add(spring_affected_by_gravity.setup("gravity", false));
 
-	multi_selection_gui_node_.setup("Selected Node", "", ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, multi_selection_gui_spring_.getPosition().y + multi_selection_gui_spring_.getHeight() + buffer_);
+	multi_selection_gui_node_.setup("Selected Object", "", ofGetWidth() - multi_selection_gui_spring_.getWidth() - buffer_, multi_selection_gui_spring_.getPosition().y + multi_selection_gui_spring_.getHeight() + buffer_);
 	multi_selection_gui_node_.add(node_pos.setup("pos", error_message));
 	multi_selection_gui_node_.add(node_vel.setup("vel", error_message));
 	multi_selection_gui_node_.add(node_accel.setup("acceleration", error_message));
@@ -214,13 +214,13 @@ void GUIManager::set_clear_all()
 	game_controller_->set_delete_all(true);
 }
 
-void GUIManager::draw_required_gui(const bool is_spring)
+void GUIManager::draw_required_gui(GameObject* selected_object, const bool is_spring)
 {
 	if (game_controller_->get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
 	{
 		player_gui_.draw();
 
-		if (game_controller_->get_active() != nullptr)
+		if (selected_object != nullptr)
 		{
 			if (is_spring)
 			{

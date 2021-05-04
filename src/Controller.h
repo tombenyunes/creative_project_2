@@ -27,7 +27,6 @@
 #define HALF_WORLD_HEIGHT (WORLD_HEIGHT / 2)
 
 
-class GameObject;
 
 class Controller {
 
@@ -35,14 +34,8 @@ public:
 	
 	Controller();
 
-	void make_active(GameObject* _this);
-	GameObject* get_active() const;
-
 	void set_gravity(bool value);
 	bool get_gravity() const;
-
-	void set_object_selected(bool value);
-	bool get_object_selected() const;
 
 	void set_mouse_dragged(bool value);
 	bool get_mouse_dragged() const;
@@ -60,11 +53,9 @@ public:
 	bool get_gui_visible() const;
 
 private:
-		
-	GameObject* active_object_;
+	
 	bool gravity_;
 	bool need_to_delete_all_;
-	bool object_selected_;
 	bool mouse_being_dragged_;
 	int new_node_id_;
 	bool hard_collisions_;

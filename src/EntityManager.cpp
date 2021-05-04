@@ -57,8 +57,8 @@ void EntityManager::delete_game_objects()
 			set_player_position(ofVec2f((*get_game_objects())[i]->get_position().x + HALF_WORLD_WIDTH, (*get_game_objects())[i]->get_position().y + HALF_WORLD_HEIGHT));
 		}
 		if ((*get_game_objects())[i]->get_request_to_be_deleted() == true) {
-			if ((*get_game_objects())[i] == game_controller_->get_active()) {
-				game_controller_->make_active(nullptr);
+			if ((*get_game_objects())[i] == get_selected_game_object()) {
+				selected_game_object_ = nullptr;
 			}
 			if ((*get_game_objects())[i]->get_type() == "Collectable") {
 				if ((*get_game_objects())[i]->get_request_to_be_deleted_event() == "Collected") {
@@ -80,10 +80,13 @@ void EntityManager::delete_game_objects()
 void EntityManager::find_selected()
 {
 	// find gameobject/gameobjects that are selected
-	for (int i = 0; i < get_game_objects()->size(); i++) {
-		if ((*get_game_objects())[i]->get_request_to_be_selected() == true) {
+	for (int i = 0; i < get_game_objects()->size(); i++)
+	{
+		if ((*get_game_objects())[i]->get_request_to_be_selected() == true)
+		{
 			
-			if (selected_game_object_ != (*get_game_objects())[i]) {
+			if (selected_game_object_ != (*get_game_objects())[i])
+			{
 				// accept request
 
 				// remove previously selected object
@@ -94,12 +97,21 @@ void EntityManager::find_selected()
 				selected_game_object_index_ = i;
 				(*get_game_objects())[i]->set_is_selected(true);
 			}
-			else {
+			else
+			{
 				// deny request
 				(*get_game_objects())[i]->set_is_selected(false);
 			}
 
 			(*get_game_objects())[i]->set_request_to_be_selected(false);
+		}
+		else if ((*get_game_objects())[i]->get_request_to_be_deselected() == true)
+		{
+			// accept request
+			selected_game_object_ = nullptr;
+			selected_game_object_index_ = -1;
+			(*get_game_objects())[i]->set_is_selected(false);
+			(*get_game_objects())[i]->set_request_to_be_deselected(false);
 		}
 	}
 }

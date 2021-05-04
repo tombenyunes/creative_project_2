@@ -63,7 +63,7 @@ void Mass::drag_nodes()
 
 void Mass::update_gui()
 {
-	if (game_controller_->get_active() == this)
+	if (get_is_selected() == true)
 	{
 		if (gui_values_need_to_be_set_)
 		{
@@ -100,10 +100,17 @@ void Mass::mouse_pressed(const float x, const float y, const int button)
 {
 	if (button == 2 && mouse_over_)
 	{
-		if (game_controller_->get_active() != this) {
-			game_controller_->make_active(this);
-			gui_values_need_to_be_set_ = true;
+		if (get_is_selected() == false)
+		{
+			// select object
 			set_request_to_be_selected(true);		// TODO - REPLACE GAME CONTROLLER GET_ACTIVE / MAKE_ACTIVE WITH ENTITY MANAGER
+			
+			gui_values_need_to_be_set_ = true;
+		}
+		else
+		{
+			// deselect object
+			set_request_to_be_deselected(true);
 		}
 	}
 }
@@ -151,13 +158,13 @@ void Mass::draw()
 	ofPopStyle();
 }
 
-void Mass::get_color()
+void Mass::get_color() const
 {
 	if (infinite_mass_)
 	{
 		ofSetColor(255, 0, 0);
 	}
-	else if ((game_controller_->get_active() == this) || (mouse_over_ || mouse_drag_))								// TODO - HERE TOO
+	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))								// TODO - HERE TOO
 	{
 		ofSetColor(selected_color_);
 	}	

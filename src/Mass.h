@@ -25,7 +25,7 @@ private:
 	// Draw
 	void draw() override;
 	
-	void get_color();
+	void get_color() const;
 	
 	// Events
 	void mouse_pressed(float x, float y, int button) override;
