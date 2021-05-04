@@ -1,13 +1,16 @@
 #include "GamemodeManager.h"
 
-GamemodeManager::GamemodeManager(const int game_mode_id) : request_for_new_scene(false),
-														   current_mode_id_(game_mode_id)
+GamemodeManager::GamemodeManager(const int game_mode_id)
+	:	request_for_new_scene(false)
+	,	game_controller_(nullptr)
+	,	current_mode_id_(game_mode_id)
 {
 	log_current_mode();
 }
 
-void GamemodeManager::init()
+void GamemodeManager::init(Controller* game_controller)
 {
+	game_controller_ = game_controller;
 }
 
 int GamemodeManager::get_current_mode_id() const
@@ -68,11 +71,14 @@ void GamemodeManager::key_pressed(const int key)
 		if (current_mode_id_ == 0)
 		{
 			new_id = 1;
+			game_controller_->set_gui_visible(false);
+			// load new scene
 			request_for_new_scene = true;
 		}
 		else if (current_mode_id_ == 1)
 		{
 			new_id = 0;
+			game_controller_->set_gui_visible(true);
 		}
 		set_current_mode_id(new_id);
 	}

@@ -1,24 +1,21 @@
 #include "PlayerTrail.h"
 
 PlayerTrail::PlayerTrail(const ofVec2f pos, const ofVec2f vel, const float radius, const ofColor color, const int lifetime)
-	:	lifetime_(lifetime)
+	:	pos_(pos),
+		vel_(ofVec2f(vel.x + ofRandom(-1.5f, 1.5f), vel.y + ofRandom(-1.5f, 1.5f))),
+		radius_(radius),
+		color_(color),
+		lifetime_(lifetime)
 {
-	set_position(pos);
-	set_velocity(ofVec2f(vel.x + ofRandom(-1.5f, 1.5f), vel.y + ofRandom(-1.5f, 1.5f)));
-	set_radius(radius);
-	set_color(color);	
-
-	add_module("screenBounce");
-	add_module("gravity");
 }
 
 void PlayerTrail::update()
 {
 	friction_ = vel_;
 	friction_ *= -1;
-	friction_ *= FRICTION_FORCE;
+	friction_ *= 0.015f;
 	accel_ += (friction_*2);
-	accel_.limit(MAXIMUM_ACCELERATION);
+	accel_.limit(0.15f);
 
 	vel_ += accel_;
 	accel_.set(0);
@@ -33,7 +30,7 @@ void PlayerTrail::update()
 		radius_ -= 0.05f;
 	}
 	else {
-		set_request_to_be_deleted(true);
+		//set_request_to_be_deleted(true);
 	}
 }
 

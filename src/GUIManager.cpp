@@ -146,6 +146,8 @@ void GUIManager::update_values(const ofVec2f node_position, const ofVec2f node_v
 	}
 	else if (panel == 2)
 	{
+		selected_gui_.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + node_position.x + 8, HALF_WORLD_HEIGHT + node_position.y + 8)));
+		
 		selected_position = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
 		selected_velocity = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
 		selected_accel = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
@@ -162,14 +164,14 @@ void GUIManager::update_values(const ofVec2f node_position, const ofVec2f node_v
 		}
 		selected_radius = _node_radius;
 		selected_affected_by_gravity = is_affected_by_gravity;
-		//selected_gui_position = ofVec2f((_pos.x - selected_gui.getWidth() - buffer), (_pos.y - buffer));
-		selected_gui_position_ = ofVec2f(cam_->screen_to_world(ofVec3f(node_position.x, node_position.y, 0)).x, cam_->screen_to_world(ofVec3f(node_position.x, node_position.y, 0)).y);
-		//cout << selected_gui.getPosition() << endl;
 	}
 }
 
 void GUIManager::update_spring_values(const ofVec2f spring_anchor_position, const float spring_k, const float spring_damping, const float spring_mass, const bool is_affected_by_gravity, const ofVec2f selected_node_pos, const ofVec2f selected_node_vel, const ofVec2f selected_node_accel, const float selected_node_mass, const float selected_node_radius)
 {
+	multi_selection_gui_spring_.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + spring_anchor_position.x + 8, HALF_WORLD_HEIGHT + spring_anchor_position.y + 8)));
+	multi_selection_gui_node_.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + selected_node_pos.x + 8, HALF_WORLD_HEIGHT + selected_node_pos.y + 8)));
+	
 	anchor_pos = ofToString(roundf(spring_anchor_position.x)) + ", " + ofToString(roundf(spring_anchor_position.y));
 
 	k = spring_k;

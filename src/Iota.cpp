@@ -23,6 +23,8 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	audio_manager.setup(app_ptr);
 
+	gamemode_manager.init(&game_controller);
+	
 	//scene_manager.loadScene("Scenes/StartingScene");
 	scene_manager.load_procedural_scene();
 }

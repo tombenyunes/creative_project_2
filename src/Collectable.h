@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "GameObject.h"
 #include "PlayerTrail.h"
+#include "Mass.h"
 
 class Collectable : public GameObject {
 
@@ -42,4 +43,6 @@ private:
 	int emission_frequency_;
 	bool needs_to_pulse_radius_;
 	bool player_within_bounds_;
+
+	vector<PlayerTrail*>* particles_;
 };

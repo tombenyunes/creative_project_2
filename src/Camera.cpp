@@ -148,6 +148,11 @@ ofVec3f Camera::screen_to_world(const ofVec3f view) const
 	return cam_.screenToWorld(view);
 }
 
+ofVec3f Camera::world_to_screen(const ofVec3f view) const
+{
+	return cam_.worldToScreen(view);
+}
+
 void Camera::draw() const
 {
 	cam_.drawFrustum();

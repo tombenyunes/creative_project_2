@@ -214,11 +214,15 @@ void Collectable::draw_particle_burst() const
 {
 	if (player_within_bounds_)
 	{
-		for (int i = 0; i < 30; i++)
+		for (int i = 0; i < 1; i++)
 		{
-			GameObject* particle = new PlayerTrail{ get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1)), ofRandom(1, 4), ofColor(255), 255 };
-			particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
-			game_objects_->push_back(particle);
+			//PlayerTrail* particle = nullptr;
+			//particle = new PlayerTrail(get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1)), ofRandom(1, 4), ofColor(255), 255);
+			//particles_->push_back(particle);
+
+			//GameObject* particle = new Mass(get_position() + ofVec2f(ofRandom(-get_radius() / 3, get_radius() / 3), ofRandom(-get_radius() / 3, get_radius() / 3)), 5, 5);
+			//particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+			//game_objects_->push_back(particle);
 		}
 	}
 }

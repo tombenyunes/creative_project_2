@@ -22,6 +22,7 @@ public:
 	void end();
 	
 	ofVec3f screen_to_world(ofVec3f view) const;
+	ofVec3f world_to_screen(ofVec3f view) const;
 
 	ofVec3f get_local_mouse_pos() const;
 	ofVec3f get_world_mouse_pos() const;
