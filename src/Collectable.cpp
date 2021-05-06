@@ -40,19 +40,23 @@ void Collectable::drag_nodes()
 {
 	local_mouse_pos_before_drag_.set(cam_->get_local_mouse_pos());
 	static ofVec2f mouse_pos_before_drag;
+	
 	if (mouse_drag_)
 	{
-		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+		if (!started_dragging_)
+		{
+			started_dragging_ = true;		
+		}
+		
+		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y)/* + mouse_offset_from_center_*/;
 
 		ofVec2f new_pos;
 		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
 		new_pos.y = ofLerp(pos_.y, prev_pos2.y, 0.1f);
 
-		pos_.set(new_pos);
-
-		vel_.set(0);
-
-		started_dragging_ = true;
+		set_position(new_pos);
+		set_velocity(ofVec2f(0));
+		
 		mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 	}
 	else
@@ -243,7 +247,8 @@ void Collectable::mouse_pressed(const float x, const float y, const int button)
 		}
 		else
 		{
-			set_request_to_be_deselected(true);
+			// deselect object
+			//set_request_to_be_deselected(true);
 		}
 	}
 }
@@ -259,6 +264,9 @@ void Collectable::mouse_dragged(const float x, const float y, const int button)
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;
 				game_controller_->set_mouse_dragged(true);
+
+				// select object, if unselected
+				mouse_pressed(x, y, button);
 			}
 		}
 	}

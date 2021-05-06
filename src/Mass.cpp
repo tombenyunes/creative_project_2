@@ -38,7 +38,12 @@ void Mass::drag_nodes()
 	
 	if (mouse_drag_)
 	{
-		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+		if (!started_dragging_)
+		{
+			started_dragging_ = true;
+		}
+		
+		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y)/* + mouse_offset_from_center_*/;
 
 		ofVec2f new_pos;
 		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
@@ -47,7 +52,6 @@ void Mass::drag_nodes()
 		set_position(new_pos);
 		set_velocity(ofVec2f(0));
 
-		started_dragging_ = true;
 		mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 	}
 	else
@@ -103,14 +107,14 @@ void Mass::mouse_pressed(const float x, const float y, const int button)
 		if (get_is_selected() == false)
 		{
 			// select object
-			set_request_to_be_selected(true);		// TODO - REPLACE GAME CONTROLLER GET_ACTIVE / MAKE_ACTIVE WITH ENTITY MANAGER
+			set_request_to_be_selected(true);
 			
 			gui_values_need_to_be_set_ = true;
 		}
 		else
 		{
 			// deselect object
-			set_request_to_be_deselected(true);
+			//set_request_to_be_deselected(true);
 		}
 	}
 }
@@ -125,7 +129,9 @@ void Mass::mouse_dragged(const float x, const float y, const int button)
 			{
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;
-				game_controller_->set_mouse_dragged(true);				
+				game_controller_->set_mouse_dragged(true);
+
+				mouse_pressed(x, y, button);
 			}
 		}
 	}

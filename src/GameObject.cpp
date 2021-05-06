@@ -312,7 +312,7 @@ void GameObject::mouse_hover()
 			if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
 			{
 					mouse_over_ = true;
-					mouse_offset_from_center_ = pos_ - ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
+					mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
 			}
 			else {
 				mouse_over_ = false;			

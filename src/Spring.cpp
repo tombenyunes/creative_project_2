@@ -120,8 +120,14 @@ void Spring::drag_nodes()
 
 	if (mouse_drag_)
 	{
-		if (mouse_over_index_ != -1) {
-			const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_;
+		if (mouse_over_index_ != -1)
+		{
+			if (!started_dragging_)
+			{
+				started_dragging_ = true;		
+			}
+			
+			const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y)/* + mouse_offset_from_center_*/;
 
 			ofVec2f new_pos; 
 			new_pos.x = ofLerp(node_positions_[mouse_over_index_].x, prev_pos2.x, 0.1f);
@@ -129,8 +135,7 @@ void Spring::drag_nodes()
 
 			node_positions_[mouse_over_index_].set(new_pos);
 			node_velocities_[mouse_over_index_].set(0);
-
-			started_dragging_ = true;
+			
 			mouse_pos_before_drag = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 		}
 		else
@@ -148,24 +153,6 @@ void Spring::drag_nodes()
 		}
 	}
 }
-
-/*void Spring::drag_nodes()
-{
-	local_mouse_pos_before_drag_.set(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
-
-	if (mouse_drag_)
-	{
-		if (mouse_over_index_ != -1)
-		{
-			node_positions_[mouse_over_index_].set(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y) + mouse_offset_from_center_);
-			node_velocities_[mouse_over_index_].set(0);
-		}
-		else
-		{
-			pos_.set(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
-		}
-	}
-}*/
 
 void Spring::update_gui()
 {
@@ -187,18 +174,19 @@ void Spring::update_gui()
 		{
 			if (selected_node_index_ != -1)
 			{
-				gui_manager_->update_multiple_values(pos_, k_, damping_, springmass_, affected_by_gravity_, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->node_mass, gui_manager_->node_radius);
+				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->node_mass, gui_manager_->node_radius);
 				node_masses_[selected_node_index_] = gui_manager_->node_mass;
 				node_radiuses_[selected_node_index_] = gui_manager_->node_radius;
 			}
 			else
 			{
-				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity);
-				k_ = gui_manager_->k;
-				damping_ = gui_manager_->damping;
-				springmass_ = gui_manager_->springmass;
-				affected_by_gravity_ = gui_manager_->spring_affected_by_gravity;
+				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity);				
 			}
+			
+			k_ = gui_manager_->k;
+			damping_ = gui_manager_->damping;
+			springmass_ = gui_manager_->springmass;
+			affected_by_gravity_ = gui_manager_->spring_affected_by_gravity;
 		}
 	}
 }
@@ -276,8 +264,9 @@ void Spring::mouse_pressed(const float x, const float y, const int button)
 		}
 		else
 		{
-			set_request_to_be_deselected(true);
-		}					
+			// deselect object
+			//set_request_to_be_deselected(true);
+		}
 	}
 }
 
@@ -292,6 +281,9 @@ void Spring::mouse_dragged(const float x, const float y, const int button)
 				// the node will only be moved by the mouse if it has been moved by more than 1 pixel - this prevents accidentally stopping something by selecting it
 				mouse_drag_ = true;
 				game_controller_->set_mouse_dragged(true);
+
+				// select object, if unselected
+				mouse_pressed(x, y, button);
 			}
 		}
 	}
