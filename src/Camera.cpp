@@ -1,44 +1,44 @@
 #include "Camera.h"
 
 Camera::Camera()
-	:	follow_player_(true),
-		zooming_out_(false),
-		zooming_in_(false),
-		zooming_speed_(0.025f),
-		zoom_scale_upper_bound_(3.25f),
-		zoom_scale_lower_bound_(0.03f)
+	:	view_(Cam_modes_::player_view)
+	,	position_(0 + (ofGetWidth() / 2), 0 + (ofGetHeight() / 2))
+	,	scale_(1)
+	,	follow_player_(true)
+	,	zooming_out_(false)
+	,	zooming_in_(false)
+	,	keyboard_zooming_speed_(0.025f)
+	,	scrollwheel_zooming_intervals_(4)
+	,	zoom_scale_upper_bound_(3.25f)
+	,	zoom_scale_lower_bound_(0.03f)
+	,	lerping_scale_(false)
+	,	scale_to_lerp_to_(0)
+	,	lerping_position_(false)
+	,	pos_to_lerp_to_(0)
 {
 	cam_.disableMouseInput();
-	cam_.setVFlip(true);
-	// flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked
+	cam_.setVFlip(true); // flipping the axis so it's as if we're in 2D, otherwise all the fluid/movement code will be fucked	
 	cam_.enableOrtho();
-	//cam.setScale(1);
-	cam_.setPosition(0 + (ofGetWidth() / 2), 0 + (ofGetHeight() / 2), 1305);
-
-	//zoomDistance = 1080.0f; 
-
 	cam_.removeAllInteractions();
-	//cam.addInteraction(ofEasyCam::TRANSFORM_SCALE, OF_MOUSE_BUTTON_RIGHT);
-	cam_.addInteraction(ofEasyCam::TRANSFORM_TRANSLATE_Z, OF_MOUSE_BUTTON_RIGHT);
-
-	//cam.setNearClip(-1000000);
-	//cam.setFarClip(1000000);
 }
 
 void Camera::update(const ofVec2f player_pos)
 {
+	if (ofGetFrameNum() % 2 == 0) cur_position_ = get_position();
 	calculate_mouse_coords();
 	follow_player(player_pos);
-	handle_zooming();
+	handle_position();
+	handle_scale();
 }
 
 void Camera::calculate_mouse_coords()
 {
 	// calculate local + world mouse positions	
 	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - HALF_WORLD_WIDTH, ofGetMouseY() - HALF_WORLD_HEIGHT, 0);
+	
 	ofVec3f world_pos = screen_to_world(local_pos);
-	world_pos.x += WORLD_WIDTH * ofMap(get_scale().x, 1.0f, 3.0f, 0.0f, 1.0f);
-	world_pos.y += WORLD_HEIGHT * ofMap(get_scale().y, 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.x += WORLD_WIDTH * ofMap(get_scale(), 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.y += WORLD_HEIGHT * ofMap(get_scale(), 1.0f, 3.0f, 0.0f, 1.0f);
 
 	local_mouse_pos_ = ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
 	world_mouse_pos_ = world_pos;
@@ -47,31 +47,82 @@ void Camera::calculate_mouse_coords()
 void Camera::follow_player(const ofVec2f player_pos)
 {
 	// the camera follows the player
-	if (follow_player_) {
-		cam_.setPosition(player_pos.x, player_pos.y, cam_.getPosition().z); // camera follows player
+	if (follow_player_)
+	{
+		pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
+		lerping_position_ = true;
 	}
-	else {
-		cam_.setPosition(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT, cam_.getPosition().z); // camera follows player
+	else
+	{
+		pos_to_lerp_to_.set(ofVec2f(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT)); // camera follows player
+		lerping_position_ = true;
 	}
 }
 
-void Camera::handle_zooming()
+void Camera::handle_position()
+{
+	cam_.setPosition(position_.x, position_.y, 1305);
+
+	if (lerping_position_)
+	{
+		lerp_position();
+	}	
+}
+
+void Camera::handle_scale()
+{
+	cam_.setScale(scale_, scale_, 1);
+	
+	handle_bounds();
+	
+	if (lerping_scale_)
+	{
+		lerp_scale();
+	}
+}
+
+void Camera::handle_bounds()
 {
 	// handle camera zooming in/out
 	if (zooming_in_)
 	{
-		if (cam_.getScale().x > zoom_scale_lower_bound_)
+		if (get_scale() > zoom_scale_lower_bound_)
 		{
-			cam_.setScale(cam_.getScale().x - zooming_speed_, cam_.getScale().y - zooming_speed_, 1);
+			set_scale(get_scale() - keyboard_zooming_speed_);
 		}
 	}
 	else if (zooming_out_)
 	{
-		if (cam_.getScale().x < zoom_scale_upper_bound_)
+		if (get_scale() < zoom_scale_upper_bound_)
 		{
-			cam_.setScale(cam_.getScale().x + zooming_speed_, cam_.getScale().y + zooming_speed_, 1);
-		}		
+			set_scale(get_scale() + keyboard_zooming_speed_);
+		}
 	}
+}
+
+void Camera::lerp_scale()
+{
+	// if difference between lerped value and actual value < 0.001f then lerping will stop, otherwise it will continue indefinitely
+	if (abs(get_scale() - scale_to_lerp_to_) < 0.001f)
+	{
+		set_scale(scale_to_lerp_to_);
+		lerping_scale_ = false;
+	}
+	else if (static_cast<float>(get_scale()) != static_cast<float>(scale_to_lerp_to_))
+	{
+		const float lerped_scale = ofLerp(get_scale(), scale_to_lerp_to_, 0.2f);
+
+		set_scale(lerped_scale);
+	}
+}
+
+void Camera::lerp_position()
+{
+	ofVec2f lerped_pos;
+	lerped_pos.x = ofLerp(get_position().x, pos_to_lerp_to_.x, 0.1f);
+	lerped_pos.y = ofLerp(get_position().y, pos_to_lerp_to_.y, 0.1f);
+
+	set_position(lerped_pos);
 }
 
 ofVec3f Camera::get_local_mouse_pos() const
@@ -87,13 +138,23 @@ ofVec3f Camera::get_world_mouse_pos() const
 void Camera::toggle_zoom_mode()
 {
 	// reset scale/zoom
-	cout << "Zoom reset" << endl;
-	if ((cam_.getScale().x == 1) && (cam_.getScale().y == 1) && (cam_.getScale().z == 1)) {
-		cam_.setScale(2.9f, 2.9f, 1);
+	//cout << "Zoom reset" << endl;
+	if (view_ == Cam_modes_::player_view)
+	{
+		view_ = Cam_modes_::map_view;
+		
+		scale_to_lerp_to_ = 2.9f;
+		lerping_scale_ = true;
+		
 		follow_player_ = false;
 	}
-	else {
-		cam_.setScale(1);
+	else
+	{
+		view_ = Cam_modes_::player_view;
+		
+		scale_to_lerp_to_ = 1;
+		lerping_scale_ = true;
+		
 		follow_player_ = true;
 	}
 }
@@ -123,14 +184,24 @@ glm::mat4 Camera::get_model_view_projection_matrix() const
 	return cam_.getModelViewProjectionMatrix();
 }
 
-ofVec3f Camera::get_position() const
+ofVec2f Camera::get_position() const
 {
-	return cam_.getPosition();
+	return position_;
 }
 
-glm::vec3 Camera::get_scale() const
+void Camera::set_position(const ofVec2f pos)
 {
-	return cam_.getScale();
+	position_ = pos;
+}
+
+float Camera::get_scale() const
+{
+	return scale_;
+}
+
+void Camera::set_scale(const float scale)
+{
+	scale_ = scale;
 }
 
 void Camera::begin()
@@ -159,30 +230,37 @@ void Camera::draw() const
 }
 
 void Camera::key_pressed(const int key)
-{	
-	if (key == 'q') {
+{
+	if (key == 'q')
+	{
 		zooming_out_ = true;
 	}
-	else if (key == 'e') {
+	else if (key == 'e')
+	{
 		zooming_in_ = true;
 	}
-	else if (key == 3682) { // ctrl
+	else if (key == 3682) // ctrl
+	{		
 		ctrl_down_ = true;
 	}
-	else if (key == 9) { // tab
+	else if (key == 9) // tab
+	{		
 		toggle_zoom_mode();
 	}
 }
 
 void Camera::key_released(const int key)
 {
-	if (key == 'q') {
+	if (key == 'q')
+	{
 		zooming_out_ = false;
 	}
-	else if (key == 'e') {
+	else if (key == 'e')
+	{
 		zooming_in_ = false;
 	}
-	else if (key == 3682) { // ctrl
+	else if (key == 3682) // ctrl
+	{		
 		ctrl_down_ = false;
 	}	
 }
@@ -199,8 +277,31 @@ void Camera::mouse_pressed(int x, int y, int button)
 
 void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scroll_y)
 {
-	if (ctrl_down_) {
-		cam_.setScale(cam_.getScale().x - scroll_y / 10, cam_.getScale().y - scroll_y / 10, 1);
-		cout << "Zoom level: " << cam_.getScale() << endl;
+	if (ctrl_down_)
+	{
+		// if within bounds
+		if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_lower_bound_ && get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_upper_bound_)
+		{
+			scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
+
+			lerping_scale_ = true;
+
+			//cout << "Zoom level: " << get_scale() << endl;
+		}
+		else
+		{
+			if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_lower_bound_)
+			{
+				scale_to_lerp_to_ = zoom_scale_lower_bound_;
+
+				lerping_scale_ = true;
+			}
+			else if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_upper_bound_)
+			{
+				scale_to_lerp_to_ = zoom_scale_upper_bound_;
+
+				lerping_scale_ = true;
+			}
+		}
 	}
 }

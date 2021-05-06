@@ -13,7 +13,13 @@ public:
 	void update(ofVec2f player_pos);
 	void calculate_mouse_coords();
 	void follow_player(ofVec2f player_pos);
-	void handle_zooming();		
+
+	void handle_position();
+
+	void handle_scale();
+	void handle_bounds();
+	void lerp_scale();
+	void lerp_position();
 
 	// Helpers
 	void toggle_zoom_mode();
@@ -26,13 +32,17 @@ public:
 
 	ofVec3f get_local_mouse_pos() const;
 	ofVec3f get_world_mouse_pos() const;
+	
 	glm::mat4 get_local_transform_matrix() const;
 	glm::mat4 get_global_transform_matrix() const;
 	glm::mat4 get_projection_matrix() const;
 	glm::mat4 get_model_view_matrix() const;
 	glm::mat4 get_model_view_projection_matrix() const;
-	ofVec3f get_position() const;
-	glm::vec3 get_scale() const;	
+	
+	ofVec2f get_position() const;
+	void set_position(ofVec2f pos);
+	float get_scale() const;
+	void set_scale(float scale);
 
 	// Draw Frustram
 	void draw() const;
@@ -46,14 +56,36 @@ public:
 
 private:
 
-	ofEasyCam cam_;
+	ofEasyCam cam_;	
+
+	enum Cam_modes_ { player_view, map_view };
+	Cam_modes_ view_;
+
+	ofVec2f position_;
+	float scale_;
+	
 	bool ctrl_down_ = false;
+
+	ofVec2f cur_position_;
+	
 	bool follow_player_;
+	
 	ofVec3f local_mouse_pos_;
 	ofVec3f world_mouse_pos_;
+	
 	bool zooming_out_;
 	bool zooming_in_;
-	float zooming_speed_;
+	
+	float keyboard_zooming_speed_;
+	float scrollwheel_zooming_intervals_;
+	
 	float zoom_scale_upper_bound_;
 	float zoom_scale_lower_bound_;
+	
+	bool lerping_scale_;
+	float scale_to_lerp_to_;
+
+	bool lerping_position_;
+	ofVec2f pos_to_lerp_to_;
+	
 };
