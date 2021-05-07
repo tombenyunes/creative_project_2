@@ -15,15 +15,15 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
 	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
-	gui_manager.init(&game_controller, &fluid_manager, &audio_manager, &gamemode_manager, &cam);
+	gui_manager.init(&game_controller, &fluid_manager, &audio_manager, &cam);
 
-	event_manager.init(&game_controller, &entity_manager);
+	event_manager.init(&entity_manager, &gui_manager);
 	event_manager.show_tutorial(false);
 	event_manager.setup();
 
 	audio_manager.setup(app_ptr);
 
-	gamemode_manager.init(&game_controller);
+	gamemode_manager.init(&gui_manager);
 	
 	//scene_manager.loadScene("Scenes/StartingScene");
 	scene_manager.load_procedural_scene();
@@ -65,10 +65,10 @@ void Iota::draw()
 	cam.end();
 
 	if (entity_manager.get_selected_game_object() != nullptr && entity_manager.get_selected_game_object()->get_type() == "Spring") {
-		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), true);
+		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), true, entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string());
 	}
 	else {
-		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), false);
+		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), false, entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string());
 	}
 }
 
@@ -145,7 +145,6 @@ void Iota::mouse_exited(int x, int y)
 
 void Iota::window_resized(int w, int h)
 {
-	gui_manager.window_resized(w, h);
 }
 
 void Iota::drag_event(ofDragInfo drag_info)

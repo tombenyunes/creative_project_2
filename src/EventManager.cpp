@@ -1,7 +1,6 @@
 #include "EventManager.h"
 
 EventManager::EventManager(): player_gui_visible(false),
-                              game_controller_(nullptr),
                               entity_manager_(nullptr),
                               current_index_(0),
                               tutorial_enabled_(false),
@@ -13,10 +12,10 @@ EventManager::EventManager(): player_gui_visible(false),
 {
 }
 
-void EventManager::init(Controller* _gameController, EntityManager* _entityManager)
+void EventManager::init(EntityManager* entity_manager, GUIManager* gui_manager)
 {
-	game_controller_ = _gameController;
-	entity_manager_ = _entityManager;
+	entity_manager_ = entity_manager;
+	gui_manager_ = gui_manager;
 }
 
 void EventManager::setup()
@@ -45,13 +44,13 @@ void EventManager::update()
 		if (!i0)
 		{
 			i0 = true;
-			game_controller_->set_gui_visible(false);
+			gui_manager_->set_gui_visible(false);
 		}
 		static bool i1 = false;
 		if (current_index_ >= 1 && !i1)
 		{
 			i1 = true;
-			game_controller_->set_gui_visible(true);
+			gui_manager_->set_gui_visible(true);
 			can_keypress_ = true;
 			full_input_ = true;
 		}

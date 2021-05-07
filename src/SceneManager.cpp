@@ -92,7 +92,7 @@ void SceneManager::get_ready_for_new_scene() const
 	destroy_current_scene();
 	reset_fluid();
 
-	gui_manager_->prepare_for_new_scene();
+	gui_manager_->reset_point_counters();
 }
 
 void SceneManager::load_scene(const string path)

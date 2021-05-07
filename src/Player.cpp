@@ -93,11 +93,11 @@ void Player::update_gui()
 		gui_manager_->update_values("Player", pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
 	}
 	else {
-		gui_manager_->update_values("Player", pos_, vel_, accel_, gui_manager_->mass, gui_manager_->infinite_mass, gui_manager_->radius, gui_manager_->affected_by_gravity); // receiving and updating the results from the GUI_Manager
-		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->mass;
-		radius_ = gui_manager_->radius;
-		infinite_mass_ = gui_manager_->infinite_mass;
-		affected_by_gravity_ = gui_manager_->affected_by_gravity;
+		gui_manager_->update_values("Player", pos_, vel_, accel_, gui_manager_->gui_player_mass, gui_manager_->gui_player_infinite_mass, gui_manager_->gui_player_radius, gui_manager_->gui_player_affected_by_gravity); // receiving and updating the results from the GUI_Manager
+		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->gui_player_mass;
+		radius_ = gui_manager_->gui_player_radius;
+		infinite_mass_ = gui_manager_->gui_player_infinite_mass;
+		affected_by_gravity_ = gui_manager_->gui_player_affected_by_gravity;
 	}
 }
 

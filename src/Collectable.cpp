@@ -81,19 +81,19 @@ void Collectable::update_gui()
 		}
 		else
 		{
-			gui_manager_->update_values("Collectable", pos_, vel_, accel_, gui_manager_->selected_mass, gui_manager_->selected_infinite_mass, gui_manager_->selected_radius, gui_manager_->selected_affected_by_gravity, gui_manager_->selected_emission_frequency);
+			gui_manager_->update_values("Collectable", pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_infinite_mass, gui_manager_->gui_node_radius, gui_manager_->gui_node_affected_by_gravity, gui_manager_->gui_node_emission_frequency);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
 			}
 			else
 			{
-				mass_ = gui_manager_->selected_mass;
+				mass_ = gui_manager_->gui_node_mass;
 			}
-			starting_radius_ = gui_manager_->selected_radius;
-			infinite_mass_ = gui_manager_->selected_infinite_mass;
-			affected_by_gravity_ = gui_manager_->selected_affected_by_gravity;
-			emission_frequency_ = gui_manager_->selected_emission_frequency;
+			starting_radius_ = gui_manager_->gui_node_radius;
+			infinite_mass_ = gui_manager_->gui_node_infinite_mass;
+			affected_by_gravity_ = gui_manager_->gui_node_affected_by_gravity;
+			emission_frequency_ = gui_manager_->gui_node_emission_frequency;
 		}
 	}
 }

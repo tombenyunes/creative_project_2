@@ -28,13 +28,15 @@ public:
 
 	void delete_all(bool exclude_player = true) const;
 
+	void set_new_node_type(int id);
+	int get_new_node_type() const;
 	void create_entity(string entity_type = "") const;
 
 	int get_point_count() const;
 	ofVec2f get_player_position() const;
 	void set_player_position(ofVec2f pos);
 
-	void key_pressed(int key) const;
+	void key_pressed(int key);
 	void key_released(int key) const;
 	void mouse_moved(int x, int y);
 	void mouse_dragged(int x, int y, int button) const;
@@ -61,6 +63,8 @@ private:
 	Camera* cam_;
 
 	ofVec2f player_position_;
+
+	int new_node_type_id_;
 
 
 };

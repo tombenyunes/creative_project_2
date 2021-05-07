@@ -7,7 +7,8 @@ EntityManager::EntityManager(): selected_game_object_(nullptr),
 								fluid_manager_(nullptr),
 								audio_manager_(nullptr),
 								game_mode_manager_(nullptr),
-								cam_(nullptr)
+								cam_(nullptr),
+								new_node_type_id_(0)
 {	
 }
 
@@ -71,8 +72,8 @@ void EntityManager::delete_game_objects()
 	}
 
 	// delete all if gui requests it
-	if (game_controller_->get_delete_all()) {
-		game_controller_->set_delete_all(false);
+	if (gui_manager_->get_delete_all()) {
+		gui_manager_->toggle_delete_all();
 		delete_all(true);
 	}
 }
@@ -131,6 +132,16 @@ void EntityManager::delete_all(const bool exclude_player) const
 	}
 }
 
+void EntityManager::set_new_node_type(int id)
+{
+	new_node_type_id_ = id;
+}
+
+int EntityManager::get_new_node_type() const
+{
+	return new_node_type_id_;
+}
+
 void EntityManager::draw_game_objects() const
 {
 	for (auto& i : *get_game_objects())
@@ -143,7 +154,7 @@ void EntityManager::create_entity(const string entity_type) const
 {
 	int type_id;
 	if (entity_type.empty()) {
-		type_id = game_controller_->get_new_node_type();
+		type_id = get_new_node_type();
 	}
 	else {
 		type_id = -1;
@@ -198,28 +209,35 @@ void EntityManager::set_player_position(const ofVec2f pos)
 	player_position_ = pos;
 }
 
-void EntityManager::key_pressed(const int key) const
+void EntityManager::key_pressed(const int key)
 {
 	for (auto& i : *get_game_objects())
 	{
 		i->root_key_pressed(key);
 	}
 
-	if (game_mode_manager_->get_current_mode_id() == 0) {
-		if (key == 'c') {
+	if (game_mode_manager_->get_current_mode_id() == 0)
+	{
+		if (key == 'c')
+		{
 			create_entity();
 		}
-		if (key == 57358) {
-			if (game_controller_->get_new_node_type() < 2) {
-				game_controller_->set_new_node_type(game_controller_->get_new_node_type() + 1); // next
+		if (key == 'd')
+		{
+			if (get_new_node_type() < 2)
+			{
+				set_new_node_type(get_new_node_type() + 1); // next
 			}
 		}
-		else if (key == 57356) {
-			if (game_controller_->get_new_node_type() > 0) {
-				game_controller_->set_new_node_type(game_controller_->get_new_node_type() - 1); // previous
+		else if (key == 'a')
+		{
+			if (get_new_node_type() > 0)
+			{
+				set_new_node_type(get_new_node_type() - 1); // previous
 			}
-			else {
-				game_controller_->set_new_node_type(0);
+			else
+			{
+				set_new_node_type(0);
 			}
 		}
 	}
@@ -247,7 +265,6 @@ void EntityManager::mouse_dragged(const int x, const int y, const int button) co
 
 void EntityManager::mouse_pressed(const int x, const int y, const int button)
 {
-	// if right 
 	if (button == 2)
 	{
 		if (selected_game_object_ != nullptr)

@@ -174,19 +174,19 @@ void Spring::update_gui()
 		{
 			if (selected_node_index_ != -1)
 			{
-				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->node_mass, gui_manager_->node_radius);
-				node_masses_[selected_node_index_] = gui_manager_->node_mass;
-				node_radiuses_[selected_node_index_] = gui_manager_->node_radius;
+				gui_manager_->update_multiple_values(pos_, gui_manager_->gui_spring_k, gui_manager_->gui_spring_damping, gui_manager_->gui_spring_springmass, gui_manager_->gui_spring_affected_by_gravity, node_positions_[selected_node_index_], node_velocities_[selected_node_index_], node_accelerations_[selected_node_index_], gui_manager_->gui_spring_node_mass, gui_manager_->gui_spring_node_radius);
+				node_masses_[selected_node_index_] = gui_manager_->gui_spring_node_mass;
+				node_radiuses_[selected_node_index_] = gui_manager_->gui_spring_node_radius;
 			}
 			else
 			{
-				gui_manager_->update_multiple_values(pos_, gui_manager_->k, gui_manager_->damping, gui_manager_->springmass, gui_manager_->spring_affected_by_gravity);				
+				gui_manager_->update_multiple_values(pos_, gui_manager_->gui_spring_k, gui_manager_->gui_spring_damping, gui_manager_->gui_spring_springmass, gui_manager_->gui_spring_affected_by_gravity);				
 			}
 			
-			k_ = gui_manager_->k;
-			damping_ = gui_manager_->damping;
-			springmass_ = gui_manager_->springmass;
-			affected_by_gravity_ = gui_manager_->spring_affected_by_gravity;
+			k_ = gui_manager_->gui_spring_k;
+			damping_ = gui_manager_->gui_spring_damping;
+			springmass_ = gui_manager_->gui_spring_springmass;
+			affected_by_gravity_ = gui_manager_->gui_spring_affected_by_gravity;
 		}
 	}
 }
@@ -302,7 +302,7 @@ void Spring::key_pressed(const int key)
 {
 	if (key == 'a')
 	{
-		create_node(ofVec2f(pos_.x + ofRandom(-50, 50), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses_[node_radiuses_.size() - 1], node_masses_[node_radiuses_.size() - 1]);
+		//create_node(ofVec2f(pos_.x + ofRandom(-50, 50), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses_[node_radiuses_.size() - 1], node_masses_[node_radiuses_.size() - 1]);
 	}
 }
 

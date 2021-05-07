@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Controller.h"
 #include "EntityManager.h"
+#include "GUIManager.h"
 
 class EventManager
 {
@@ -9,7 +9,7 @@ public:
 
 	EventManager();
 
-	void init(Controller* _gameController, EntityManager* _entityManager);
+	void init(EntityManager* entity_manager, GUIManager* gui_manager);
 
 	void setup();
 	void update();
@@ -24,9 +24,9 @@ public:
 	bool player_gui_visible;
 
 private:
-
-	Controller* game_controller_;
+	
 	EntityManager* entity_manager_;
+	GUIManager* gui_manager_;
 
 	vector<string> dialogues_;
 	vector<ofVec2f> positions_;

@@ -40,25 +40,13 @@ public:
 	void set_mouse_dragged(bool value);
 	bool get_mouse_dragged() const;
 
-	void set_new_node_type(int value);
-	int get_new_node_type() const;
-
 	void set_use_hard_collisions(bool value);
-	bool get_use_hard_collisions() const;
-
-	void set_delete_all(bool value);
-	bool get_delete_all() const;
-
-	void set_gui_visible(bool value);
-	bool get_gui_visible() const;
+	bool get_use_hard_collisions() const;	
 
 private:
 	
 	bool gravity_;
-	bool need_to_delete_all_;
 	bool mouse_being_dragged_;
-	int new_node_id_;
 	bool hard_collisions_;
-	bool gui_visible_;
 	
 };
