@@ -3,6 +3,7 @@
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
 	:	starting_radius_(get_radius())
 	,	emission_frequency_(static_cast<int>(ofRandom(25, 100)))
+	,	emission_force_(0.1)
 	,	needs_to_pulse_radius_(false)
 {
 	set_type("Collectable");
@@ -76,24 +77,25 @@ void Collectable::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_values("Collectable", pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_);
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_, emission_force_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else
 		{
-			gui_manager_->update_values("Collectable", pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_infinite_mass, gui_manager_->gui_node_radius, gui_manager_->gui_node_affected_by_gravity, gui_manager_->gui_node_emission_frequency);
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, gui_manager_->gui_collectable_mass, gui_manager_->gui_collectable_infinite_mass, gui_manager_->gui_collectable_radius, gui_manager_->gui_collectable_affected_by_gravity, gui_manager_->gui_collectable_emission_frequency, gui_manager_->gui_collectable_emission_force);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
 			}
 			else
 			{
-				mass_ = gui_manager_->gui_node_mass;
+				mass_ = gui_manager_->gui_collectable_mass;
 			}
-			starting_radius_ = gui_manager_->gui_node_radius;
-			infinite_mass_ = gui_manager_->gui_node_infinite_mass;
-			affected_by_gravity_ = gui_manager_->gui_node_affected_by_gravity;
-			emission_frequency_ = gui_manager_->gui_node_emission_frequency;
+			starting_radius_ = gui_manager_->gui_collectable_radius;
+			infinite_mass_ = gui_manager_->gui_collectable_infinite_mass;
+			affected_by_gravity_ = gui_manager_->gui_collectable_affected_by_gravity;
+			emission_frequency_ = gui_manager_->gui_collectable_emission_frequency;
+			emission_force_ = gui_manager_->gui_collectable_emission_force;
 		}
 	}
 }
@@ -161,11 +163,12 @@ void Collectable::random_forces()
 			}
 		}
 		
-		vel = (point_positions[0] - get_position()) / 1000;
+		vel = (point_positions[0] - get_position())/* / 1000*/;
+		vel.normalize();
 
 		
 
-		fluid_manager_->add_to_fluid(mapped_pos, vel, true,  true, 100);
+		fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true,  true, 100);
 		needs_to_pulse_radius_ = true;
 
 		// if collectable is within screen bounds increment brightness
@@ -292,8 +295,10 @@ void Collectable::draw()
 	get_color();
 
 	ofNoFill();
-	ofSetLineWidth(ofMap(mass_, MINIMUM_MASS, MAXIMUM_MASS, 0.1f, 10.0f));
-
+	//ofSetLineWidth(ofMap(mass_, MINIMUM_MASS, MAXIMUM_MASS, 0.1f, 10.0f));
+	static int r = get_radius();
+	ofSetLineWidth(ofMap(radius_, r / 2, r, 0.1f, 5.0f));
+	
 	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
 	static bool spraying = false;

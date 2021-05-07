@@ -192,7 +192,7 @@ void SceneManager::load_procedural_scene() const
 	entity_manager_->create_entity("Player");
 
 	for (int i = 0; i < 5; i++) {
-		entity_manager_->create_entity("Collectable");
+		entity_manager_->create_entity("Collectable", ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2)));
 	}	
 
 	cout << "------------SceneManager.cpp------------" << endl;

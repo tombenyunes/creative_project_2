@@ -19,9 +19,12 @@ public:
 	
 	void update();
 	void update_world();
-	
-	void update_values(string entity_type, ofVec2f node_position, ofVec2f node_velocity, ofVec2f node_acceleration, float _node_mass, bool infmass, float _node_radius, bool is_affected_by_gravity, int emission_frequency = -1);
-	void update_multiple_values(ofVec2f spring_anchor_position, float spring_k, float spring_damping, float spring_mass, bool is_affected_by_gravity, ofVec2f selected_node_pos = ofVec2f(-1, -1), ofVec2f selected_node_vel = ofVec2f(-1, -1), ofVec2f selected_node_accel = ofVec2f(-1, -1), float selected_node_mass = -1, float selected_node_radius = -1);	
+
+	void update_player_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
+	void update_mass_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
+	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force);
+	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity);
+	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
 	
 	void inc_points_collected();
 	void inc_max_point_count();
@@ -35,7 +38,7 @@ public:
 	bool get_gui_visible() const;
 
 	// Draw
-	void draw_required_gui(GameObject* selected_object, bool is_spring, int new_node_id, string current_gamemode);
+	void draw_required_gui(GameObject* selected_object, int new_node_id, string current_gamemode);
 
 	// Events
 	void key_pressed(int key);	
@@ -47,6 +50,7 @@ public:
 	ofxPanel panel_world;
 	ofxPanel panel_player;
 	ofxPanel panel_node;
+	ofxPanel panel_collectable;
 	ofxPanel panel_spring_settings;
 	ofxPanel panel_spring_node;
 	
@@ -66,7 +70,7 @@ public:
 	ofxFloatSlider gui_player_radius;
 	ofxToggle gui_player_affected_by_gravity;
 
-	// Selected Node
+	// Node
 	ofxLabel gui_node_pos;
 	ofxLabel gui_node_vel;
 	ofxLabel gui_node_accel;
@@ -74,7 +78,17 @@ public:
 	ofxToggle gui_node_infinite_mass;
 	ofxFloatSlider gui_node_radius;
 	ofxToggle gui_node_affected_by_gravity;
-	ofxFloatSlider gui_node_emission_frequency;
+
+	// Collectable
+	ofxLabel gui_collectable_pos;
+	ofxLabel gui_collectable_vel;
+	ofxLabel gui_collectable_accel;
+	ofxFloatSlider gui_collectable_mass;
+	ofxToggle gui_collectable_infinite_mass;
+	ofxFloatSlider gui_collectable_radius;
+	ofxToggle gui_collectable_affected_by_gravity;
+	ofxFloatSlider gui_collectable_emission_frequency;
+	ofxFloatSlider gui_collectable_emission_force;
 	
 	// Spring Settings
 	ofxLabel gui_spring_anchor_pos;
@@ -88,7 +102,7 @@ public:
 	ofxLabel gui_spring_node_vel;
 	ofxLabel gui_spring_node_accel;
 	ofxFloatSlider gui_spring_node_radius;
-	ofxFloatSlider gui_spring_node_mass;	
+	ofxFloatSlider gui_spring_node_mass;
 	
 
 

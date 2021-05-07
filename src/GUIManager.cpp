@@ -1,5 +1,7 @@
 #include "GUIManager.h"
 
+#include "GameObject.h"
+
 GUIManager::GUIManager()
 	:	multi_node_selected_(false),
 		point_count_(0),
@@ -27,7 +29,7 @@ GUIManager::GUIManager()
 	panel_world.add(gui_world_hard_collisions.setup("hard collisions", false));
 
 	// Player
-	panel_player.setup("Player", "", panel_world.getPosition().x + panel_world.getWidth() + panel_pixel_buffer_, panel_pixel_buffer_);
+	panel_player.setup("Player", "", panel_pixel_buffer_, panel_world.getPosition().y + panel_world.getHeight() + panel_pixel_buffer_);
 	panel_player.add(gui_player_pos.setup("pos", error_message));
 	panel_player.add(gui_player_vel.setup("vel", error_message));
 	panel_player.add(gui_player_accel.setup("acceleration", error_message));
@@ -37,7 +39,7 @@ GUIManager::GUIManager()
 	panel_player.add(gui_player_affected_by_gravity.setup("gravity", false));
 
 	// Mass
-	panel_node.setup("Selected Object", "", ofGetWidth() - panel_node.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
+	panel_node.setup("Node", "", ofGetWidth() - panel_node.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
 	panel_node.add(gui_node_pos.setup("pos", error_message));
 	panel_node.add(gui_node_vel.setup("vel", error_message));
 	panel_node.add(gui_node_accel.setup("acceleration", error_message));
@@ -45,7 +47,18 @@ GUIManager::GUIManager()
 	panel_node.add(gui_node_infinite_mass.setup("infinite mass", false));
 	panel_node.add(gui_node_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 	panel_node.add(gui_node_affected_by_gravity.setup("gravity", false));
-	panel_node.add(gui_node_emission_frequency.setup("Emission Frequency", error_int, 15, 150));
+
+	// Mass
+	panel_collectable.setup("Collectable", "", ofGetWidth() - panel_node.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
+	panel_collectable.add(gui_collectable_pos.setup("pos", error_message));
+	panel_collectable.add(gui_collectable_vel.setup("vel", error_message));
+	panel_collectable.add(gui_collectable_accel.setup("acceleration", error_message));
+	panel_collectable.add(gui_collectable_mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
+	panel_collectable.add(gui_collectable_infinite_mass.setup("infinite mass", false));
+	panel_collectable.add(gui_collectable_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
+	panel_collectable.add(gui_collectable_affected_by_gravity.setup("gravity", false));
+	panel_collectable.add(gui_collectable_emission_frequency.setup("Emission Frequency", error_int, 15, 150));
+	panel_collectable.add(gui_collectable_emission_force.setup("Emission Force", error_int, 0.1f, 150));
 
 	// Spring
 	panel_spring_settings.setup("Spring Settings", "", ofGetWidth() - panel_spring_settings.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
@@ -54,6 +67,7 @@ GUIManager::GUIManager()
 	panel_spring_settings.add(gui_spring_damping.setup("damping", error_int, damping_bounds.x, damping_bounds.y));
 	panel_spring_settings.add(gui_spring_springmass.setup("springmass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
 	panel_spring_settings.add(gui_spring_affected_by_gravity.setup("gravity", false));
+	
 	// Spring Node
 	panel_spring_node.setup("Selected Object", "", ofGetWidth() - panel_spring_settings.getWidth() - panel_pixel_buffer_, panel_spring_settings.getPosition().y + panel_spring_settings.getHeight() + panel_pixel_buffer_);
 	panel_spring_node.add(gui_spring_node_pos.setup("pos", error_message));
@@ -123,103 +137,116 @@ bool GUIManager::get_gui_visible() const
 	return gui_visible_;
 }
 
-void GUIManager::update_values(const string entity_type, const ofVec2f node_position, const ofVec2f node_velocity, const ofVec2f node_acceleration, const float _node_mass, const bool infmass, const float _node_radius, const bool is_affected_by_gravity, const int emission_frequency)
+
+
+void GUIManager::update_player_values(const ofVec2f pos, const ofVec2f vel, const ofVec2f accel, const float mass, const bool infmass, const float radius, const bool affected_by_gravity)
 {
-	if (entity_type == "Player")
+	gui_player_pos = ofToString(roundf(pos.x)) + ", " + ofToString(roundf(pos.y));
+	gui_player_vel = ofToString(roundf(vel.x * 100) / 100) + ", " + ofToString(roundf(vel.y * 100) / 100);
+	gui_player_accel = ofToString(roundf(accel.x * 10000) / 10000) + ", " + ofToString(roundf(accel.y * 10000) / 10000);
+	if (infmass)
 	{
-		gui_player_pos = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
-		gui_player_vel = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
-		gui_player_accel = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
-		if (infmass)
-		{
-			gui_player_mass.setTextColor(0);
-			gui_player_infinite_mass = true;
-		}
-		else
-		{
-			gui_player_mass.setTextColor(255);
-			gui_player_mass = _node_mass;
-			gui_player_infinite_mass = false;
-		}
-		gui_player_radius = _node_radius;
-		gui_player_affected_by_gravity = is_affected_by_gravity;
-	}
-	else if (entity_type == "Mass")
-	{
-		panel_node.setName(entity_type);
-		panel_node.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + node_position.x + 8, HALF_WORLD_HEIGHT + node_position.y + 8)));
-		
-		gui_node_pos = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
-		gui_node_vel = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
-		gui_node_accel = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
-		if (infmass)
-		{
-			gui_node_mass.setTextColor(0);
-			gui_node_infinite_mass = true;
-		}
-		else
-		{
-			gui_node_mass.setTextColor(255);
-			gui_node_mass = _node_mass;
-			gui_node_infinite_mass = false;
-		}
-		gui_node_radius = _node_radius;
-		gui_node_affected_by_gravity = is_affected_by_gravity;
-	}
-	else if (entity_type == "Collectable")
-	{
-		panel_node.setName(entity_type);
-		panel_node.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + node_position.x + 8, HALF_WORLD_HEIGHT + node_position.y + 8)));
-
-		gui_node_pos = ofToString(roundf(node_position.x)) + ", " + ofToString(roundf(node_position.y));
-		gui_node_vel = ofToString(roundf(node_velocity.x * 100) / 100) + ", " + ofToString(roundf(node_velocity.y * 100) / 100);
-		gui_node_accel = ofToString(roundf(node_acceleration.x * 10000) / 10000) + ", " + ofToString(roundf(node_acceleration.y * 10000) / 10000);
-		if (infmass)
-		{
-			gui_node_mass.setTextColor(0);
-			gui_node_infinite_mass = true;
-		}
-		else
-		{
-			gui_node_mass.setTextColor(255);
-			gui_node_mass = _node_mass;
-			gui_node_infinite_mass = false;
-		}
-		gui_node_radius = _node_radius;
-		gui_node_affected_by_gravity = is_affected_by_gravity;
-		gui_node_emission_frequency = emission_frequency;
-	}
-}
-
-void GUIManager::update_multiple_values(const ofVec2f spring_anchor_position, const float spring_k, const float spring_damping, const float spring_mass, const bool is_affected_by_gravity, const ofVec2f selected_node_pos, const ofVec2f selected_node_vel, const ofVec2f selected_node_accel, const float selected_node_mass, const float selected_node_radius)
-{
-	panel_spring_settings.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + spring_anchor_position.x + 8, HALF_WORLD_HEIGHT + spring_anchor_position.y + 8)));
-	panel_spring_node.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + selected_node_pos.x + 8, HALF_WORLD_HEIGHT + selected_node_pos.y + 8)));
-	
-	gui_spring_anchor_pos = ofToString(roundf(spring_anchor_position.x)) + ", " + ofToString(roundf(spring_anchor_position.y));
-
-	gui_spring_k = spring_k;
-	gui_spring_damping = spring_damping;
-	gui_spring_springmass = spring_mass;
-	gui_spring_affected_by_gravity = is_affected_by_gravity;
-
-	if (selected_node_pos == ofVec2f(-1, -1) && selected_node_vel == ofVec2f(-1, -1) && selected_node_accel == ofVec2f(-1, -1) && selected_node_mass == -1 && selected_node_radius == -1)
-	{
-		// can't draw
-		multi_node_selected_ = false;
+		gui_player_mass.setTextColor(0);
+		gui_player_infinite_mass = true;
 	}
 	else
 	{
-		multi_node_selected_ = true;
-		gui_spring_node_pos = ofToString(roundf(selected_node_pos.x)) + ", " + ofToString(roundf(selected_node_pos.y));
-		gui_spring_node_vel = ofToString(roundf(selected_node_vel.x * 100) / 100) + ", " + ofToString(roundf(selected_node_vel.y * 100) / 100);
-		gui_spring_node_accel = ofToString(roundf(selected_node_accel.x * 10000) / 10000) + ", " + ofToString(roundf(selected_node_accel.y * 10000) / 10000);
-		gui_spring_node_mass = selected_node_mass;
-		gui_spring_node_radius = selected_node_radius;
+		gui_player_mass.setTextColor(255);
+		gui_player_mass = mass;
+		gui_player_infinite_mass = false;
 	}
+	gui_player_radius = radius;
+	gui_player_affected_by_gravity = affected_by_gravity;
 }
 
-void GUIManager::draw_required_gui(GameObject* selected_object, const bool is_spring, const int new_node_id, const string current_gamemode)
+void GUIManager::update_mass_values(const ofVec2f pos, const ofVec2f vel, const ofVec2f accel, const float mass, const bool infmass, const float radius, const bool affected_by_gravity)
+{
+	panel_node.setName("Mass");
+	panel_node.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + pos.x + 8, HALF_WORLD_HEIGHT + pos.y + 8)));
+
+	gui_node_pos = ofToString(roundf(pos.x)) + ", " + ofToString(roundf(pos.y));
+	gui_node_vel = ofToString(roundf(vel.x * 100) / 100) + ", " + ofToString(roundf(vel.y * 100) / 100);
+	gui_node_accel = ofToString(roundf(accel.x * 10000) / 10000) + ", " + ofToString(roundf(accel.y * 10000) / 10000);
+	if (infmass)
+	{
+		gui_node_mass.setTextColor(0);
+		gui_node_infinite_mass = true;
+	}
+	else
+	{
+		gui_node_mass.setTextColor(255);
+		gui_node_mass = mass;
+		gui_node_infinite_mass = false;
+	}
+	gui_node_radius = radius;
+	gui_node_affected_by_gravity = affected_by_gravity;
+}
+
+void GUIManager::update_collectable_values(const ofVec2f pos, const ofVec2f vel, const ofVec2f accel, const float mass, const bool infmass, const float radius, const bool affected_by_gravity, const float emission_frequency, const float emission_force)
+{
+	panel_collectable.setName("Collectable");
+	panel_collectable.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + pos.x + 8, HALF_WORLD_HEIGHT + pos.y + 8)));
+
+	gui_collectable_pos = ofToString(roundf(pos.x)) + ", " + ofToString(roundf(pos.y));
+	gui_collectable_vel = ofToString(roundf(vel.x * 100) / 100) + ", " + ofToString(roundf(vel.y * 100) / 100);
+	gui_collectable_accel = ofToString(roundf(accel.x * 10000) / 10000) + ", " + ofToString(roundf(accel.y * 10000) / 10000);
+	if (infmass)
+	{
+		gui_collectable_mass.setTextColor(0);
+		gui_collectable_infinite_mass = true;
+	}
+	else
+	{
+		gui_collectable_mass.setTextColor(255);
+		gui_collectable_mass = mass;
+		gui_node_infinite_mass = false;
+	}
+	gui_collectable_radius = radius;
+	gui_collectable_affected_by_gravity = affected_by_gravity;
+	gui_collectable_emission_frequency = emission_frequency;
+	gui_collectable_emission_force = emission_force;
+}
+
+
+
+void GUIManager::update_spring_values(const ofVec2f anchor_position, const float k, const float damping, const float springmass, const bool affected_by_gravity, const ofVec2f selected_node_pos, const ofVec2f selected_node_vel, const ofVec2f selected_node_accel, const float selected_node_mass, const float selected_node_radius)
+{
+	panel_spring_settings.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + anchor_position.x + 8, HALF_WORLD_HEIGHT + anchor_position.y + 8)));
+	panel_spring_node.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + selected_node_pos.x + 8, HALF_WORLD_HEIGHT + selected_node_pos.y + 8)));
+	
+	gui_spring_anchor_pos = ofToString(roundf(anchor_position.x)) + ", " + ofToString(roundf(anchor_position.y));
+
+	gui_spring_k = k;
+	gui_spring_damping = damping;
+	gui_spring_springmass = springmass;
+	gui_spring_affected_by_gravity = affected_by_gravity;
+	
+	gui_spring_node_pos = ofToString(roundf(selected_node_pos.x)) + ", " + ofToString(roundf(selected_node_pos.y));
+	gui_spring_node_vel = ofToString(roundf(selected_node_vel.x * 100) / 100) + ", " + ofToString(roundf(selected_node_vel.y * 100) / 100);
+	gui_spring_node_accel = ofToString(roundf(selected_node_accel.x * 10000) / 10000) + ", " + ofToString(roundf(selected_node_accel.y * 10000) / 10000);
+	gui_spring_node_mass = selected_node_mass;
+	gui_spring_node_radius = selected_node_radius;
+
+	multi_node_selected_ = true;
+}
+
+void GUIManager::update_spring_values(const ofVec2f anchor_position, const float k, const float damping, const float springmass, const bool affected_by_gravity)
+{
+	panel_spring_settings.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + anchor_position.x + 8, HALF_WORLD_HEIGHT + anchor_position.y + 8)));
+
+	gui_spring_anchor_pos = ofToString(roundf(anchor_position.x)) + ", " + ofToString(roundf(anchor_position.y));
+
+	gui_spring_k = k;
+	gui_spring_damping = damping;
+	gui_spring_springmass = springmass;
+	gui_spring_affected_by_gravity = affected_by_gravity;
+	
+	multi_node_selected_ = false;
+}
+
+
+
+void GUIManager::draw_required_gui(GameObject* selected_object, const int new_node_id, const string current_gamemode)
 {
 	if (get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
 	{
@@ -227,7 +254,11 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const bool is_sp
 
 		if (selected_object != nullptr)
 		{
-			if (is_spring)
+			if (selected_object->get_type() == "Mass")
+			{
+				panel_node.draw();
+			}
+			else if (selected_object->get_type() == "Spring")
 			{
 				// if an object is a spring then it has multiple gui windows to draw
 				panel_spring_settings.draw();
@@ -236,22 +267,26 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const bool is_sp
 					panel_spring_node.draw();
 				}
 			}
-			else
+			else if (selected_object->get_type() == "Collectable")
 			{
-				panel_node.draw();
+				panel_collectable.draw();
 			}
 		}
-	}
-	if (get_gui_visible())
-	{
+		
 		panel_world.draw();
-	}
+	}		
 
+	
 	FluidManager::draw_gui(draw_particle_gui_);
 	audio_manager_->drawGUI(draw_audio_gui_);
 
+	
 	draw_text(new_node_id, current_gamemode);
-	if (current_gamemode == "Sandbox") draw_border();
+	
+	if (current_gamemode == "Sandbox")
+	{
+		draw_border();
+	}
 }
 
 void GUIManager::draw_text(const int new_node_id, const string current_gamemode) const

@@ -23,6 +23,7 @@ private:
 	ofVec2f get_movement_vector() const;
 
 	// Misc
+	void follow_mouse();
 	void pull_points();
 	void boost_player();
 
@@ -52,7 +53,8 @@ private:
 	bool mouse_down_;
 	int mouse_button_;
 	ofVec2f mouse_pos_;
-	
-	bool aiming_boost_;
 
+	bool aiming_boost_;
+	
+	bool player_following_mouse_;
 };

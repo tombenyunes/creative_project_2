@@ -30,7 +30,10 @@ public:
 
 	void set_new_node_type(int id);
 	int get_new_node_type() const;
-	void create_entity(string entity_type = "") const;
+
+	void create_entity() const;
+	void create_entity(string entity_type) const;
+	void create_entity(string entity_type, ofVec2f pos) const;
 
 	int get_point_count() const;
 	ofVec2f get_player_position() const;

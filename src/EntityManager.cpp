@@ -150,41 +150,61 @@ void EntityManager::draw_game_objects() const
 	}
 }
 
+
+void EntityManager::create_entity() const
+{
+	// if no args, get new node type
+	
+	const int type_id = get_new_node_type();
+	if (type_id == 0)
+	{
+		create_entity("Mass");
+	}
+	else if (type_id == 1)
+	{
+		create_entity("Spring");
+	}
+	else if (type_id == 2)
+	{
+		create_entity("Collectable");
+	}
+}
+
 void EntityManager::create_entity(const string entity_type) const
 {
-	int type_id;
-	if (entity_type.empty()) {
-		type_id = get_new_node_type();
-	}
-	else {
-		type_id = -1;
-	}
+	// if no pos, create at mouse pos
 	
+	create_entity(entity_type, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
+}
+
+void EntityManager::create_entity(const string entity_type, const ofVec2f pos) const
+{	
 	if (entity_type == "Player") {
 		GameObject* player = new Player;
 		player->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(player);
 	}
-	if (type_id == 0 || entity_type == "Mass") {
+	if (entity_type == "Mass") {
 		cout << "Mass created" << endl;
-		GameObject* object = new Mass(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
+		GameObject* object = new Mass(pos, ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
 		object->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(object);
 	}
-	else if (type_id == 1 || entity_type == "Spring") {
+	else if (entity_type == "Spring") {
 		cout << "Spring created" << endl;
-		GameObject* spring = new Spring(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
+		GameObject* spring = new Spring(pos, { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
 		spring->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(spring);
 	}
-	else if (type_id == 2 || entity_type == "Collectable") {
+	else if (entity_type == "Collectable") {
 		cout << "Collectable created" << endl;
-		GameObject* point = new Collectable(ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2)), 15, 25);
+		GameObject* point = new Collectable(pos, 15, 25);
 		point->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 		add_game_object(point);
 		gui_manager_->inc_max_point_count();
 	}
 }
+
 
 int EntityManager::get_point_count() const
 {

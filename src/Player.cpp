@@ -1,11 +1,12 @@
 #include "Player.h"
 
 Player::Player(const ofVec2f pos, const ofColor color)
-	:	movement_speed(0.10f),
-		mouse_down_(false),
-		mouse_button_(-1),
-		mouse_pos_(0),
-		aiming_boost_(false)
+	:	movement_speed(0.10f)
+	,	mouse_down_(false)
+	,	mouse_button_(-1)
+	,	mouse_pos_(0)
+	,	aiming_boost_(false)
+	,	player_following_mouse_(false)
 {
 	set_type("Player");
 	set_position(pos);
@@ -23,6 +24,7 @@ Player::Player(const ofVec2f pos, const ofColor color)
 
 void Player::update()
 {
+	follow_mouse();
 	pull_points();
 	draw_fluid_trail();
 	update_forces();
@@ -61,6 +63,14 @@ ofVec2f Player::get_movement_vector() const
 	return movement_vec;	
 }
 
+void Player::follow_mouse()
+{
+	if (player_following_mouse_)
+	{
+		set_position(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
+	}
+}
+
 void Player::pull_points()
 {
 	for (auto& game_object : *game_objects_)
@@ -90,10 +100,10 @@ void Player::update_gui()
 	static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
 	if (!initiai_values_triggered) {
 		initiai_values_triggered = true;
-		gui_manager_->update_values("Player", pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
+		gui_manager_->update_player_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
 	}
 	else {
-		gui_manager_->update_values("Player", pos_, vel_, accel_, gui_manager_->gui_player_mass, gui_manager_->gui_player_infinite_mass, gui_manager_->gui_player_radius, gui_manager_->gui_player_affected_by_gravity); // receiving and updating the results from the GUI_Manager
+		gui_manager_->update_player_values(pos_, vel_, accel_, gui_manager_->gui_player_mass, gui_manager_->gui_player_infinite_mass, gui_manager_->gui_player_radius, gui_manager_->gui_player_affected_by_gravity); // receiving and updating the results from the GUI_Manager
 		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->gui_player_mass;
 		radius_ = gui_manager_->gui_player_radius;
 		infinite_mass_ = gui_manager_->gui_player_infinite_mass;
@@ -131,15 +141,19 @@ void Player::mouse_released(const float x, const float y, const int button)
 
 void Player::key_pressed(const int key)
 {
-	if (key == 114) // r
+	if (key == 'r')
 	{
 		accel_ = { 0, 0 };
 		vel_ = { 0, 0 };
 		pos_ = { 0, 0 };
 	}
-	if (key == 32)
+	else if (key == 32)
 	{
 		//aimingBoost = true;
+	}
+	else if (key == 'z')
+	{
+		player_following_mouse_ = true;
 	}
 }
 
@@ -148,6 +162,10 @@ void Player::key_released(const int key)
 	if (key == 32)
 	{
 		//boostPlayer();
+	}
+	else if (key == 'z')
+	{
+		player_following_mouse_ = false;
 	}
 }
 
