@@ -65,7 +65,7 @@ void GamemodeManager::log_current_mode() const
 
 void GamemodeManager::key_pressed(const int key)
 {
-	if (key == 57347) // f4 toggles between modes
+	if (key == 32) // 'space' toggles between modes
 	{
 		int new_id = -1;
 		if (current_mode_id_ == 0)
@@ -73,7 +73,7 @@ void GamemodeManager::key_pressed(const int key)
 			new_id = 1;
 			gui_manager_->set_gui_visible(false);
 			// load new scene
-			request_for_new_scene = true;
+			//request_for_new_scene = true;
 		}
 		else if (current_mode_id_ == 1)
 		{

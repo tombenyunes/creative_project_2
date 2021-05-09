@@ -67,7 +67,13 @@ void SceneManager::save_scene(const string scene_name)
 		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
 		xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
 		xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_radius());
-		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Spring")
+		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Collectable")
+		{
+			xml1_.addValue("emission_frequency", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_frequency"));
+			xml1_.addValue("emission_force", ((*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_force")));
+			xml1_.addValue("is_active", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("is_active"));
+		}
+		else if ((*entity_manager_->get_game_objects())[i]->get_type() == "Spring")
 		{
 			xml1_.addValue("node_count", static_cast<int>((*entity_manager_->get_game_objects())[i]->get_multiple_masses().size()));
 			
@@ -76,7 +82,7 @@ void SceneManager::save_scene(const string scene_name)
 				xml1_.addValue("mass" + to_string(j + 1), (*entity_manager_->get_game_objects())[i]->get_multiple_masses()[j]);
 				xml1_.addValue("radius" + to_string(j + 1), (*entity_manager_->get_game_objects())[i]->get_multiple_radiuses()[j]);
 			}
-		}
+		}		
 		xml1_.popTag();
 	}
 
@@ -131,8 +137,7 @@ void SceneManager::load_scene(const string path)
 				float radius = xml_.getValue("radius", -1);
 
 				GameObject* player = new Player;
-				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
-				             audio_manager_);
+				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(player);
 			}
 			else if (type == "Mass")
@@ -141,8 +146,7 @@ void SceneManager::load_scene(const string path)
 				const float radius = xml_.getValue("radius", -1);
 
 				GameObject* object = new Mass(pos, mass, radius);
-				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
-				             audio_manager_);
+				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(object);
 			}
 			else if (type == "Spring")
@@ -159,8 +163,7 @@ void SceneManager::load_scene(const string path)
 				}							
 				
 				GameObject* spring = new Spring(pos, radiuses, masses, 2, 2, 22);
-				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
-				             audio_manager_);
+				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(spring);
 			}
 			else if (type == "Collectable")
@@ -168,9 +171,12 @@ void SceneManager::load_scene(const string path)
 				const float mass = xml_.getValue("mass", -1);
 				const float radius = xml_.getValue("radius", -1);
 
-				GameObject* point = new Collectable(pos, mass, radius);
-				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_,
-				            audio_manager_);
+				const float emission_frequency = xml_.getValue("emission_frequency", -1);
+				const double emission_force = xml_.getValue("emission_force", -1.0f);
+				const bool is_active = xml_.getValue("is_active", false);
+				cout << emission_force << endl;
+				GameObject* point = new Collectable(pos, mass, radius, emission_frequency, emission_force, is_active);
+				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(point);
 			}
 
@@ -216,39 +222,45 @@ void SceneManager::reset_fluid() const
 void SceneManager::key_pressed(const int key)
 {
 	if (gamemode_manager_->get_current_mode_id() == 0) {
-		if (key == '1') {
+		if (key == '1')
+		{
 			// load scene 1
 			load_scene("Scenes/Scene1");
 
 			fluid_manager_->explosion(500);
 		}
-		else if (key == '2') {
+		else if (key == '2')
+		{
 			// load scene 2
 			load_scene("Scenes/Scene2");
 
 			fluid_manager_->explosion(500);
 		}
-		else if (key == '3') {
+		else if (key == '3')
+		{
 			// load scene 2
 			load_scene("Scenes/Scene3");
 
 			fluid_manager_->explosion(500);
 		}
-		else if (key == '4') {
+		else if (key == '4')
+		{
 			// load scene 2
 			load_scene("Scenes/Scene4");
 
 			fluid_manager_->explosion(500);
 		}
-		else if (key == '9') {
-			// load saved scene
+		else if (key == 57352) //f9
+		{
+			// load quick-saved scene
 			load_scene("Scenes/newScene");
 
 			fluid_manager_->explosion(500);
 		}
 	}
-	if (key == '0') {
-		// save scene
+	if (key == 57348) //f5
+	{
+		// quick-save scene
 		save_scene("Scenes/newScene");
 	}
 	else if (key == 'p') {

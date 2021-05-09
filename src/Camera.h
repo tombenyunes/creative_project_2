@@ -59,7 +59,7 @@ private:
 
 	ofEasyCam cam_;	
 
-	enum Cam_modes_ { player_view, map_view };
+	enum Cam_modes_ { player_view, map_view, free_view };
 	Cam_modes_ view_;
 
 	ofVec2f position_;
@@ -87,9 +87,7 @@ private:
 
 	bool lerping_position_;
 	ofVec2f pos_to_lerp_to_;
-
-	bool drag_started_{ false };
+	
 	ofVec2f drag_pos_start_{};
-	ofVec2f drag_pos_end_{};
 	
 };

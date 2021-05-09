@@ -5,37 +5,59 @@
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>229.474548340</pos.x>
-        <pos.y>505.736938477</pos.y>
+        <pos.x>0.000000000</pos.x>
+        <pos.y>0.000000000</pos.y>
         <mass>500.000000000</mass>
         <radius>14.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-59.213260651</pos.x>
-        <pos.y>-69.787010193</pos.y>
+        <pos.x>1090.670288086</pos.x>
+        <pos.y>1004.684448242</pos.y>
         <mass>15.000000000</mass>
-        <radius>67.666664124</radius>
+        <radius>44.459465027</radius>
+        <emission_frequency>37.000000000</emission_frequency>
+        <emission_force>0.100000001</emission_force>
+        <is_active>1.000000000</is_active>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-53.816497803</pos.x>
-        <pos.y>-10.102605820</pos.y>
+        <pos.x>-1929.807128906</pos.x>
+        <pos.y>-384.487365723</pos.y>
         <mass>15.000000000</mass>
-        <radius>67.666664124</radius>
+        <radius>25.000000000</radius>
+        <emission_frequency>64.000000000</emission_frequency>
+        <emission_force>0.100000001</emission_force>
+        <is_active>0.000000000</is_active>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-70.918136597</pos.x>
-        <pos.y>-47.978179932</pos.y>
+        <pos.x>1029.633422852</pos.x>
+        <pos.y>105.700790405</pos.y>
         <mass>15.000000000</mass>
-        <radius>67.666664124</radius>
+        <radius>64.673896790</radius>
+        <emission_frequency>46.000000000</emission_frequency>
+        <emission_force>0.100000001</emission_force>
+        <is_active>1.000000000</is_active>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-42.671344757</pos.x>
-        <pos.y>-41.407089233</pos.y>
+        <pos.x>1746.940185547</pos.x>
+        <pos.y>1107.867553711</pos.y>
         <mass>15.000000000</mass>
-        <radius>67.666664124</radius>
+        <radius>38.294013977</radius>
+        <emission_frequency>85.000000000</emission_frequency>
+        <emission_force>0.100000001</emission_force>
+        <is_active>1.000000000</is_active>
+    </GameObject>
+    <GameObject>
+        <type>Collectable</type>
+        <pos.x>-706.747619629</pos.x>
+        <pos.y>786.416137695</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+        <emission_frequency>61.000000000</emission_frequency>
+        <emission_force>0.100000001</emission_force>
+        <is_active>0.000000000</is_active>
     </GameObject>
 </Scene>

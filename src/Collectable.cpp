@@ -1,9 +1,9 @@
 #include "Collectable.h"
 
-Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
-	:	is_active_(false)											// controlls if the particle emission is enabled
-	,	emission_frequency_(static_cast<int>(ofRandom(25, 100)))	// frequency of particle emission
-	,	emission_force_(0.1f)										// force of particle emission
+Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const float emission_frequency, const float emission_force, const bool is_active)
+	:	is_active_(is_active)												// controlls if the particle emission is enabled
+	,	emission_frequency_(emission_frequency)								// frequency of particle emission
+	,	emission_force_(emission_force)										// force of particle emission
 	,	starting_radius_(get_radius())
 	,	needs_to_pulse_radius_(false)
 {
@@ -21,8 +21,6 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("mouseHover");
 
 	pixel_buffer_before_drag_ = 2;
-
-	cout << get_position() << endl;
 }
 
 void Collectable::update()

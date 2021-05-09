@@ -9,7 +9,7 @@ class Collectable : public GameObject {
 
 public:
 
-	Collectable(ofVec2f pos, float mass, float radius);	
+	Collectable(ofVec2f pos, float mass, float radius, const float emission_frequency = static_cast<int>(ofRandom(25, 100)), const float emission_force = 0.1f, const bool is_active = false);
 
 private:
 
@@ -39,6 +39,20 @@ private:
 	void random_forces();
 	void pulse_radius();
 	void draw_particle_burst() const;
+
+	float get_attribute_by_name(const string name) const override
+	{
+		if (name == "emission_frequency")
+			return emission_frequency_;
+		else if (name == "emission_force")
+			return emission_force_;
+		else if (name == "is_active")
+			return is_active_;
+		else
+			return -1;
+	}
+	
+	
 
 	bool is_active_;
 	float emission_frequency_;

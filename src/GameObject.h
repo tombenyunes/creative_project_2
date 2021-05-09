@@ -25,39 +25,41 @@ public:
 	virtual void mouse_dragged(float x, float y, int button) {}
 	virtual void mouse_released(float x, float y, int button) {}
 
-	string get_type() const                                  { return type_; }
-	void set_type(const string type)                         { type_ = type;  }
+	string get_type() const											{ return type_; }
+	void set_type(const string type)								{ type_ = type;  }
 	
-	ofVec2f get_position() const                             { return pos_; }
-	void set_position(const ofVec2f pos)                     { pos_ = pos; }
+	ofVec2f get_position() const									{ return pos_; }
+	void set_position(const ofVec2f pos)							{ pos_ = pos; }
 
-	void set_velocity(const ofVec2f vel)					 { vel_ = vel; }
+	void set_velocity(const ofVec2f vel)							{ vel_ = vel; }
 	
-	float get_radius() const                                 { return radius_; }
-	void set_radius(const float radius)                      { radius_ = radius; }
-	float get_mass() const						             { return mass_; }
-	void set_mass(const float mass)                          { mass_ = mass; }
+	float get_radius() const										{ return radius_; }
+	void set_radius(const float radius)								{ radius_ = radius; }
+	float get_mass() const											{ return mass_; }
+	void set_mass(const float mass)									{ mass_ = mass; }
 
-	ofColor get_color() const                                { return color_; }
-	void set_color(const ofColor color)                      { color_ = color; }
+	ofColor get_color() const										{ return color_; }
+	void set_color(const ofColor color)								{ color_ = color; }
 	
-	vector<ofVec2f> get_multiple_positions() const           { return node_positions_; }
-	vector<float> get_multiple_radiuses() const	             { return node_radiuses_; }
-	vector<float> get_multiple_masses() const                { return node_masses_; }	
+	vector<ofVec2f> get_multiple_positions() const					{ return node_positions_; }
+	vector<float> get_multiple_radiuses() const						{ return node_radiuses_; }
+	vector<float> get_multiple_masses() const						{ return node_masses_; }	
 
-	bool get_request_to_be_deleted() const                   { return request_to_be_deleted_; }
-	void set_request_to_be_deleted(const bool req)           { request_to_be_deleted_ = req; }
-	string get_request_to_be_deleted_event() const           { return request_to_be_deleted_event_; }
-	void set_request_to_be_deleted_event(const string event) { request_to_be_deleted_event_ = event; }
+	virtual float get_attribute_by_name(const string name) const	{ return -1; }
+	
+	bool get_request_to_be_deleted() const							{ return request_to_be_deleted_; }
+	void set_request_to_be_deleted(const bool req)					{ request_to_be_deleted_ = req; }
+	string get_request_to_be_deleted_event() const					{ return request_to_be_deleted_event_; }
+	void set_request_to_be_deleted_event(const string event)		{ request_to_be_deleted_event_ = event; }
 
-	bool get_request_to_be_selected() const                  { return request_to_be_selected_; }
-	bool get_request_to_be_deselected() const                { return request_to_be_deselected_; }
-	void set_request_to_be_selected(const bool req)          { request_to_be_selected_ = req; }
-	void set_request_to_be_deselected(const bool req)        { request_to_be_deselected_ = req; }
-	bool get_is_selected() const                             { return is_selected_; }
-	void set_is_selected(const bool val)                     { is_selected_ = val; }
+	bool get_request_to_be_selected() const							{ return request_to_be_selected_; }
+	bool get_request_to_be_deselected() const						{ return request_to_be_deselected_; }
+	void set_request_to_be_selected(const bool req)					{ request_to_be_selected_ = req; }
+	void set_request_to_be_deselected(const bool req)				{ request_to_be_deselected_ = req; }
+	bool get_is_selected() const									{ return is_selected_; }
+	void set_is_selected(const bool val)							{ is_selected_ = val; }
 
-	bool can_collide() const					             { return ellipse_collider_enabled_; }
+	bool can_collide() const										{ return ellipse_collider_enabled_; }
 	
 	virtual void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 });
 

@@ -41,7 +41,8 @@ public:
 	void draw_required_gui(GameObject* selected_object, int new_node_id, string current_gamemode);
 
 	// Events
-	void key_pressed(int key);	
+	void key_pressed(int key);
+	void toggle_menu_screen();
 
 	
 
@@ -112,6 +113,7 @@ private:
 	// Draw
 	void draw_text(int new_node_id, string current_gamemode) const;
 	void draw_border() const;
+	void draw_menu() const;
 	
 	Controller* game_controller_{};
 	FluidManager* fluid_manager_{};
@@ -131,5 +133,7 @@ private:
 	int max_point_count_;
 
 	bool delete_all_;
+
+	bool showing_menu_;
 
 };

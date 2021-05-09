@@ -3,15 +3,16 @@
 #include "GameObject.h"
 
 GUIManager::GUIManager()
-	:	multi_node_selected_(false),
-		point_count_(0),
-		points_collected_(0),
-		max_point_count_(0),   // buffer between all panels and each other + screen edges
-		delete_all_(false),
-		gui_visible_(false),
-		panel_pixel_buffer_(5),
-		draw_particle_gui_(false),
-		draw_audio_gui_(false)
+	:	gui_visible_(false)
+	,	panel_pixel_buffer_(5)
+	,	draw_particle_gui_(false)
+	,	draw_audio_gui_(false)   // buffer between all panels and each other + screen edges
+	,	multi_node_selected_(false)
+	,	point_count_(0)
+	,	points_collected_(0)
+	,	max_point_count_(0)
+	,	delete_all_(false)
+	,	showing_menu_(false)
 {
 	const string error_message = "Error: Updating failed"; // error message will show for all parameters that require but haven't received an update
 	const int error_int = 404;
@@ -250,44 +251,53 @@ void GUIManager::update_spring_values(const ofVec2f anchor_position, const float
 
 void GUIManager::draw_required_gui(GameObject* selected_object, const int new_node_id, const string current_gamemode)
 {
-	if (get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
+	if (showing_menu_)
 	{
-		panel_player.draw();
+		draw_menu();
+	}
+	else
+	{
+		draw_text(new_node_id, current_gamemode);
 
-		if (selected_object != nullptr)
+		if (current_gamemode == "Sandbox")
 		{
-			if (selected_object->get_type() == "Mass")
+			draw_border();
+		}
+
+		
+
+		if (get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
+		{
+			panel_player.draw();
+
+			if (selected_object != nullptr)
 			{
-				panel_node.draw();
-			}
-			else if (selected_object->get_type() == "Spring")
-			{
-				// if an object is a spring then it has multiple gui windows to draw
-				panel_spring_settings.draw();
-				if (multi_node_selected_ == true)
+				if (selected_object->get_type() == "Mass")
 				{
-					panel_spring_node.draw();
+					panel_node.draw();
+				}
+				else if (selected_object->get_type() == "Spring")
+				{
+					// if an object is a spring then it has multiple gui windows to draw
+					panel_spring_settings.draw();
+					if (multi_node_selected_ == true)
+					{
+						panel_spring_node.draw();
+					}
+				}
+				else if (selected_object->get_type() == "Collectable")
+				{
+					panel_collectable.draw();
 				}
 			}
-			else if (selected_object->get_type() == "Collectable")
-			{
-				panel_collectable.draw();
-			}
+
+			panel_world.draw();
 		}
-		
-		panel_world.draw();
-	}		
-
-	
-	FluidManager::draw_gui(draw_particle_gui_);
-	audio_manager_->drawGUI(draw_audio_gui_);
-
-	
-	draw_text(new_node_id, current_gamemode);
-	
-	if (current_gamemode == "Sandbox")
-	{
-		draw_border();
+		else
+		{
+			FluidManager::draw_gui(draw_particle_gui_);
+			audio_manager_->drawGUI(draw_audio_gui_);
+		}
 	}
 }
 
@@ -329,9 +339,40 @@ void GUIManager::draw_border() const
 	ofPopStyle();
 }
 
+void GUIManager::draw_menu() const
+{
+	ofPushStyle();
+	ofPushMatrix();
+
+	ofSetColor(0, 0, 0, 125);
+	ofFill();
+	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+
+	ofSetColor(255);
+	const float w = ofGetWidth() / 2 - 150;
+	const float h = ofGetHeight() / 4;
+	ofDrawBitmapString("Menu", w, h + 16 * 1);
+	ofDrawBitmapString("'Left Click' to exert a force in a direction", w, h + 16 * 2);
+	ofDrawBitmapString("'Space' to toggle sandbox mode", w, h + 16 * 3);
+	ofDrawBitmapString("'Right Click' to select and move entities", w, h + 16 * 4);
+	ofDrawBitmapString("'F5' to quick-save a scene", w, h + 16 * 5);
+	ofDrawBitmapString("'F9' to quick-load a scene", w, h + 16 * 6);
+	ofDrawBitmapString("'c' to create an entity", w, h + 16 * 7);
+	ofDrawBitmapString("'x' to delete an entity", w, h + 16 * 8);
+	ofDrawBitmapString("'Scroll Wheel' to zoom", w, h + 16 * 9);
+	ofDrawBitmapString("'Tab' to toggle perspectives", w, h + 16 * 10);
+
+	ofPopMatrix();
+	ofPopStyle();
+}
+
 void GUIManager::key_pressed(const int key)
 {
-	if (key == 57344) // f1
+	if (key == 27)
+	{
+		toggle_menu_screen();
+	}
+	else if (key == 57344) // f1
 	{		
 		if (get_gui_visible())
 		{
@@ -370,4 +411,9 @@ void GUIManager::key_pressed(const int key)
 			draw_audio_gui_ = true;
 		}
 	}
+}
+
+void GUIManager::toggle_menu_screen()
+{
+	(!showing_menu_) ? showing_menu_ = true : showing_menu_ = false;
 }

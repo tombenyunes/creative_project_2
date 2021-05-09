@@ -58,16 +58,16 @@ void Camera::handle_position(const ofVec2f player_pos)
 void Camera::follow_player(const ofVec2f player_pos)
 {
 	// the camera follows the player
-	if (!drag_started_)
+	if (view_ != Cam_modes_::free_view)
 	{
-		if (follow_player_)
+		if (view_ == Cam_modes_::player_view)
 		{
 			pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
 			lerping_position_ = true;
 		}
-		else
+		else if (view_ == Cam_modes_::map_view)
 		{
-			pos_to_lerp_to_.set(ofVec2f(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT)); // camera follows player
+			pos_to_lerp_to_.set(ofVec2f(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT));
 			lerping_position_ = true;
 		}
 	}
@@ -207,7 +207,7 @@ void Camera::mouse_dragged(const int x, const int y, const int button)
 {
 	if (button == 1)
 	{
-		//cout << drag_pos_start_ - ofVec2f(x, y) << endl;
+		view_ = Cam_modes_::free_view;
 		pos_to_lerp_to_ = get_position() + drag_pos_start_ - ofVec2f(x, y);
 		lerping_position_ = true;
 		set_position(get_position() + drag_pos_start_ - ofVec2f(x, y));
@@ -220,7 +220,6 @@ void Camera::mouse_pressed(const int x, const int y, const int button)
 	if (button == 1)
 	{
 		drag_pos_start_ = ofVec2f(x, y);
-		drag_started_ = true;
 	}
 }
 
@@ -254,11 +253,6 @@ void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scro
 
 void Camera::mouse_released(const int x, const int y, const int button)
 {
-	if (button == 1)
-	{
-		drag_pos_end_ = ofVec2f(x, y);
-		//drag_started_ = false;
-	}
 }
 
 

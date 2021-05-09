@@ -3,7 +3,8 @@
 void Iota::setup(ofBaseApp* app_ptr)
 {
 	//ofSetWindowPosition(3849, 649);
-	ofSetWindowShape(1920, 1080);
+	//ofSetWindowShape(1920, 1080);
+	ofSetWindowShape(1920, 1019);
 	ofSetWindowPosition((ofGetScreenWidth() - ofGetWindowWidth()) / 2, (ofGetScreenHeight() - ofGetWindowHeight()) / 2);
 	ofSetWindowTitle("iota");
 	ofSetCircleResolution(176);
@@ -12,6 +13,7 @@ void Iota::setup(ofBaseApp* app_ptr)
 	window_resized(ofGetWidth(), ofGetHeight());
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
+	ofSetEscapeQuitsApp(false);
 
 	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
 	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
@@ -87,8 +89,9 @@ void Iota::key_pressed(const int key)
 	if (event_manager.is_event_allowed("key_pressed")) {
 		entity_manager.key_pressed(key);
 	}
-
-	if (key == 'f') {
+	
+	if (key == 57354) //f11
+	{
 		ofToggleFullscreen();
 	}
 }

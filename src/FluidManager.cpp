@@ -266,7 +266,7 @@ ParticleSystem* FluidManager::get_particle_system()
 
 void FluidManager::key_pressed(const int key)
 {
-	if (key == ' ')
+	if (key == 'f')
 	{
 		explosion(12500);
 	}
