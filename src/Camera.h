@@ -14,7 +14,7 @@ public:
 	void calculate_mouse_coords();
 	void follow_player(ofVec2f player_pos);
 
-	void handle_position();
+	void handle_position(ofVec2f player_pos);
 
 	void handle_scale();
 	void handle_bounds();
@@ -53,6 +53,7 @@ public:
 	void mouse_dragged(int x, int y, int button);
 	void mouse_pressed(int x, int y, int button);
 	void mouse_scrolled(int x, int y, float scroll_x, float scroll_y);
+	void mouse_released(int x, int y, int button);
 
 private:
 
@@ -65,10 +66,9 @@ private:
 	float scale_;
 	
 	bool ctrl_down_ = false;
-
-	ofVec2f cur_position_;
 	
 	bool follow_player_;
+	float prev_player_view_scale_;
 	
 	ofVec3f local_mouse_pos_;
 	ofVec3f world_mouse_pos_;
@@ -87,5 +87,9 @@ private:
 
 	bool lerping_position_;
 	ofVec2f pos_to_lerp_to_;
+
+	bool drag_started_{ false };
+	ofVec2f drag_pos_start_{};
+	ofVec2f drag_pos_end_{};
 	
 };

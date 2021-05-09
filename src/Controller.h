@@ -20,6 +20,8 @@
 #define FRICTION_FORCE 0.015f
 #define GRAVITY_FORCE 0.0001f
 
+//#define WORLD_WIDTH (1920 * 0.5)
+//#define WORLD_HEIGHT (1080 * 0.5)
 #define WORLD_WIDTH (2000 * 2)
 #define WORLD_HEIGHT (1500 * 2)
 

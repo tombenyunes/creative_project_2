@@ -1,14 +1,16 @@
 #include "Collectable.h"
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius)
-	:	starting_radius_(get_radius())
-	,	emission_frequency_(static_cast<int>(ofRandom(25, 100)))
-	,	emission_force_(0.1)
+	:	is_active_(false)											// controlls if the particle emission is enabled
+	,	emission_frequency_(static_cast<int>(ofRandom(25, 100)))	// frequency of particle emission
+	,	emission_force_(0.1f)										// force of particle emission
+	,	starting_radius_(get_radius())
 	,	needs_to_pulse_radius_(false)
 {
 	set_type("Collectable");
 	set_position(pos);
-	set_color(ofColor(passive_color_));
+	//set_color(ofColor(passive_color_));
+	set_color(ofColor(passive_color_.r, passive_color_.g, passive_color_.b, 100));
 	set_mass(mass);
 	set_radius(radius);
 
@@ -19,12 +21,17 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("mouseHover");
 
 	pixel_buffer_before_drag_ = 2;
+
+	cout << get_position() << endl;
 }
 
 void Collectable::update()
 {
-	random_forces();
-	pulse_radius();
+	if (is_active_)
+	{
+		random_forces();
+		pulse_radius();
+	}
 	
 	update_forces();
 	drag_nodes();
@@ -77,12 +84,12 @@ void Collectable::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_collectable_values(pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_, emission_force_);
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_, emission_force_, is_active_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else
 		{
-			gui_manager_->update_collectable_values(pos_, vel_, accel_, gui_manager_->gui_collectable_mass, gui_manager_->gui_collectable_infinite_mass, gui_manager_->gui_collectable_radius, gui_manager_->gui_collectable_affected_by_gravity, gui_manager_->gui_collectable_emission_frequency, gui_manager_->gui_collectable_emission_force);
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, gui_manager_->gui_collectable_mass, gui_manager_->gui_collectable_infinite_mass, gui_manager_->gui_collectable_radius, gui_manager_->gui_collectable_affected_by_gravity, gui_manager_->gui_collectable_emission_frequency, gui_manager_->gui_collectable_emission_force, gui_manager_->gui_collectable_is_active);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
@@ -96,6 +103,7 @@ void Collectable::update_gui()
 			affected_by_gravity_ = gui_manager_->gui_collectable_affected_by_gravity;
 			emission_frequency_ = gui_manager_->gui_collectable_emission_frequency;
 			emission_force_ = gui_manager_->gui_collectable_emission_force;
+			is_active_ = gui_manager_->gui_collectable_is_active;
 		}
 	}
 }
@@ -109,6 +117,11 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 {
 	if (other->get_type() == "PullRange")
 	{
+		is_active_ = true;
+	}
+	
+	/*if (other->get_type() == "PullRange")
+	{
 		const ofVec2f direction_to_player = other->get_position() - pos_;
 		apply_force(accel_, direction_to_player, true, 2.75f);
 		other->set_request_to_be_deleted(true);
@@ -118,7 +131,7 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 		fluid_manager_->increment_brightness();
 		set_request_to_be_deleted_event("Collected");
 		set_request_to_be_deleted(true);
-	}
+	}*/
 }
 
 // collectables randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
@@ -155,16 +168,40 @@ void Collectable::random_forces()
 
 		// randomly select a collectables and target all velocities towards that point's position
 		vector<ofVec2f> point_positions;
-		for (int i = 0; i < game_objects_->size(); i++)
+		for (auto& game_object : *game_objects_)
 		{
-			if ((*game_objects_)[i]->get_type() == "Collectable")
+			if (game_object->get_type() == "Collectable")
 			{
-				point_positions.push_back((*game_objects_)[i]->get_position());
+				point_positions.push_back(game_object->get_position());
 			}
 		}
+
+		//vel = (point_positions[0] - get_position())/* / 1000*/;
+		//vel.normalize();
 		
-		vel = (point_positions[0] - get_position())/* / 1000*/;
-		vel.normalize();
+		for (int i = 0; i < point_positions.size(); i++)
+		{
+			/*static bool init = false;
+			if (!init)
+			{
+				if (point_positions[0] == get_position())
+				{
+					is_active_ = true;
+					init = true;
+				}
+			}*/
+			if (point_positions[i] == get_position())
+			{
+				int i2;
+				if (i + 1 >= point_positions.size())
+					i2 = 0;
+				else
+					i2 = i + 1;
+				
+				vel = (point_positions[i2] - point_positions[i]);
+				vel.normalize();
+			}
+		}
 
 		
 
@@ -290,57 +327,34 @@ void Collectable::mouse_released(const float x, const float y, const int button)
 
 void Collectable::draw()
 {
-	ofPushStyle();
+	ofPushStyle();	
 
-	get_color();
-
-	ofNoFill();
-	//ofSetLineWidth(ofMap(mass_, MINIMUM_MASS, MAXIMUM_MASS, 0.1f, 10.0f));
-	static int r = get_radius();
-	ofSetLineWidth(ofMap(radius_, r / 2, r, 0.1f, 5.0f));
-	
+	ofSetColor(ofColor(color_.r, color_.g, color_.b, 50));
+	//get_color();
+	ofFill();
 	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
-	static bool spraying = false;
-	static bool trig = false;
-	if (ofGetFrameNum() % 60 == 0) {
-		spraying = true;
-		trig = false;
-		ofResetElapsedTimeCounter();
-	}
-	if (spraying) {
-		if (ofGetElapsedTimef() < 0.1f) {
-			static ofVec2f new_pos;
-			static ofVec2f new_vel;
-			if (!trig) {
-				new_pos.x = ofMap(pos_.x, -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
-				new_pos.y = ofMap(pos_.y, -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
-				new_vel.x = (ofRandom(-1, 1) / 120);
-				new_vel.y = (ofRandom(-1, 1) / 120);
-				trig = true;
-			}			
-			//Fluid_Manager->addToFluid(newPos, newVel, true, true);
-		}
-		else {
-			spraying = false;
-		}
-	}
+	static int r = get_radius();
+	ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 5.0f));
+	ofNoFill();
+	get_color();
+	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);	
 
 	ofPopStyle();
 }
 
 void Collectable::get_color() const
 {
-	if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
+	if (infinite_mass_)
+	{
+		ofSetColor(255, 0, 0);
+	}
+	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
 	{
 		ofSetColor(selected_color_);
 	}
-	else if (infinite_mass_)
-	{
-		ofSetColor(passive_color_);
-	}
 	else
 	{
-		ofSetColor(color_);
+		ofSetColor(ofColor(color_.r, color_.g, color_.b));
 	}
 }

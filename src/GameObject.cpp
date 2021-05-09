@@ -26,7 +26,7 @@ GameObject::GameObject(const ofVec2f pos, const ofColor color)
 	  local_mouse_pos_before_drag_(0),
 	  pixel_buffer_before_drag_(0),
 	  started_dragging_(false),
-	  passive_color_(ofColor(255)),
+	  passive_color_(ofColor(255, 255, 255)),
 	  selected_color_(ofColor(255, 165, 0)),
 	  delete_key_down_(false),
 	  request_to_be_deleted_(false),

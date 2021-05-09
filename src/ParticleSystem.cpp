@@ -13,7 +13,7 @@ ParticleSystem::ParticleSystem() {
 	cur_index_ = 0;
 }
 
-void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const ofVec2f window_size, const bool drawing_fluid) {
+void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const ofVec2f window_size, const bool drawing_fluid, ofVec2f player_pos) {
 	const ofVec2f inv_window_size(1.0f / window_size.x, 1.0f / window_size.y);
 
 	glEnable(GL_BLEND);
@@ -24,8 +24,8 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 	
 	for(int i=0; i<MAX_PARTICLES; i++) {
 		if(particles_[i].alpha > 0) {
-			particles_[i].update(a_solver, window_size, inv_window_size);
-			particles_[i].update_vertex_arrays(drawing_fluid, inv_window_size, i, pos_array_, col_array_);
+			particles_[i].update(a_solver, window_size, inv_window_size, player_pos);
+			particles_[i].update_vertex_arrays(drawing_fluid, inv_window_size, i, pos_array_, col_array_, player_pos);
 		}
 	}
 	
@@ -46,7 +46,7 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 
 void ParticleSystem::add_particles(const ofVec2f &pos, const int count){
 	for(int i=0; i<count; i++)
-		//addParticle(pos + msa::Rand::randVec2f() * 15);
+		//add_particle(pos + msa::Rand::randVec2f() * 4);
 		add_particle(pos);
 }
 

@@ -170,12 +170,12 @@ void Mass::get_color() const
 	{
 		ofSetColor(255, 0, 0);
 	}
-	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))								// TODO - HERE TOO
+	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
 	{
 		ofSetColor(selected_color_);
 	}	
 	else
 	{
-		ofSetColor(color_);
+		ofSetColor(ofColor(color_.r, color_.g, color_.b));
 	}
 }

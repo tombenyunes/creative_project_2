@@ -46,11 +46,11 @@ void Iota::update()
 }
 
 void Iota::draw()
-{
+{	
 	cam.begin();
 
 	fluid_manager.render_fluid();
-	fluid_manager.render_particles();
+	fluid_manager.render_particles(entity_manager.get_player_position());
 
 	//audio_manager.draw(); // background animation effect
 
@@ -107,10 +107,11 @@ void Iota::mouse_moved(const int x, const int y)
 {
 }
 
-void Iota::mouse_dragged(const int x, const int y, const int button) const
+void Iota::mouse_dragged(const int x, const int y, const int button)
 {
 	if (event_manager.is_event_allowed("mouse_dragged", button)) {
 		entity_manager.mouse_dragged(x, y, button);
+		cam.mouse_dragged(x, y, button);
 	}
 }
 
@@ -118,6 +119,7 @@ void Iota::mouse_pressed(const int x, const int y, const int button)
 {
 	if (event_manager.is_event_allowed("mouse_pressed", button)) {
 		entity_manager.mouse_pressed(x, y, button);
+		cam.mouse_pressed(x, y, button);
 	}
 }
 
@@ -128,10 +130,11 @@ void Iota::mouse_scrolled(const int x, const int y, const float scroll_x, const 
 	}
 }
 
-void Iota::mouse_released(const int x, const int y, const int button) const
+void Iota::mouse_released(const int x, const int y, const int button)
 {
 	if (event_manager.is_event_allowed("mouse_released", button)) {
 		entity_manager.mouse_released(x, y, button);
+		cam.mouse_released(x, y, button);
 	}
 }
 

@@ -40,9 +40,10 @@ private:
 	void pulse_radius();
 	void draw_particle_burst() const;
 
-	float starting_radius_;
+	bool is_active_;
 	float emission_frequency_;
 	float emission_force_;
+	float starting_radius_;
 	bool needs_to_pulse_radius_;
 	bool player_within_bounds_;
 

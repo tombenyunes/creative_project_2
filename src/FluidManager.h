@@ -15,7 +15,7 @@ public:
 
 	void update();
 	void render_fluid();
-	void render_particles();
+	void render_particles(ofVec2f player_pos);
 	static void draw_gui(bool enable);
 
 	void add_to_fluid(ofVec2f pos, ofVec2f vel, bool add_color, bool add_force, int count = 10);

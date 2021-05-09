@@ -144,6 +144,9 @@ int EntityManager::get_new_node_type() const
 
 void EntityManager::draw_game_objects() const
 {
+	ofEnableAlphaBlending();
+	//ofBlendMode(OF_BLENDMODE_ALPHA);
+	
 	for (auto& i : *get_game_objects())
 	{
 		i->root_draw();

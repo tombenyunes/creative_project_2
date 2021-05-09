@@ -5,6 +5,7 @@ Camera::Camera()
 	,	position_(0 + (ofGetWidth() / 2), 0 + (ofGetHeight() / 2))
 	,	scale_(1)
 	,	follow_player_(true)
+	,	prev_player_view_scale_(1)
 	,	zooming_out_(false)
 	,	zooming_in_(false)
 	,	keyboard_zooming_speed_(0.025f)
@@ -24,10 +25,8 @@ Camera::Camera()
 
 void Camera::update(const ofVec2f player_pos)
 {
-	if (ofGetFrameNum() % 2 == 0) cur_position_ = get_position();
-	calculate_mouse_coords();
-	follow_player(player_pos);
-	handle_position();
+	calculate_mouse_coords();	
+	handle_position(player_pos);
 	handle_scale();
 }
 
@@ -44,29 +43,43 @@ void Camera::calculate_mouse_coords()
 	world_mouse_pos_ = world_pos;
 }
 
-void Camera::follow_player(const ofVec2f player_pos)
-{
-	// the camera follows the player
-	if (follow_player_)
-	{
-		pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
-		lerping_position_ = true;
-	}
-	else
-	{
-		pos_to_lerp_to_.set(ofVec2f(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT)); // camera follows player
-		lerping_position_ = true;
-	}
-}
-
-void Camera::handle_position()
+void Camera::handle_position(const ofVec2f player_pos)
 {
 	cam_.setPosition(position_.x, position_.y, 1305);
 
+	follow_player(player_pos);
+	
 	if (lerping_position_)
 	{
 		lerp_position();
 	}	
+}
+
+void Camera::follow_player(const ofVec2f player_pos)
+{
+	// the camera follows the player
+	if (!drag_started_)
+	{
+		if (follow_player_)
+		{
+			pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
+			lerping_position_ = true;
+		}
+		else
+		{
+			pos_to_lerp_to_.set(ofVec2f(0 + HALF_WORLD_WIDTH, 0 + HALF_WORLD_HEIGHT)); // camera follows player
+			lerping_position_ = true;
+		}
+	}
+}
+
+void Camera::lerp_position()
+{
+	ofVec2f lerped_pos;
+	lerped_pos.x = ofLerp(get_position().x, pos_to_lerp_to_.x, 0.1f);
+	lerped_pos.y = ofLerp(get_position().y, pos_to_lerp_to_.y, 0.1f);
+
+	set_position(lerped_pos);
 }
 
 void Camera::handle_scale()
@@ -116,14 +129,139 @@ void Camera::lerp_scale()
 	}
 }
 
-void Camera::lerp_position()
+void Camera::toggle_zoom_mode()
 {
-	ofVec2f lerped_pos;
-	lerped_pos.x = ofLerp(get_position().x, pos_to_lerp_to_.x, 0.1f);
-	lerped_pos.y = ofLerp(get_position().y, pos_to_lerp_to_.y, 0.1f);
-
-	set_position(lerped_pos);
+	// toggle between 'player view' and 'map view' camera perspectives
+	if (view_ == Cam_modes_::player_view)
+	{
+		prev_player_view_scale_ = get_scale();
+		
+		scale_to_lerp_to_ = 2.9f;
+		lerping_scale_ = true;
+		
+		follow_player_ = false;
+		
+		view_ = Cam_modes_::map_view;		
+	}
+	else
+	{		
+		scale_to_lerp_to_ = prev_player_view_scale_;
+		lerping_scale_ = true;
+		
+		follow_player_ = true;
+		
+		view_ = Cam_modes_::player_view;
+	}
 }
+
+void Camera::draw() const
+{
+	cam_.drawFrustum();
+}
+
+void Camera::key_pressed(const int key)
+{
+	if (key == 'q')
+	{
+		zooming_out_ = true;
+	}
+	else if (key == 'e')
+	{
+		zooming_in_ = true;
+	}
+	else if (key == 'r')
+	{
+		if (view_ == Cam_modes_::player_view)
+		{
+			scale_to_lerp_to_ = 1;
+			lerping_scale_ = true;
+		}
+	}
+	else if (key == 3682) // ctrl
+	{		
+		ctrl_down_ = true;
+	}
+	else if (key == 9) // tab
+	{		
+		toggle_zoom_mode();
+	}
+}
+
+void Camera::key_released(const int key)
+{
+	if (key == 'q')
+	{
+		zooming_out_ = false;
+	}
+	else if (key == 'e')
+	{
+		zooming_in_ = false;
+	}
+	else if (key == 3682) // ctrl
+	{		
+		ctrl_down_ = false;
+	}	
+}
+
+void Camera::mouse_dragged(const int x, const int y, const int button)
+{
+	if (button == 1)
+	{
+		//cout << drag_pos_start_ - ofVec2f(x, y) << endl;
+		pos_to_lerp_to_ = get_position() + drag_pos_start_ - ofVec2f(x, y);
+		lerping_position_ = true;
+		set_position(get_position() + drag_pos_start_ - ofVec2f(x, y));
+		drag_pos_start_ = ofVec2f(x, y);
+	}
+}
+
+void Camera::mouse_pressed(const int x, const int y, const int button)
+{
+	if (button == 1)
+	{
+		drag_pos_start_ = ofVec2f(x, y);
+		drag_started_ = true;
+	}
+}
+
+void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scroll_y)
+{
+	//if (ctrl_down_)
+	{
+		// if within bounds
+		if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_lower_bound_ && get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_upper_bound_)
+		{
+			scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
+			lerping_scale_ = true;
+
+			//cout << "Zoom level: " << get_scale() << endl;
+		}
+		else
+		{
+			if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_lower_bound_)
+			{
+				scale_to_lerp_to_ = zoom_scale_lower_bound_;
+				lerping_scale_ = true;
+			}
+			else if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_upper_bound_)
+			{
+				scale_to_lerp_to_ = zoom_scale_upper_bound_;
+				lerping_scale_ = true;
+			}
+		}
+	}
+}
+
+void Camera::mouse_released(const int x, const int y, const int button)
+{
+	if (button == 1)
+	{
+		drag_pos_end_ = ofVec2f(x, y);
+		//drag_started_ = false;
+	}
+}
+
+
 
 ofVec3f Camera::get_local_mouse_pos() const
 {
@@ -135,38 +273,14 @@ ofVec3f Camera::get_world_mouse_pos() const
 	return world_mouse_pos_;
 }
 
-void Camera::toggle_zoom_mode()
-{
-	// reset scale/zoom
-	//cout << "Zoom reset" << endl;
-	if (view_ == Cam_modes_::player_view)
-	{
-		view_ = Cam_modes_::map_view;
-		
-		scale_to_lerp_to_ = 2.9f;
-		lerping_scale_ = true;
-		
-		follow_player_ = false;
-	}
-	else
-	{
-		view_ = Cam_modes_::player_view;
-		
-		scale_to_lerp_to_ = 1;
-		lerping_scale_ = true;
-		
-		follow_player_ = true;
-	}
-}
-
 glm::mat4 Camera::get_model_view_matrix() const
 {
-	return cam_.getModelViewMatrix();	
+	return cam_.getModelViewMatrix();
 }
 
 glm::mat4 Camera::get_local_transform_matrix() const
 {
-	return cam_.getLocalTransformMatrix();		
+	return cam_.getLocalTransformMatrix();
 }
 
 glm::mat4 Camera::get_global_transform_matrix() const
@@ -175,7 +289,7 @@ glm::mat4 Camera::get_global_transform_matrix() const
 }
 
 glm::mat4 Camera::get_projection_matrix() const
-{	
+{
 	return cam_.getProjectionMatrix();
 }
 
@@ -222,86 +336,4 @@ ofVec3f Camera::screen_to_world(const ofVec3f view) const
 ofVec3f Camera::world_to_screen(const ofVec3f view) const
 {
 	return cam_.worldToScreen(view);
-}
-
-void Camera::draw() const
-{
-	cam_.drawFrustum();
-}
-
-void Camera::key_pressed(const int key)
-{
-	if (key == 'q')
-	{
-		zooming_out_ = true;
-	}
-	else if (key == 'e')
-	{
-		zooming_in_ = true;
-	}
-	else if (key == 3682) // ctrl
-	{		
-		ctrl_down_ = true;
-	}
-	else if (key == 9) // tab
-	{		
-		toggle_zoom_mode();
-	}
-}
-
-void Camera::key_released(const int key)
-{
-	if (key == 'q')
-	{
-		zooming_out_ = false;
-	}
-	else if (key == 'e')
-	{
-		zooming_in_ = false;
-	}
-	else if (key == 3682) // ctrl
-	{		
-		ctrl_down_ = false;
-	}	
-}
-
-void Camera::mouse_dragged(int x, int y, int button)
-{
-
-}
-
-void Camera::mouse_pressed(int x, int y, int button)
-{
-
-}
-
-void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scroll_y)
-{
-	if (ctrl_down_)
-	{
-		// if within bounds
-		if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_lower_bound_ && get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_upper_bound_)
-		{
-			scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
-
-			lerping_scale_ = true;
-
-			//cout << "Zoom level: " << get_scale() << endl;
-		}
-		else
-		{
-			if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_lower_bound_)
-			{
-				scale_to_lerp_to_ = zoom_scale_lower_bound_;
-
-				lerping_scale_ = true;
-			}
-			else if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_upper_bound_)
-			{
-				scale_to_lerp_to_ = zoom_scale_upper_bound_;
-
-				lerping_scale_ = true;
-			}
-		}
-	}
 }

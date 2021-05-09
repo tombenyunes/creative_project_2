@@ -138,11 +138,11 @@ void FluidManager::render_fluid()
 	fluid_blur_.draw(); // blur only applies to background fluid
 }
 
-void FluidManager::render_particles()
+void FluidManager::render_particles(const ofVec2f player_pos)
 {
 	if (draw_particles_)
 	{
-		particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_/*, p*/);
+		particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player_pos);
 	}
 }
 
