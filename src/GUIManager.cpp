@@ -4,7 +4,7 @@
 
 GUIManager::GUIManager()
 	:	gui_visible_(false)
-	,	panel_pixel_buffer_(5)
+	,	panel_pixel_buffer_(10)
 	,	draw_particle_gui_(false)
 	,	draw_audio_gui_(false)   // buffer between all panels and each other + screen edges
 	,	multi_node_selected_(false)
@@ -28,7 +28,10 @@ GUIManager::GUIManager()
 	panel_world.add(gui_world_delete_all.setup("clear all"));
 	panel_world.add(gui_world_gravity.setup("global gravity", false));
 	panel_world.add(gui_world_hard_collisions.setup("hard collisions", false));
-
+	panel_world.add(gui_world_calculate_fluid.setup("calculate fluid", true));
+	panel_world.add(gui_world_calculate_particles.setup("calculate particles", true));
+	panel_world.add(gui_world_calculate_entities.setup("calculate entities", true));
+	
 	// Player
 	panel_player.setup("Player", "", panel_pixel_buffer_, panel_world.getPosition().y + panel_world.getHeight() + panel_pixel_buffer_);
 	panel_player.add(gui_player_pos.setup("pos", error_message));
@@ -79,10 +82,9 @@ GUIManager::GUIManager()
 	panel_spring_node.add(gui_spring_node_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 }
 
-void GUIManager::init(Controller* controller, FluidManager* fluid_manager, AudioManager* audio_manager, Camera* cam)
+void GUIManager::init(Controller* controller, AudioManager* audio_manager, Camera* cam)
 {
 	game_controller_ = controller;
-	fluid_manager_ = fluid_manager;
 	audio_manager_ = audio_manager;
 	cam_ = cam;
 }

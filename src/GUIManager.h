@@ -3,7 +3,6 @@
 #include "AudioManager.h"
 #include "Camera.h"
 #include "Controller.h"
-#include "FluidManager.h"
 #include "ofMain.h"
 #include "ofxGui.h"
 
@@ -15,7 +14,7 @@ public:
 
 	GUIManager();
 
-	void init(Controller* controller, FluidManager* fluid_manager, AudioManager* audio_manager, Camera* cam);
+	void init(Controller* controller, AudioManager* audio_manager, Camera* cam);
 	
 	void update();
 	void update_world();
@@ -60,7 +59,10 @@ public:
 	// World
 	ofxButton gui_world_delete_all;
 	ofxToggle gui_world_gravity;
-	ofxToggle gui_world_hard_collisions;	
+	ofxToggle gui_world_hard_collisions;
+	ofxToggle gui_world_calculate_fluid;
+	ofxToggle gui_world_calculate_particles;
+	ofxToggle gui_world_calculate_entities;
 	
 	// Player
 	ofxLabel gui_player_pos;
@@ -116,7 +118,6 @@ private:
 	void draw_menu() const;
 	
 	Controller* game_controller_{};
-	FluidManager* fluid_manager_{};
 	AudioManager* audio_manager_{};
 	Camera* cam_{};	
 

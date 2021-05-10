@@ -57,6 +57,11 @@ FluidManager::FluidManager(): fluid_cells_x_(150),
 	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
+void FluidManager::init(GUIManager* gui_manager)
+{
+	gui_manager_ = gui_manager;
+}
+
 void FluidManager::update()
 {
 	if (resize_fluid_)
@@ -123,26 +128,38 @@ void FluidManager::update()
 	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
+void FluidManager::draw(const ofVec2f player_pos)
+{
+	render_fluid();
+	render_particles(player_pos);
+}
+
 void FluidManager::render_fluid()
 {
-	fluid_blur_.begin();
-	if (draw_fluid_)
+	if (gui_manager_->gui_world_calculate_fluid)
 	{
-		ofBackground(0);
-		ofClear(0);
-		glColor3f(1, 1, 1);
-		ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
-		fluid_drawer_.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+		fluid_blur_.begin();
+		if (draw_fluid_)
+		{
+			ofBackground(0);
+			ofClear(0);
+			glColor3f(1, 1, 1);
+			ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
+			fluid_drawer_.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+		}
+		fluid_blur_.end();
+		fluid_blur_.draw(); // blur only applies to background fluid
 	}
-	fluid_blur_.end();
-	fluid_blur_.draw(); // blur only applies to background fluid
 }
 
 void FluidManager::render_particles(const ofVec2f player_pos)
 {
-	if (draw_particles_)
+	if (gui_manager_->gui_world_calculate_particles)
 	{
-		particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player_pos);
+		if (draw_particles_)
+		{
+			particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player_pos);
+		}
 	}
 }
 

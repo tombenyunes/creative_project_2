@@ -40,13 +40,16 @@ void EntityManager::add_game_object(GameObject* _gameobject) const
 
 void EntityManager::update()
 {
-	delete_game_objects();
-	find_selected();
-
-	// update all gameobjects
-	for (auto& i : *get_game_objects())
+	if (gui_manager_->gui_world_calculate_entities)
 	{
-		i->root_update();
+		delete_game_objects();
+		find_selected();
+
+		// update all gameobjects
+		for (auto& i : *get_game_objects())
+		{
+			i->root_update();
+		}
 	}
 }
 
@@ -145,11 +148,13 @@ int EntityManager::get_new_node_type() const
 void EntityManager::draw_game_objects() const
 {
 	ofEnableAlphaBlending();
-	//ofBlendMode(OF_BLENDMODE_ALPHA);
-	
-	for (auto& i : *get_game_objects())
+
+	if (gui_manager_->gui_world_calculate_entities)
 	{
-		i->root_draw();
+		for (auto& i : *get_game_objects())
+		{
+			i->root_draw();
+		}
 	}
 }
 

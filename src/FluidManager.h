@@ -3,7 +3,7 @@
 #include "MSAFluid.h"
 #include "ofxBlur.h"
 #include "ofxSimpleGuiToo.h"
-
+#include "GUIManager.h"
 #include "Controller.h"
 #include "ParticleSystem.h"
 
@@ -13,7 +13,10 @@ public:
 
 	FluidManager();
 
+	void init(GUIManager* gui_manager);
+	
 	void update();
+	void draw(ofVec2f player_pos);
 	void render_fluid();
 	void render_particles(ofVec2f player_pos);
 	static void draw_gui(bool enable);
@@ -58,4 +61,7 @@ private:
 	float prev_viscocity_;
 	bool do_increment_velocity_;
 	float prev_velocity_;
+
+	GUIManager* gui_manager_;
+	
 };

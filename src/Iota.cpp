@@ -17,8 +17,10 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
 	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
-	gui_manager.init(&game_controller, &fluid_manager, &audio_manager, &cam);
+	gui_manager.init(&game_controller, &audio_manager, &cam);
 
+	fluid_manager.init(&gui_manager);
+	
 	event_manager.init(&entity_manager, &gui_manager);
 	event_manager.show_tutorial(false);
 	event_manager.setup();
@@ -50,9 +52,8 @@ void Iota::update()
 void Iota::draw()
 {	
 	cam.begin();
-
-	fluid_manager.render_fluid();
-	fluid_manager.render_particles(entity_manager.get_player_position());
+	
+	fluid_manager.draw(entity_manager.get_player_position());
 
 	//audio_manager.draw(); // background animation effect
 
