@@ -24,10 +24,10 @@ Spring::Spring(const ofVec2f anchor_pos, vector<float> node_radiuses, vector<flo
 		create_node(ofVec2f(pos_.x + ofRandom(-50.0f, 50.0f), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses[i], node_masses[i]);
 	}
 
-	affected_by_gravity_ = true; // by default spring have 'local' gravity (the anchor doesn't) to make springiness noticible
+	// by default spring have 'local' gravity (the anchor doesn't) to make springiness noticible
+	affected_by_gravity_ = false;
 	gravity_mult_ = 400;
 	collision_mult_ = 4;
-	pixel_buffer_before_drag_ = 0.5f;
 }
 
 void Spring::create_node(const ofVec2f node_pos, const ofVec2f node_vel, const ofVec2f node_accel, const float node_radius, const float node_mass)
@@ -37,10 +37,20 @@ void Spring::create_node(const ofVec2f node_pos, const ofVec2f node_vel, const o
 	node_accelerations_.push_back(node_accel);
 	node_radiuses_.push_back(node_radius);
 	node_masses_.push_back(node_mass);
+	fluid_velocities_.push_back(ofVec2f(0, 0));
 }
 
 void Spring::update()
 {	
+	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
+	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);
+
+	for (int i = 0; i < node_positions_.size(); i++)
+	{
+		fluid_velocities_[i] = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(node_positions_[i].x + HALF_WORLD_WIDTH, node_positions_[i].y + HALF_WORLD_HEIGHT) * inv_window_size) * (1 * 0.06f) * window_size + fluid_velocities_[i] * 0.5f;
+		apply_force(node_accelerations_[i], fluid_velocities_[i], true, 10.0f);
+	}
+	
 	update_forces();
 	drag_nodes();
 	update_gui();
@@ -188,6 +198,21 @@ void Spring::update_gui()
 			springmass_ = gui_manager_->gui_spring_springmass;
 			affected_by_gravity_ = gui_manager_->gui_spring_affected_by_gravity;
 		}
+
+		static bool trig = false;
+		if (gui_manager_->gui_spring_add_node)
+		{
+			if (!trig)
+			{
+				trig = true;
+				create_node(ofVec2f(pos_.x + ofRandom(-50, 50), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses_[node_radiuses_.size() - 1], node_masses_[node_radiuses_.size() - 1]);
+			}
+		}
+		else if (trig)
+		{
+			trig = false;
+		}
+		
 	}
 }
 
@@ -300,10 +325,6 @@ void Spring::mouse_released(const float x, const float y, const int button)
 
 void Spring::key_pressed(const int key)
 {
-	if (key == 'a')
-	{
-		//create_node(ofVec2f(pos_.x + ofRandom(-50, 50), pos_.y), ofVec2f(0, 0), ofVec2f(0, 0), node_radiuses_[node_radiuses_.size() - 1], node_masses_[node_radiuses_.size() - 1]);
-	}
 }
 
 
@@ -314,22 +335,38 @@ void Spring::draw()
 {
 	ofPushStyle();
 
-	ofNoFill();
-	ofSetColor(color_);
-	get_node_color(-2);
-
-	draw_connecting_lines();
-
-	(fill_ellipses_) ? ofFill() : ofNoFill();
-	get_node_color(-1);
-	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
-
-	ofSetColor(0);
+	// node semi-transparent inner fill
+	ofSetColor(ofColor(0, 0, 0, 50));
+	ofFill();
 	for (int i = 0; i < node_positions_.size(); i++)
 	{
 		ofDrawEllipse(node_positions_[i].x, node_positions_[i].y, node_radiuses_[i], node_radiuses_[i]);
 	}
+	
+	ofNoFill();
+	//ofSetColor(color_);
+	get_node_color(-2);
 
+	// lines connecting nodes
+	draw_connecting_lines();
+
+	(fill_ellipses_) ? ofFill() : ofNoFill();
+
+	// spring anchor
+	get_node_color(-1);
+	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+
+	// nodes
+	if (fill_ellipses_)
+	{
+		ofSetColor(0);
+		for (int i = 0; i < node_positions_.size(); i++)
+		{
+			ofDrawEllipse(node_positions_[i].x, node_positions_[i].y, node_radiuses_[i], node_radiuses_[i]);
+		}
+	}
+
+	// node outlines
 	for (int i = 0; i < node_positions_.size(); i++)
 	{
 		ofSetLineWidth(ofMap(node_masses_[i], MINIMUM_MASS, MAXIMUM_MASS / 2, 0.1f, 10.0f));
@@ -349,7 +386,7 @@ void Spring::get_node_color(const int node_index)
 	}
 	else
 	{
-		ofSetColor(passive_color_);
+		ofSetColor(ofColor(color_.r, color_.g, color_.b));
 	}
 }
 

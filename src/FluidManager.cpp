@@ -128,10 +128,10 @@ void FluidManager::update()
 	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
-void FluidManager::draw(const ofVec2f player_pos)
+void FluidManager::draw(GameObject* player)
 {
 	render_fluid();
-	render_particles(player_pos);
+	render_particles(player);
 }
 
 void FluidManager::render_fluid()
@@ -152,13 +152,13 @@ void FluidManager::render_fluid()
 	}
 }
 
-void FluidManager::render_particles(const ofVec2f player_pos)
+void FluidManager::render_particles(GameObject* player)
 {
 	if (gui_manager_->gui_world_calculate_particles)
 	{
 		if (draw_particles_)
 		{
-			particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player_pos);
+			particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player);
 		}
 	}
 }

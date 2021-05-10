@@ -6,6 +6,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	,	emission_force_(emission_force)										// force of particle emission
 	,	starting_radius_(get_radius())
 	,	needs_to_pulse_radius_(false)
+	,	alpha_(255)
 {
 	set_type("Collectable");
 	set_position(pos);
@@ -327,13 +328,14 @@ void Collectable::draw()
 {
 	ofPushStyle();	
 
-	ofSetColor(ofColor(color_.r, color_.g, color_.b, 50));
+	ofSetColor(ofColor(0, 0, 0, 50));
 	//get_color();
 	ofFill();
 	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
 	static int r = get_radius();
-	ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 5.0f));
+	alpha_ = ofMap(radius_, r, r * 4, 0, 255);
+	ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 2.0f));
 	ofNoFill();
 	get_color();
 	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);	
@@ -353,6 +355,6 @@ void Collectable::get_color() const
 	}
 	else
 	{
-		ofSetColor(ofColor(color_.r, color_.g, color_.b));
+		ofSetColor(ofColor(color_.r, color_.g, color_.b, alpha_));
 	}
 }

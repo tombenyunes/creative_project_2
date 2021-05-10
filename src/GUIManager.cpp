@@ -72,6 +72,7 @@ GUIManager::GUIManager()
 	panel_spring_settings.add(gui_spring_damping.setup("damping", error_int, damping_bounds.x, damping_bounds.y));
 	panel_spring_settings.add(gui_spring_springmass.setup("springmass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
 	panel_spring_settings.add(gui_spring_affected_by_gravity.setup("gravity", false));
+	panel_spring_settings.add(gui_spring_add_node.setup("add node"));
 	
 	// Spring Node
 	panel_spring_node.setup("Selected Object", "", ofGetWidth() - panel_spring_settings.getWidth() - panel_pixel_buffer_, panel_spring_settings.getPosition().y + panel_spring_settings.getHeight() + panel_pixel_buffer_);
@@ -90,7 +91,7 @@ void GUIManager::init(Controller* controller, AudioManager* audio_manager, Camer
 }
 
 void GUIManager::update()
-{	
+{
 	update_world();
 }
 

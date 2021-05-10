@@ -53,5 +53,7 @@ private:
 	float time_step_;	
 
 	bool fill_ellipses_;
+	
+	vector<ofVec2f> fluid_velocities_;
 
 };

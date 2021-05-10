@@ -9,11 +9,13 @@
 
 #include "ParticleSystem.h"
 
+#include "GameObject.h"
+
 ParticleSystem::ParticleSystem() {
 	cur_index_ = 0;
 }
 
-void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const ofVec2f window_size, const bool drawing_fluid, ofVec2f player_pos) {
+void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const ofVec2f window_size, const bool drawing_fluid, GameObject* player) {
 	const ofVec2f inv_window_size(1.0f / window_size.x, 1.0f / window_size.y);
 
 	glEnable(GL_BLEND);
@@ -24,10 +26,18 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 	
 	for(int i=0; i<MAX_PARTICLES; i++) {
 		if(particles_[i].alpha > 0) {
-			particles_[i].update(a_solver, window_size, inv_window_size, player_pos);
-			particles_[i].update_vertex_arrays(drawing_fluid, inv_window_size, i, pos_array_, col_array_, player_pos);
+			particles_[i].update(a_solver, window_size, inv_window_size, player);
+			particles_[i].update_vertex_arrays(drawing_fluid, inv_window_size, i, pos_array_, col_array_, player);			
 		}
 	}
+
+	vel = a_solver.getVelocityAtPos(pos * inv_window_size) * (1 * 0.6f) * window_size + player->get_velocity() * 0.5f;
+	pos += vel;
+	
+	//ofDrawEllipse(pos, 100, 100);
+	//player->set_position(ofVec2f(pos.x - 2000, pos.y - 1500));
+	//player->apply_force(player->get_accel(), vel * 100, true);
+	//player->add_forces(false);
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, pos_array_);

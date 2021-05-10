@@ -36,6 +36,7 @@ public:
 	void create_entity(string entity_type, ofVec2f pos) const;
 
 	int get_point_count() const;
+	GameObject* get_player() const;
 	ofVec2f get_player_position() const;
 	void set_player_position(ofVec2f pos);
 
@@ -65,6 +66,7 @@ private:
 	GamemodeManager* game_mode_manager_;
 	Camera* cam_;
 
+	GameObject* player_{ nullptr };
 	ofVec2f player_position_;
 
 	int new_node_type_id_;

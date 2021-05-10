@@ -100,6 +100,7 @@ public:
 	ofxFloatSlider gui_spring_damping;
 	ofxFloatSlider gui_spring_springmass;
 	ofxToggle gui_spring_affected_by_gravity;
+	ofxButton gui_spring_add_node;
 	
 	// Spring Node
 	ofxLabel gui_spring_node_pos;

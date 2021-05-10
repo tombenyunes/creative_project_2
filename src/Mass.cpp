@@ -19,7 +19,13 @@ Mass::Mass(const ofVec2f pos, const float mass, const float radius)
 }
 
 void Mass::update()
-{	
+{
+	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
+	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);
+	
+	force_ = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(pos_.x + HALF_WORLD_WIDTH, pos_.y + HALF_WORLD_HEIGHT) * inv_window_size) * (1 * 0.0006f) * window_size + force_ * 0.5f;
+	apply_force(accel_, force_, false);
+	
 	update_forces();
 	drag_nodes();
 	update_gui();
@@ -154,8 +160,11 @@ void Mass::draw()
 {
 	ofPushStyle();
 
-	get_color();
+	ofSetColor(ofColor(0, 0, 0, 50));
+	ofFill();
+	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
+	get_color();
 	ofNoFill();
 	ofSetLineWidth(ofMap(mass_, MINIMUM_MASS, MAXIMUM_MASS, 0.1f, 10.0f));
 

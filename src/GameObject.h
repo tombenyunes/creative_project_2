@@ -31,10 +31,15 @@ public:
 	ofVec2f get_position() const									{ return pos_; }
 	void set_position(const ofVec2f pos)							{ pos_ = pos; }
 
+	ofVec2f get_velocity() const									{ return vel_; }
 	void set_velocity(const ofVec2f vel)							{ vel_ = vel; }
+
+	ofVec2f get_accel() const										{ return accel_; }
+	void set_accel(const ofVec2f accel)								{ accel_ = accel; }
 	
 	float get_radius() const										{ return radius_; }
 	void set_radius(const float radius)								{ radius_ = radius; }
+	
 	float get_mass() const											{ return mass_; }
 	void set_mass(const float mass)									{ mass_ = mass; }
 
@@ -63,12 +68,13 @@ public:
 	
 	virtual void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 });
 
+	virtual void apply_force(ofVec2f& accel, ofVec2f force, bool limit = true, float limit_amount = MAXIMUM_ACCELERATION);
+	virtual void add_forces(bool interp_pos);
+
 protected:
 
 	void add_module(string id);	
 	
-	virtual void apply_force(ofVec2f& accel, ofVec2f force, bool limit = true, float limit_amount = MAXIMUM_ACCELERATION);
-	virtual void add_forces(bool interp_pos);
 	virtual ofVec2f get_interpolated_position();
 
 	virtual void update(){}

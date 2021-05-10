@@ -53,7 +53,7 @@ void Iota::draw()
 {	
 	cam.begin();
 	
-	fluid_manager.draw(entity_manager.get_player_position());
+	fluid_manager.draw(entity_manager.get_player());
 
 	//audio_manager.draw(); // background animation effect
 

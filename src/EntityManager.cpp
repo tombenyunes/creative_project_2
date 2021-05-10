@@ -59,6 +59,7 @@ void EntityManager::delete_game_objects()
 	for (int i = 0; i < get_game_objects()->size(); i++) {
 		if ((*get_game_objects())[i]->get_type() == "Player") {
 			set_player_position(ofVec2f((*get_game_objects())[i]->get_position().x + HALF_WORLD_WIDTH, (*get_game_objects())[i]->get_position().y + HALF_WORLD_HEIGHT));
+			player_ = (*get_game_objects())[i];
 		}
 		if ((*get_game_objects())[i]->get_request_to_be_deleted() == true) {
 			if ((*get_game_objects())[i] == get_selected_game_object()) {
@@ -225,6 +226,11 @@ int EntityManager::get_point_count() const
 	}
 	gui_manager_->update_point_count(pointCount);
 	return pointCount;
+}
+
+GameObject* EntityManager::get_player() const
+{
+	return player_;
 }
 
 ofVec2f EntityManager::get_player_position() const

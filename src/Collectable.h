@@ -62,4 +62,5 @@ private:
 	bool player_within_bounds_;
 
 	vector<PlayerTrail*>* particles_;
+	float alpha_;
 };

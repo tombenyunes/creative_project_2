@@ -31,5 +31,7 @@ private:
 	void mouse_pressed(float x, float y, int button) override;
 	void mouse_dragged(float x, float y, int button) override;
 	void mouse_released(float x, float y, int button) override;
+
+	ofVec2f force_;
 	
 };

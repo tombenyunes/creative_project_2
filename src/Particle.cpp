@@ -11,7 +11,7 @@ void Particle::init(const float x, const float y)
 	mass_ = msa::Rand::randFloat(0.1f, 1);
 }
 
-void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_size, const ofVec2f& inv_window_size, const ofVec2f player_pos)
+void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_size, const ofVec2f& inv_window_size, GameObject* player)
 {
 	//if (player_pos.x < pos_.x + 1000 && player_pos.x > pos_.x - 1000 &&
 		//player_pos.y < pos_.y + 500 && player_pos.y > pos_.y - 500)
@@ -61,7 +61,7 @@ void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_si
 	}
 }
 
-void Particle::update_vertex_arrays(const bool drawing_fluid, const ofVec2f& inv_window_size, const int i, float* pos_buffer, float* col_buffer, const ofVec2f player_pos)
+void Particle::update_vertex_arrays(const bool drawing_fluid, const ofVec2f& inv_window_size, const int i, float* pos_buffer, float* col_buffer, GameObject* player)
 {
 
 	{

@@ -16,9 +16,9 @@ public:
 	void init(GUIManager* gui_manager);
 	
 	void update();
-	void draw(ofVec2f player_pos);
+	void draw(GameObject* player);
 	void render_fluid();
-	void render_particles(ofVec2f player_pos);
+	void render_particles(GameObject* player);
 	static void draw_gui(bool enable);
 
 	void add_to_fluid(ofVec2f pos, ofVec2f vel, bool add_color, bool add_force, int count = 10);
