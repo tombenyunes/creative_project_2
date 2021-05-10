@@ -61,9 +61,10 @@ GUIManager::GUIManager()
 	panel_collectable.add(gui_collectable_infinite_mass.setup("infinite mass", false));
 	panel_collectable.add(gui_collectable_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 	panel_collectable.add(gui_collectable_affected_by_gravity.setup("gravity", false));
-	panel_collectable.add(gui_collectable_emission_frequency.setup("Emission Frequency", error_int, 15, 150));
-	panel_collectable.add(gui_collectable_emission_force.setup("Emission Force", error_int, 0.1f, 150));	
-	panel_collectable.add(gui_collectable_is_active.setup("Active", true));
+	panel_collectable.add(gui_collectable_emission_frequency.setup("emission Frequency", error_int, 15, 150));
+	panel_collectable.add(gui_collectable_emission_force.setup("emission Force", error_int, 0.1f, 150));	
+	panel_collectable.add(gui_collectable_is_active.setup("active", true));
+	panel_collectable.add(gui_collectable_id.setup("id", error_int));
 
 	// Spring
 	panel_spring_settings.setup("Spring Settings", "", ofGetWidth() - panel_spring_settings.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
@@ -187,7 +188,7 @@ void GUIManager::update_mass_values(const ofVec2f pos, const ofVec2f vel, const 
 	gui_node_affected_by_gravity = affected_by_gravity;
 }
 
-void GUIManager::update_collectable_values(const ofVec2f pos, const ofVec2f vel, const ofVec2f accel, const float mass, const bool infmass, const float radius, const bool affected_by_gravity, const float emission_frequency, const float emission_force, const bool is_active)
+void GUIManager::update_collectable_values(const ofVec2f pos, const ofVec2f vel, const ofVec2f accel, const float mass, const bool infmass, const float radius, const bool affected_by_gravity, const float emission_frequency, const float emission_force, const bool is_active, const int id)
 {
 	panel_collectable.setName("Collectable");
 	panel_collectable.setPosition(cam_->world_to_screen(ofVec2f(HALF_WORLD_WIDTH + pos.x + 8, HALF_WORLD_HEIGHT + pos.y + 8)));
@@ -211,6 +212,7 @@ void GUIManager::update_collectable_values(const ofVec2f pos, const ofVec2f vel,
 	gui_collectable_emission_frequency = emission_frequency;
 	gui_collectable_emission_force = emission_force;
 	gui_collectable_is_active = is_active;
+	gui_collectable_id = id;
 }
 
 

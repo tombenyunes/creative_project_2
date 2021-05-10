@@ -34,8 +34,11 @@ void SceneManager::update() const
 		gamemode_manager_->request_for_new_scene = false;
 	}
 
-	if (gamemode_manager_->get_current_mode_id() == 1) {
-		if (entity_manager_->get_point_count() <= 0) {			
+	if (entity_manager_->get_point_count() <= 0) {			
+
+		Collectable::reset_ids();
+		
+		if (gamemode_manager_->get_current_mode_id() == 1) {
 			load_procedural_scene();
 		}
 	}
@@ -196,7 +199,7 @@ void SceneManager::load_procedural_scene() const
 	fluid_manager_->explosion(500);
 
 	entity_manager_->create_entity("Player");
-
+	
 	for (int i = 0; i < 5; i++) {
 		entity_manager_->create_entity("Collectable", ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2)));
 	}	
@@ -208,6 +211,8 @@ void SceneManager::load_procedural_scene() const
 
 void SceneManager::destroy_current_scene() const
 {
+	Collectable::reset_ids();
+	
 	for (auto& i : *entity_manager_->get_game_objects())
 	{
 		i->set_request_to_be_deleted(true);

@@ -11,6 +11,13 @@ public:
 
 	Collectable(ofVec2f pos, float mass, float radius, const float emission_frequency = static_cast<int>(ofRandom(25, 100)), const float emission_force = 0.1f, const bool is_active = false);
 
+	static void reset_ids()
+	{
+		first_point_ = true;
+		last_id_collected_ = -404;
+		cur_id_ = -1;
+	}
+
 private:
 
 	void update() override;
@@ -38,6 +45,7 @@ private:
 
 	void random_forces();
 	void pulse_radius();
+	void check_if_active();
 	void draw_particle_burst() const;
 
 	float get_attribute_by_name(const string name) const override
@@ -48,9 +56,14 @@ private:
 			return emission_force_;
 		else if (name == "is_active")
 			return is_active_;
+		else if (name == "id")
+			return id_;
 		else
 			return -1;
-	}
+	}	
+
+	static bool first_point();
+	static int get_cur_id();
 	
 	
 
@@ -63,4 +76,11 @@ private:
 
 	vector<PlayerTrail*>* particles_;
 	float alpha_;
+	bool can_be_collected_;
+	static bool first_point_;
+
+	int id_{};
+	static int last_id_collected_;
+
+	static int cur_id_;	
 };

@@ -21,7 +21,7 @@ public:
 
 	void update_player_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
 	void update_mass_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
-	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force, bool is_active);
+	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force, bool is_active, int id);
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity);
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
 	
@@ -93,6 +93,7 @@ public:
 	ofxFloatSlider gui_collectable_emission_frequency;
 	ofxFloatSlider gui_collectable_emission_force;
 	ofxToggle gui_collectable_is_active;
+	ofxFloatField gui_collectable_id;
 	
 	// Spring Settings
 	ofxLabel gui_spring_anchor_pos;
