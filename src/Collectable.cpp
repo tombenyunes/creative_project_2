@@ -2,6 +2,7 @@
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const float emission_frequency, const float emission_force, const bool is_active)
 	:	is_active_(is_active)												// controlls if the particle emission is enabled
+	,	make_active_on_next_emission_(false)
 	,	emission_frequency_(emission_frequency)								// frequency of particle emission
 	,	emission_force_(emission_force)										// force of particle emission
 	,	starting_radius_(get_radius())
@@ -55,7 +56,7 @@ int Collectable::get_cur_id()
 
 void Collectable::update()
 {
-	if (is_active_)
+	if (can_emit())
 	{
 		random_forces();
 		pulse_radius();
@@ -69,6 +70,15 @@ void Collectable::update()
 	drag_nodes();
 	update_gui();
 	reset_forces();	
+}
+
+bool Collectable::can_emit() const
+{
+	if (make_active_on_next_emission_ || is_active_)
+	{
+		return true;
+	}
+	return false;
 }
 
 // collectables randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
@@ -129,9 +139,16 @@ void Collectable::random_forces()
 				vel.normalize();
 			}
 		}
-
+		
 		fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
+
 		needs_to_pulse_radius_ = true;
+
+		if (make_active_on_next_emission_)
+		{
+			is_active_ = true;
+			make_active_on_next_emission_ = false;
+		}
 
 		// if collectable is within screen bounds increment brightness
 		/*for (auto& game_object : *game_objects_)
@@ -280,7 +297,7 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 				first_point_ = false;				
 			}
 			
-			is_active_ = true;
+			make_active_on_next_emission_ = true;
 			alpha_ = 255;
 			Collectable::last_id_collected_ = id_;
 		}
@@ -375,23 +392,29 @@ void Collectable::draw()
 {
 	ofPushStyle();	
 
-	ofSetColor(ofColor(0, 0, 0, 50));
-	//get_color();
-	ofFill();
-	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	// Draw inner fill
+	if (is_active_ || can_be_collected_)
+	{
+		ofSetColor(ofColor(0, 0, 0, 50));
+		ofFill();
+		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	}
 
-	
-	static int r = get_radius();
-	
-	if (is_active_)
-		alpha_ = ofMap(radius_, r, r * 4, 0, 255);
-	else if (can_be_collected_)
-		alpha_ = 255;
-	
-	ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 2.0f));
-	ofNoFill();
-	get_color();
-	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	// Draw outline
+	if (is_active_ || can_be_collected_)
+	{
+		static int r = get_radius();
+
+		if (is_active_)
+			alpha_ = ofMap(radius_, r, r * 4, 0, 255);
+		else if (can_be_collected_)
+			alpha_ = 100;
+
+		ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 2.0f));
+		ofNoFill();
+		get_color();
+		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	}
 
 	ofPopStyle();
 }

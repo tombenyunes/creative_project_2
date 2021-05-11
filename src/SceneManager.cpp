@@ -63,6 +63,7 @@ void SceneManager::save_scene(const string scene_name)
 
 	for (int i = 0; i < entity_manager_->get_game_objects()->size(); i++)
 	{
+		// Shared properties
 		xml1_.addTag("GameObject");
 		xml1_.pushTag("GameObject", i);
 		xml1_.addValue("type", (*entity_manager_->get_game_objects())[i]->get_type());
@@ -70,14 +71,21 @@ void SceneManager::save_scene(const string scene_name)
 		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
 		xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
 		xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_radius());
+
+		// Collectable properties
 		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Collectable")
 		{
 			xml1_.addValue("emission_frequency", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_frequency"));
 			xml1_.addValue("emission_force", ((*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_force")));
 			xml1_.addValue("is_active", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("is_active"));
 		}
+		// Spring properties
 		else if ((*entity_manager_->get_game_objects())[i]->get_type() == "Spring")
 		{
+			xml1_.addValue("k", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("k"));
+			xml1_.addValue("damping", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("damping"));
+			xml1_.addValue("springmass", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("springmass"));
+			
 			xml1_.addValue("node_count", static_cast<int>((*entity_manager_->get_game_objects())[i]->get_multiple_masses().size()));
 			
 			for (int j = 0; j < (*entity_manager_->get_game_objects())[i]->get_multiple_masses().size(); j++)
@@ -129,20 +137,20 @@ void SceneManager::load_scene(const string path)
 			count++;
 			xml_.pushTag("GameObject", i);
 
+			// Shared properties
 			string type = xml_.getValue("type", "N/A");
 			ofVec2f pos;
 			pos.x = xml_.getValue("pos.x", -1);
 			pos.y = xml_.getValue("pos.y", -1);
 
+			// Player properties
 			if (type == "Player")
 			{
-				float mass = xml_.getValue("mass", -1);
-				float radius = xml_.getValue("radius", -1);
-
 				GameObject* player = new Player;
 				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(player);
 			}
+			// Mass properties
 			else if (type == "Mass")
 			{
 				const float mass = xml_.getValue("mass", -1);
@@ -152,8 +160,13 @@ void SceneManager::load_scene(const string path)
 				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(object);
 			}
+			// Spring properties
 			else if (type == "Spring")
 			{
+				const float k = xml_.getValue("k", -1.0f);
+				const float damping = xml_.getValue("damping", -1.0f);
+				const float springmass = xml_.getValue("springmass", -1.0f);
+				
 				vector<float> masses;
 				vector<float> radiuses;
 
@@ -165,10 +178,11 @@ void SceneManager::load_scene(const string path)
 					radiuses.push_back(xml_.getValue("radius" + to_string(i + 1), -1));
 				}							
 				
-				GameObject* spring = new Spring(pos, radiuses, masses, 2, 2, 22);
+				GameObject* spring = new Spring(pos, radiuses, masses, k, damping, springmass);
 				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
 				entity_manager_->add_game_object(spring);
 			}
+			// Collectable properties
 			else if (type == "Collectable")
 			{
 				const float mass = xml_.getValue("mass", -1);
@@ -255,19 +269,35 @@ void SceneManager::key_pressed(const int key)
 
 			fluid_manager_->explosion(500);
 		}
-		else if (key == 57352) //f9
+		else if (key == '4')
 		{
-			// load quick-saved scene
-			load_scene("Scenes/newScene");
+			// load scene 2
+			load_scene("Scenes/Scene4");
+
+			fluid_manager_->explosion(500);
+		}
+		else if (key == '5')
+		{
+			// load scene 2
+			load_scene("Scenes/CircleScene");
 
 			fluid_manager_->explosion(500);
 		}
 	}
+	
 	if (key == 57348) //f5
 	{
 		// quick-save scene
-		save_scene("Scenes/newScene");
+		save_scene("Scenes/saved_scene");
 	}
+	else if (key == 57352) //f9
+	{
+		// load quick-saved scene
+		load_scene("Scenes/saved_scene");
+
+		fluid_manager_->explosion(500);
+	}
+	
 	else if (key == 'p') {
 		load_procedural_scene();
 	}

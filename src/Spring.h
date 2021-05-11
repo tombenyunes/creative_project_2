@@ -45,6 +45,16 @@ private:
 	
 	void key_pressed(int key) override;
 
+	float get_attribute_by_name(const string name) const override
+	{
+		if (name == "k")
+			return k_;
+		else if (name == "damping")
+			return damping_;
+		else if (name == "springmass")
+			return springmass_;
+	}
+
 
 	
 	float k_;

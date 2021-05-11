@@ -21,6 +21,7 @@ public:
 private:
 
 	void update() override;
+	bool can_emit() const;
 
 	// Physics/movement
 	void update_forces();
@@ -68,6 +69,7 @@ private:
 	
 
 	bool is_active_;
+	bool make_active_on_next_emission_;
 	float emission_frequency_;
 	float emission_force_;
 	float starting_radius_;
