@@ -35,7 +35,7 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 void Iota::audio_out(float* output, const int buffer_size, const int n_channels)
 {
-	//audio_manager.audioOut(output, buffer_size, n_channels);
+	audio_manager.audioOut(output, buffer_size, n_channels);
 }
 
 void Iota::update()
@@ -66,6 +66,10 @@ void Iota::draw()
 			}
 		}
 	ofPopMatrix();*/
+
+	
+	//audio_manager.draw();			// draw the audio waveform
+
 	
 	ofPushMatrix();
 
@@ -109,7 +113,7 @@ void Iota::key_pressed(const int key)
 
 void Iota::key_released(const int key)
 {
-	audio_manager.keyPressed(key);
+	audio_manager.keyReleased(key);
 	
 	cam.key_released(key);
 	scene_manager.key_released(key);
@@ -136,6 +140,8 @@ void Iota::mouse_pressed(const int x, const int y, const int button)
 	if (event_manager.is_event_allowed("mouse_pressed", button)) {
 		entity_manager.mouse_pressed(x, y, button);
 		cam.mouse_pressed(x, y, button);
+
+		audio_manager.mousePressed(x, y, button);
 	}
 }
 
@@ -151,6 +157,8 @@ void Iota::mouse_released(const int x, const int y, const int button)
 	if (event_manager.is_event_allowed("mouse_released", button)) {
 		entity_manager.mouse_released(x, y, button);
 		cam.mouse_released(x, y, button);
+
+		audio_manager.mouseReleased(x, y, button);
 	}
 }
 
