@@ -6,7 +6,7 @@ EntityManager::EntityManager(): selected_game_object_(nullptr),
 								gui_manager_(nullptr),
 								fluid_manager_(nullptr),
 								audio_manager_(nullptr),
-								game_mode_manager_(nullptr),
+								gamemode_manager_(nullptr),
 								cam_(nullptr),
 								new_node_type_id_(0)
 {	
@@ -18,7 +18,7 @@ void EntityManager::init(Controller* game_controller, GUIManager* gui_manager, C
 	gui_manager_ = gui_manager;
 	fluid_manager_ = fluid_manager;
 	audio_manager_ = audio_manager;
-	game_mode_manager_ = gamemode_manager;
+	gamemode_manager_ = gamemode_manager;
 
 	cam_ = cam;
 }
@@ -190,26 +190,26 @@ void EntityManager::create_entity(const string entity_type, const ofVec2f pos, c
 {	
 	if (entity_type == "Player") {
 		GameObject* player = new Player;
-		player->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+		player->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(player);
 	}
 	if (entity_type == "Mass") {
 		cout << "Mass created" << endl;
 		GameObject* object = new Mass(pos, ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
-		object->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+		object->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(object);
 	}
 	else if (entity_type == "Spring") {
 		cout << "Spring created" << endl;
 		GameObject* spring = new Spring(pos, { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
-		spring->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+		spring->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(spring);
 	}
 	else if (entity_type == "Collectable") {
 		cout << "Collectable created" << endl;
 		// if collectable is created by player (e.g. sandbox mode) activate it by default
 		GameObject* point = new Collectable(pos, 15, 25, created_by_player);
-		point->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+		point->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(point);
 		gui_manager_->inc_max_point_count();
 	}
@@ -251,7 +251,7 @@ void EntityManager::key_pressed(const int key)
 		i->root_key_pressed(key);
 	}
 
-	if (game_mode_manager_->get_current_mode_id() == 0)
+	if (gamemode_manager_->get_current_mode_id() == 0)
 	{
 		if (key == 'c')
 		{

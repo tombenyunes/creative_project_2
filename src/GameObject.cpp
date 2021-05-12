@@ -42,13 +42,14 @@ GameObject::GameObject(const ofVec2f pos, const ofColor color)
 {
 }
 
-void GameObject::init(vector<GameObject*>* gameobjects, Controller* controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager)
+void GameObject::init(vector<GameObject*>* gameobjects, Controller* controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager, GamemodeManager* gamemode_manager)
 {
 	game_objects_ = gameobjects;
 	game_controller_ = controller;
 	gui_manager_ = gui_manager;
 	fluid_manager_ = fluid_manager;
 	audio_manager_ = audio_manager;
+	gamemode_manager_ = gamemode_manager;
 
 	cam_ = cam;
 }

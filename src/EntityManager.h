@@ -63,7 +63,7 @@ private:
 	GUIManager* gui_manager_;
 	FluidManager* fluid_manager_;
 	AudioManager* audio_manager_;
-	GamemodeManager* game_mode_manager_;
+	GamemodeManager* gamemode_manager_;
 	Camera* cam_;
 
 	GameObject* player_{ nullptr };

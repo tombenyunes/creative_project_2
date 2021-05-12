@@ -400,6 +400,8 @@ void Collectable::draw()
 {
 	ofPushStyle();	
 
+	static int base_radius = get_radius();
+	
 	// Draw inner fill
 	if (is_active_ || can_be_collected_)
 	{
@@ -411,17 +413,22 @@ void Collectable::draw()
 	// Draw outline
 	if (is_active_ || can_be_collected_)
 	{
-		static int r = get_radius();
-
 		if (is_active_)
-			alpha_ = ofMap(radius_, r, r * 4, 0, 255);
+			alpha_ = ofMap(radius_, base_radius, base_radius * 4, 0, 255);
 		else if (can_be_collected_)
 			alpha_ = 100;
 
-		ofSetLineWidth(ofMap(radius_, r, r * 2, 0.1f, 2.0f));
+		ofSetLineWidth(ofMap(radius_, base_radius, base_radius * 2, 0.1f, 2.0f));
 		ofNoFill();
 		get_color();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	}
+
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox")
+	{
+		ofNoFill();
+		ofSetColor(255, 255, 0);
+		ofDrawEllipse(pos_.x, pos_.y, base_radius * 3, base_radius * 3);
 	}
 
 	ofPopStyle();

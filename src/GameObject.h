@@ -7,13 +7,14 @@
 #include "FluidManager.h"
 #include "GUIManager.h"
 #include "ofMain.h"
+#include "GamemodeManager.h"
 
 class GameObject {
 	
 public:
 
 	GameObject(ofVec2f pos = { 0, 0 }, ofColor color = ofColor(255));
-	void init(vector<GameObject*>* gameobjects, Controller* controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager);
+	void init(vector<GameObject*>* gameobjects, Controller* controller, GUIManager* gui_manager, Camera* cam, FluidManager* fluid_manager, AudioManager* audio_manager, GamemodeManager* gamemode_manager);
 
 	void root_update();
 	void root_draw();
@@ -88,6 +89,7 @@ protected:
 	GUIManager* gui_manager_;
 	FluidManager* fluid_manager_;
 	AudioManager* audio_manager_;
+	GamemodeManager* gamemode_manager_;
 
 	Camera* cam_;
 

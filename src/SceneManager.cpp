@@ -147,7 +147,7 @@ void SceneManager::load_scene(const string path)
 			if (type == "Player")
 			{
 				GameObject* player = new Player;
-				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 				entity_manager_->add_game_object(player);
 			}
 			// Mass properties
@@ -157,7 +157,7 @@ void SceneManager::load_scene(const string path)
 				const float radius = xml_.getValue("radius", -1);
 
 				GameObject* object = new Mass(pos, mass, radius);
-				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+				object->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 				entity_manager_->add_game_object(object);
 			}
 			// Spring properties
@@ -179,7 +179,7 @@ void SceneManager::load_scene(const string path)
 				}							
 				
 				GameObject* spring = new Spring(pos, radiuses, masses, k, damping, springmass);
-				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+				spring->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 				entity_manager_->add_game_object(spring);
 			}
 			// Collectable properties
@@ -193,7 +193,7 @@ void SceneManager::load_scene(const string path)
 				const bool is_active = xml_.getValue("is_active", false);
 				cout << emission_force << endl;
 				GameObject* point = new Collectable(pos, mass, radius, emission_frequency, emission_force, is_active);
-				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
+				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 				entity_manager_->add_game_object(point);
 			}
 
