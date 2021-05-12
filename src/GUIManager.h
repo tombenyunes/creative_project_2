@@ -25,7 +25,6 @@ public:
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity);
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
 	
-	void inc_points_collected();
 	void inc_max_point_count();
 	void update_point_count(int count);
 	void reset_point_counters();
@@ -131,7 +130,6 @@ private:
 
 	bool multi_node_selected_;
 	
-	int point_count_;
 	int points_collected_;
 	int max_point_count_;
 

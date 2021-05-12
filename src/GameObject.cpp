@@ -306,44 +306,51 @@ void GameObject::friction()
 // determines if the mouse is over an object
 void GameObject::mouse_hover()
 {
-	if (node_positions_.empty())
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox")
 	{
-		if (game_controller_->get_mouse_dragged() == false)
+		if (node_positions_.empty())
 		{
-			if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
+			if (game_controller_->get_mouse_dragged() == false)
 			{
-					mouse_over_ = true;
-					mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
-			}
-			else {
-				mouse_over_ = false;			
-			}
-		}
-	}
-	else {
-		if (game_controller_->get_mouse_dragged() == false)
-		{
-			for (int i = 0; i < node_positions_.size(); i++)
-			{
-				if (Collisions::ellipse_compare(node_positions_[i], node_radiuses_[i], cam_->get_world_mouse_pos(), 0))
+				if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
 				{
 					mouse_over_ = true;
-					mouse_over_index_ = i;
-					mouse_offset_from_center_ = node_positions_[i] - cam_->get_world_mouse_pos();
-					break;
-				}
-				else if (Collisions::ellipse_compare(pos_, radius_, cam_->get_world_mouse_pos(), 0))
-				{
-					mouse_over_ = true;
-					mouse_over_index_ = -1;
 					mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
-					break;
 				}
 				else {
 					mouse_over_ = false;
 				}
 			}
 		}
+		else {
+			if (game_controller_->get_mouse_dragged() == false)
+			{
+				for (int i = 0; i < node_positions_.size(); i++)
+				{
+					if (Collisions::ellipse_compare(node_positions_[i], node_radiuses_[i], cam_->get_world_mouse_pos(), 0))
+					{
+						mouse_over_ = true;
+						mouse_over_index_ = i;
+						mouse_offset_from_center_ = node_positions_[i] - cam_->get_world_mouse_pos();
+						break;
+					}
+					else if (Collisions::ellipse_compare(pos_, radius_, cam_->get_world_mouse_pos(), 0))
+					{
+						mouse_over_ = true;
+						mouse_over_index_ = -1;
+						mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
+						break;
+					}
+					else {
+						mouse_over_ = false;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		mouse_over_ = false;
 	}
 }
 

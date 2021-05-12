@@ -110,7 +110,9 @@ void Iota::key_pressed(const int key)
 void Iota::key_released(const int key)
 {
 	audio_manager.keyPressed(key);
+	
 	cam.key_released(key);
+	scene_manager.key_released(key);
 
 	if (event_manager.is_event_allowed("key_released")) {
 		entity_manager.key_released(key);

@@ -8,7 +8,6 @@ GUIManager::GUIManager()
 	,	draw_particle_gui_(false)
 	,	draw_audio_gui_(false)   // buffer between all panels and each other + screen edges
 	,	multi_node_selected_(false)
-	,	point_count_(0)
 	,	points_collected_(0)
 	,	max_point_count_(0)
 	,	delete_all_(false)
@@ -102,11 +101,6 @@ void GUIManager::update_world()
 	game_controller_->set_use_hard_collisions(gui_world_hard_collisions);
 }
 
-void GUIManager::inc_points_collected()
-{
-	points_collected_++;
-}
-
 void GUIManager::inc_max_point_count()
 {
 	max_point_count_++;
@@ -114,7 +108,7 @@ void GUIManager::inc_max_point_count()
 
 void GUIManager::update_point_count(const int count)
 {
-	point_count_ = count;
+	points_collected_ = count;
 }
 
 void GUIManager::reset_point_counters()
@@ -324,7 +318,9 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 		cout << "Error -> GUIManager.cpp::update_create_node_id -> New Node Type Not Specified" << endl;
 		break;
 	}
-	
+
+	if (points_collected_ == max_point_count_)
+		ofDrawBitmapString("Press 'Enter' to move to next level", glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 200));
 	ofDrawBitmapString("Entity Type: " + entity_type, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 150));
 	ofDrawBitmapString("GameMode: " + current_gamemode, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
 	ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));

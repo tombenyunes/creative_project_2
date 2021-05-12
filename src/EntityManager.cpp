@@ -65,11 +65,6 @@ void EntityManager::delete_game_objects()
 			if ((*get_game_objects())[i] == get_selected_game_object()) {
 				selected_game_object_ = nullptr;
 			}
-			if ((*get_game_objects())[i]->get_type() == "Collectable") {
-				if ((*get_game_objects())[i]->get_request_to_be_deleted_event() == "Collected") {
-					gui_manager_->inc_points_collected();
-				}
-			}
 			delete (*get_game_objects())[i];
 			get_game_objects()->erase(get_game_objects()->begin() + i);
 		}
@@ -218,15 +213,15 @@ void EntityManager::create_entity(const string entity_type, const ofVec2f pos, c
 
 int EntityManager::get_point_count() const
 {
-	int pointCount = 0;
+	int point_count = 0;
 	for (auto& i : *get_game_objects())
 	{
 		if (i->get_type() == "Collectable") {
-			pointCount++;
+			point_count++;
 		}
 	}
-	gui_manager_->update_point_count(pointCount);
-	return pointCount;
+	gui_manager_->update_point_count(Collectable::get_points_collected());
+	return point_count;
 }
 
 GameObject* EntityManager::get_player() const

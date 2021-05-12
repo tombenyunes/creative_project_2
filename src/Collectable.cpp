@@ -11,6 +11,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	,	alpha_(0)
 	,	can_be_collected_(false)
 	,	id_(get_cur_id())
+	,	collectable_count_(0)
 {
 	set_type("Collectable");
 	set_position(pos);
@@ -26,6 +27,11 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("mouseHover");
 
 	pixel_buffer_before_drag_ = 2;
+
+	if (is_active_)
+	{
+		Collectable::points_collected_++;
+	}
 }
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const bool is_active)
@@ -57,6 +63,8 @@ int Collectable::get_cur_id()
 	cur_id_++;
 	return cur_id_;
 }
+
+int Collectable::points_collected_ = 0;
 
 
 
@@ -126,18 +134,16 @@ void Collectable::random_forces()
 		{
 			if (game_object->get_type() == "Collectable")
 			{
-				point_positions.push_back(game_object->get_position());				
+				point_positions.push_back(game_object->get_position());
 			}
 		}
-
-		collectable_count_ = point_positions.size();
 		
 		for (int i = 0; i < point_positions.size(); i++)
 		{
 			if (point_positions[i] == get_position())
 			{
 				int i2;
-				if (i + 1 > point_positions.size() - 1)
+				if (i + 1 == point_positions.size())
 					i2 = 0;
 				else
 					i2 = i + 1;
@@ -156,6 +162,8 @@ void Collectable::random_forces()
 		{
 			is_active_ = true;
 			make_active_on_next_emission_ = false;
+
+			gui_values_need_to_be_set_ = true;
 		}
 
 		// if collectable is within screen bounds increment brightness
@@ -207,7 +215,7 @@ void Collectable::pulse_radius()
 void Collectable::check_if_active()
 {
 	int next_id;
-	if (last_id_collected_ == collectable_count_ - 1)
+	if (last_id_collected_ == 4)
 		next_id = 0;
 	else
 		next_id = last_id_collected_ + 1;
@@ -300,14 +308,13 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 	{
 		if (can_be_collected_ || Collectable::first_point())
 		{
-			if (Collectable::first_point())
-			{
-				first_point_ = false;				
-			}
+			first_point_ = false;
+			can_be_collected_ = false;
 			
 			make_active_on_next_emission_ = true;
 			alpha_ = 255;
 			Collectable::last_id_collected_ = id_;
+			Collectable::points_collected_++;
 		}
 	}
 	

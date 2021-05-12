@@ -17,6 +17,11 @@ public:
 		first_point_ = true;
 		last_id_collected_ = -404;
 		cur_id_ = -1;
+		points_collected_ = 0;
+	}
+	static int get_points_collected()
+	{
+		return points_collected_;
 	}
 
 private:
@@ -86,5 +91,7 @@ private:
 	static int last_id_collected_;
 
 	static int cur_id_;
-	float collectable_count_{};
+	int collectable_count_;
+
+	static int points_collected_;
 };

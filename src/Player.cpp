@@ -151,7 +151,7 @@ void Player::key_pressed(const int key)
 	{
 		//aimingBoost = true;
 	}
-	else if (key == 'z')
+	else if (gamemode_manager_->get_current_mode_string() == "Sandbox" && key == 't')
 	{
 		player_following_mouse_ = true;
 	}
@@ -163,7 +163,7 @@ void Player::key_released(const int key)
 	{
 		//boostPlayer();
 	}
-	else if (key == 'z')
+	else if (key == 't')
 	{
 		player_following_mouse_ = false;
 	}

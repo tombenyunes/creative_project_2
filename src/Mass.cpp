@@ -179,7 +179,7 @@ void Mass::get_color() const
 	{
 		ofSetColor(255, 0, 0);
 	}
-	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
+	else if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
 	{
 		ofSetColor(selected_color_);
 	}	

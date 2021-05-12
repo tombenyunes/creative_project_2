@@ -27,9 +27,17 @@ void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Ca
 	cam_ = cam;
 }
 
-void SceneManager::update() const
+void SceneManager::update()
 {
-	if (gamemode_manager_->request_for_new_scene) {
+	if (entity_manager_->get_point_count() == Collectable::get_points_collected())
+	{
+		if (enter_pressed_)
+		{
+			load_procedural_scene();
+			enter_pressed_ = false;
+		}
+	}
+	else if (gamemode_manager_->request_for_new_scene) {
 		load_procedural_scene();
 		gamemode_manager_->request_for_new_scene = false;
 	}
@@ -110,6 +118,7 @@ void SceneManager::get_ready_for_new_scene() const
 	reset_fluid();
 
 	gui_manager_->reset_point_counters();
+	Collectable::reset_ids();
 }
 
 void SceneManager::load_scene(const string path)
@@ -224,9 +233,7 @@ void SceneManager::load_procedural_scene() const
 }
 
 void SceneManager::destroy_current_scene() const
-{
-	Collectable::reset_ids();
-	
+{	
 	for (auto& i : *entity_manager_->get_game_objects())
 	{
 		i->set_request_to_be_deleted(true);
@@ -240,7 +247,7 @@ void SceneManager::reset_fluid() const
 
 void SceneManager::key_pressed(const int key)
 {
-	if (gamemode_manager_->get_current_mode_id() == 0) {
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox") {
 		if (key == '1')
 		{
 			// load scene 1
@@ -285,6 +292,10 @@ void SceneManager::key_pressed(const int key)
 		}
 	}
 	
+	if (key == 13) //enter
+	{
+		enter_pressed_ = true;
+	}
 	if (key == 57348) //f5
 	{
 		// quick-save scene
@@ -300,5 +311,13 @@ void SceneManager::key_pressed(const int key)
 	
 	else if (key == 'p') {
 		load_procedural_scene();
+	}
+}
+
+void SceneManager::key_released(const int key)
+{
+	if (key == 13)
+	{
+		enter_pressed_ = false;
 	}
 }
