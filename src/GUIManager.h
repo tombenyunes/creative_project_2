@@ -24,9 +24,11 @@ public:
 	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force, bool is_active, int id);
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity);
 	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
-	
-	void inc_max_point_count();
-	void update_point_count(int count);
+
+	int get_max_point_count();
+	void set_max_point_count(int count);
+	int get_point_count();
+	void set_point_count(int count);
 	void reset_point_counters();
 
 	int get_delete_all() const;

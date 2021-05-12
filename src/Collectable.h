@@ -12,6 +12,8 @@ public:
 	Collectable(ofVec2f pos, float mass, float radius, float emission_frequency, float emission_force, bool is_active);
 	Collectable(ofVec2f pos, float mass, float radius, bool is_active);
 
+	~Collectable();
+
 	static void reset_ids()
 	{
 		first_point_ = true;
@@ -22,6 +24,10 @@ public:
 	static int get_points_collected()
 	{
 		return points_collected_;
+	}
+	static void set_points_collected(const int count)
+	{
+		Collectable::points_collected_ = count;
 	}
 
 private:

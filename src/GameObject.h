@@ -55,6 +55,8 @@ public:
 	
 	bool get_request_to_be_deleted() const							{ return request_to_be_deleted_; }
 	void set_request_to_be_deleted(const bool req)					{ request_to_be_deleted_ = req; }
+	string get_request_to_be_deleted_event() const					{ return request_to_be_deleted_event_; }
+	void set_request_to_be_deleted_event(const string event)		{ request_to_be_deleted_event_ = event; }
 
 	bool get_request_to_be_selected() const							{ return request_to_be_selected_; }
 	bool get_request_to_be_deselected() const						{ return request_to_be_deselected_; }

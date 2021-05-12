@@ -28,10 +28,9 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 
 	pixel_buffer_before_drag_ = 2;
 
+	// incase a point is added in sandbox mode and is enabled by default
 	if (is_active_)
-	{
 		Collectable::points_collected_++;
-	}
 }
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const bool is_active)
@@ -157,6 +156,7 @@ void Collectable::random_forces()
 		fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
 
 		needs_to_pulse_radius_ = true;
+		audio_manager_->event_point_pulsed(get_position());
 
 		if (make_active_on_next_emission_)
 		{
@@ -315,6 +315,8 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 			alpha_ = 255;
 			Collectable::last_id_collected_ = id_;
 			Collectable::points_collected_++;
+			
+			audio_manager_->event_point_collected();
 		}
 	}
 	

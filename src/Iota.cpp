@@ -45,7 +45,7 @@ void Iota::update()
 	gui_manager.update();
 	event_manager.update();
 	fluid_manager.update();
-	audio_manager.update();
+	audio_manager.update(entity_manager.get_player()->get_position());
 	scene_manager.update();
 }
 

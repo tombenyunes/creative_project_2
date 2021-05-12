@@ -61,7 +61,8 @@ void GameObject::root_update()
 	{
 		if (mouse_over_)
 		{
-			request_to_be_deleted_ = true;
+			set_request_to_be_deleted(true);
+			set_request_to_be_deleted_event("User");
 		}
 	}
 	if (!request_to_be_deleted_)
@@ -416,7 +417,7 @@ ofVec2f GameObject::get_interpolated_position()
 // functions in the same way as root_update
 void GameObject::root_key_pressed(const int key)
 {
-	if (key == 120)
+	if (key == 'x')
 	{
 		delete_key_down_ = true;
 	}
@@ -425,7 +426,7 @@ void GameObject::root_key_pressed(const int key)
 
 void GameObject::root_key_released(const int key)
 {
-	if (key == 120)
+	if (key == 'x')
 	{
 		delete_key_down_ = false;
 	}

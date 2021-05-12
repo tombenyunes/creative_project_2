@@ -101,15 +101,27 @@ void GUIManager::update_world()
 	game_controller_->set_use_hard_collisions(gui_world_hard_collisions);
 }
 
-void GUIManager::inc_max_point_count()
+
+int GUIManager::get_max_point_count()
 {
-	max_point_count_++;
+	return max_point_count_;
 }
 
-void GUIManager::update_point_count(const int count)
+void GUIManager::set_max_point_count(const int count)
+{
+	max_point_count_ = count;
+}
+
+int GUIManager::get_point_count()
+{
+	return points_collected_;
+}
+
+void GUIManager::set_point_count(const int count)
 {
 	points_collected_ = count;
 }
+
 
 void GUIManager::reset_point_counters()
 {
@@ -320,7 +332,9 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 	}
 
 	if (points_collected_ == max_point_count_)
+	{
 		ofDrawBitmapString("Press 'Enter' to move to next level", glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 200));
+	}
 	ofDrawBitmapString("Entity Type: " + entity_type, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 150));
 	ofDrawBitmapString("GameMode: " + current_gamemode, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
 	ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));

@@ -4,7 +4,7 @@
 #include "ofxMaxim.h"
 #include "ofxGui.h"
 
-//#include "Controller.h"
+#include "Controller.h" // <--- for global world dimensions
 
 class AudioManager {
 
@@ -12,7 +12,7 @@ public:
     ~AudioManager();
 	
     void setup(ofBaseApp* appPtr);
-    void update();
+    void update(ofVec2f player_position);
     void draw();
     void drawGUI(bool enable);
     void drawWaveform();
@@ -45,6 +45,17 @@ public:
 
     void keyPressed(int key);
     void keyReleased(int key);
+
+	// ----------> EVENT FUNCTIONS <---------- //
+    void event_point_collected();
+    void event_point_pulsed(ofVec2f point_position);
+    void event_level_complete();
+    void event_new_level_loaded();
+
+	// the player pos starts at (0, 0) and ranges from (-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH) horizontally, and (-HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT) vertically
+    ofVec2f player_pos;
+    // -------------------------------------------- //
+	
     void mouseMoved(int x, int y);
     void mouseDragged(int x, int y, int button);
     void mousePressed(int x, int y, int button);

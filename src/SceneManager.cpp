@@ -31,10 +31,21 @@ void SceneManager::update()
 {
 	if (entity_manager_->get_point_count() == Collectable::get_points_collected())
 	{
+		static bool trig = false;
+		
 		if (enter_pressed_)
 		{
 			load_procedural_scene();
 			enter_pressed_ = false;
+			trig = false;
+		}
+		else
+		{			
+			if (!trig)
+			{
+				audio_manager_->event_level_complete();
+				trig = true;
+			}
 		}
 	}
 	else if (gamemode_manager_->request_for_new_scene) {
@@ -219,6 +230,8 @@ void SceneManager::load_procedural_scene() const
 {
 	get_ready_for_new_scene();
 
+	audio_manager_->event_new_level_loaded();
+	
 	fluid_manager_->explosion(500);
 
 	entity_manager_->create_entity("Player");

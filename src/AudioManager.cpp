@@ -962,7 +962,9 @@ void AudioManager::drawWaveform() {
 }
 
 //--------------------------------------------------------------
-void AudioManager::update() {
+void AudioManager::update(const ofVec2f player_position) {
+
+    player_pos = player_position;
     
     if (randomSampleTriggered) {
         if (ofGetFrameNum() % 30 == 0) {
@@ -1025,7 +1027,7 @@ void AudioManager::update() {
     noiseEnv.setSustain(5);
     noiseEnv.setRelease(10000);
     
-    std::cout<<patternSwitch<<std::endl;
+    //std::cout<<patternSwitch<<std::endl;
     
     //---Pattern-Switch-Selection--//
     if (patternSwitch == 0) {
@@ -1313,6 +1315,41 @@ void AudioManager::keyReleased(int key) {
     
 //    sq_BassEnv.trigger = 0;
 }
+
+
+
+// ==============================> EVENT FUNCTIONS <============================== //
+
+// triggered every time a point is collected/triggered
+void AudioManager::event_point_collected()
+{
+    cout << "POINT COLLECTED" << endl;
+}
+
+// triggered every time a collectable pulses/emits particles
+// the position of the point is passed through incase needed for panning etc
+void AudioManager::event_point_pulsed(const ofVec2f point_position)
+{
+    cout << "POINT PULSED: " << point_position << endl;
+}
+
+// triggered when the final 'point' in a level has been collected
+void AudioManager::event_level_complete()
+{
+    cout << "LEVEL COMPLETE" << endl;
+}
+
+// triggered when a new level is loaded
+// this is either be by pressing 'enter' after a level is complete, or pressing 'p' at any time
+// ((i haven't made many levels yet so currently the game is just cycling through procedural levels))
+void AudioManager::event_new_level_loaded()
+{
+    cout << "NEW LEVEL LOADED" << endl;
+}
+
+// ==================================================================================== //
+
+
 
 //--------------------------------------------------------------
 void AudioManager::mouseMoved(int x, int y) {
