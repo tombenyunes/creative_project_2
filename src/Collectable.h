@@ -9,7 +9,8 @@ class Collectable : public GameObject {
 
 public:
 
-	Collectable(ofVec2f pos, float mass, float radius, const float emission_frequency = static_cast<int>(ofRandom(25, 100)), const float emission_force = 0.1f, const bool is_active = false);
+	Collectable(ofVec2f pos, float mass, float radius, float emission_frequency, float emission_force, bool is_active);
+	Collectable(ofVec2f pos, float mass, float radius, bool is_active);
 
 	static void reset_ids()
 	{
@@ -76,7 +77,7 @@ private:
 	bool needs_to_pulse_radius_;
 	bool player_within_bounds_;
 
-	vector<PlayerTrail*>* particles_;
+	//vector<PlayerTrail*>* particles_;
 	float alpha_;
 	bool can_be_collected_;
 	static bool first_point_;
@@ -84,5 +85,6 @@ private:
 	int id_{};
 	static int last_id_collected_;
 
-	static int cur_id_;	
+	static int cur_id_;
+	float collectable_count_{};
 };

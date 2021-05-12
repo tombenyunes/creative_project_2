@@ -7,6 +7,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	,	emission_force_(emission_force)										// force of particle emission
 	,	starting_radius_(get_radius())
 	,	needs_to_pulse_radius_(false)
+	,	player_within_bounds_(false)
 	,	alpha_(0)
 	,	can_be_collected_(false)
 	,	id_(get_cur_id())
@@ -25,6 +26,11 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("mouseHover");
 
 	pixel_buffer_before_drag_ = 2;
+}
+
+Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const bool is_active)
+	: Collectable(pos, mass, radius, static_cast<int>(ofRandom(25, 100)), 0.1f, is_active)
+{
 }
 
 
@@ -124,6 +130,8 @@ void Collectable::random_forces()
 			}
 		}
 
+		collectable_count_ = point_positions.size();
+		
 		for (int i = 0; i < point_positions.size(); i++)
 		{
 			if (point_positions[i] == get_position())
@@ -199,7 +207,7 @@ void Collectable::pulse_radius()
 void Collectable::check_if_active()
 {
 	int next_id;
-	if (last_id_collected_ == 4)
+	if (last_id_collected_ == collectable_count_ - 1)
 		next_id = 0;
 	else
 		next_id = last_id_collected_ + 1;
