@@ -393,7 +393,7 @@ void AudioManager::audioOut(float* output, const int bufferSize, const int nChan
 
 
 //--------------------------------------------------------------
-void AudioManager::drawWaveform() {
+void AudioManager::drawWaveform(const ofVec2f pos) {
 
     ofNoFill();
     ofSetColor(0, 200, 0);
@@ -413,7 +413,7 @@ void AudioManager::drawWaveform() {
 
     ofPushMatrix();
 
-    ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, -1000);
+    //ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, -1000);
 
     //ofBeginShape();
     for (int i = 0; i < 255; i++) {
@@ -431,7 +431,7 @@ void AudioManager::drawWaveform() {
         float x = (soundBuffer[i] + (10 * soundBufMix[i])) * cos(float(i)) * cellRadius;
         float y = (soundBuffer[i] + (10 * soundBufMix[i])) * sin(float(i)) * cellRadius;
 
-        ofDrawCircle(x, y, 1);
+        ofDrawCircle(pos.x + x, pos.y + y, 1);
 
     }
     //ofEndShape();
@@ -450,8 +450,8 @@ void AudioManager::update() {
 }
 
 //--------------------------------------------------------------
-void AudioManager::draw() {
-    drawWaveform();
+void AudioManager::draw(const ofVec2f pos) {
+    drawWaveform(pos);
 }
 
 void AudioManager::drawGUI(const bool enable) {

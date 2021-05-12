@@ -13,9 +13,9 @@ public:
 
     void setup(ofBaseApp* appPtr);
     void update();
-    void draw();
+    void draw(const ofVec2f pos);
     void drawGUI(bool enable);
-    void drawWaveform();
+    void drawWaveform(const ofVec2f pos);
 
     //--------------SETUPS-----------------//
     void envelopeSetup();  //set up envelopes

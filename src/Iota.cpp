@@ -55,8 +55,18 @@ void Iota::draw()
 	
 	fluid_manager.draw(entity_manager.get_player());
 
-	//audio_manager.draw(); // background animation effect
-
+	/*ofPushMatrix();
+	ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT);
+		for (int i = 0; i < entity_manager.get_game_objects()->size(); i++)
+		{
+			if ((*entity_manager.get_game_objects())[i]->get_type() == "Collectable")
+			{
+				ofVec2f pos = (*entity_manager.get_game_objects())[i]->get_position();
+				audio_manager.draw(ofVec2f(pos.x, pos.y));
+			}
+		}
+	ofPopMatrix();*/
+	
 	ofPushMatrix();
 
 	ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT);
