@@ -39,7 +39,7 @@ public:
 	Controller game_controller;
 	GUIManager gui_manager;
 	SceneManager scene_manager;
-	GamemodeManager gamemode_manager{ 1 };
+	GamemodeManager gamemode_manager{ 2 }; // main menu
 	EventManager event_manager;
 	AudioManager audio_manager;
 	FluidManager fluid_manager;

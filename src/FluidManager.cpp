@@ -103,8 +103,8 @@ void FluidManager::update()
 
 void FluidManager::update_from_gui()
 {
-	//fluid_cells_x_ = gui_manager_->gui_fluid_cells;
-	//resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
+	fluid_cells_x_ = gui_manager_->gui_fluid_cells;
+	resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
 	color_mult_ = gui_manager_->gui_fluid_color_mult;
 	velocity_mult_ = gui_manager_->gui_fluid_velocity_mult;
 	fluid_solver_.viscocity = gui_manager_->gui_fluid_viscocity;

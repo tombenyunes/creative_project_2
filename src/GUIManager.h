@@ -32,6 +32,7 @@ public:
 
 	int get_delete_all() const;
 	void toggle_delete_all();
+	void trigger_reset_fluid();
 
 	void set_gui_visible(bool value);
 	bool get_gui_visible() const;
@@ -41,7 +42,6 @@ public:
 
 	// Events
 	void key_pressed(int key);
-	void toggle_menu_screen();
 
 	
 
@@ -144,8 +144,7 @@ private:
 
 	bool gui_visible_;	
 	int panel_pixel_buffer_;
-
-	bool draw_particle_gui_;
+	
 	bool draw_audio_gui_;
 
 	bool multi_node_selected_;
@@ -154,7 +153,5 @@ private:
 	int max_point_count_;
 
 	bool delete_all_;
-
-	bool showing_menu_;
 
 };

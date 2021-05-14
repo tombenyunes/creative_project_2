@@ -5,13 +5,11 @@
 GUIManager::GUIManager()
 	:	gui_visible_(false)
 	,	panel_pixel_buffer_(10)
-	,	draw_particle_gui_(false)
 	,	draw_audio_gui_(false)   // buffer between all panels and each other + screen edges
 	,	multi_node_selected_(false)
 	,	points_collected_(0)
 	,	max_point_count_(0)
 	,	delete_all_(false)
-	,	showing_menu_(false)
 {
 	const string error_message = "Error: Updating failed"; // error message will show for all parameters that require but haven't received an update
 	const int error_int = 404;
@@ -45,7 +43,7 @@ GUIManager::GUIManager()
 	// Fluid
 	panel_fluid.setup("FluidManager", "", panel_pixel_buffer_, panel_player.getPosition().y + panel_player.getHeight() + panel_pixel_buffer_);
 	panel_fluid.add(gui_fluid_cells.setup("fluid cells", 100, 20, 400));
-	panel_fluid.add(gui_fluid_resize_fluid.setup("resize", true));
+	panel_fluid.add(gui_fluid_resize_fluid.setup("resize"));
 	panel_fluid.add(gui_fluid_color_mult.setup("color mult", 100.0f, 0.0f, 100.0f));
 	panel_fluid.add(gui_fluid_velocity_mult.setup("velocity mult", 7.0f, 0.0f, 100.0f));
 	panel_fluid.add(gui_fluid_viscocity.setup("viscocity", 0.00015f, 0.0f, 0.01f));
@@ -266,7 +264,7 @@ void GUIManager::update_spring_values(const ofVec2f anchor_position, const float
 
 void GUIManager::draw_required_gui(GameObject* selected_object, const int new_node_id, const string current_gamemode)
 {
-	if (showing_menu_)
+	if (current_gamemode == "Menu")
 	{
 		draw_menu();
 	}
@@ -388,11 +386,7 @@ void GUIManager::draw_menu() const
 
 void GUIManager::key_pressed(const int key)
 {
-	if (key == 27)
-	{
-		toggle_menu_screen();
-	}
-	else if (key == 57344) // f1
+	if (key == 57344) // f1
 	{		
 		if (get_gui_visible())
 		{
@@ -401,20 +395,6 @@ void GUIManager::key_pressed(const int key)
 		else
 		{
 			set_gui_visible(true);
-			draw_particle_gui_ = false;
-			draw_audio_gui_ = false;
-		}
-	}
-	else if (key == 57345) // f2
-	{		
-		if (draw_particle_gui_)
-		{
-			draw_particle_gui_ = false;
-		}
-		else
-		{
-			set_gui_visible(false);
-			draw_particle_gui_ = true;
 			draw_audio_gui_ = false;
 		}
 	}
@@ -427,7 +407,6 @@ void GUIManager::key_pressed(const int key)
 		else
 		{
 			set_gui_visible(false);
-			draw_particle_gui_ = false;
 			draw_audio_gui_ = true;
 		}
 	}
@@ -439,9 +418,4 @@ void GUIManager::key_pressed(const int key)
 	{
 		gui_fluid_viscocity = 0.00015f;
 	}
-}
-
-void GUIManager::toggle_menu_screen()
-{
-	(!showing_menu_) ? showing_menu_ = true : showing_menu_ = false;
 }
