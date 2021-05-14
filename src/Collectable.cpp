@@ -5,7 +5,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	,	make_active_on_next_emission_(false)
 	,	emission_frequency_(emission_frequency)								// frequency of particle emission
 	,	emission_force_(emission_force)										// force of particle emission
-	,	starting_radius_(get_radius())
+	,	starting_radius_(radius)
 	,	needs_to_pulse_radius_(false)
 	,	player_within_bounds_(false)
 	,	alpha_(0)
@@ -19,7 +19,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	set_color(ofColor(passive_color_.r, passive_color_.g, passive_color_.b, 100));
 	set_mass(mass);
 	set_radius(radius);
-
+	
 	add_module("screenBounce");
 	add_module("ellipseCollider");
 	add_module("gravity");
@@ -100,36 +100,7 @@ void Collectable::random_forces()
 {
 	if (ofGetFrameNum() % static_cast<int>(emission_frequency_) == 0)
 	{
-		ofVec2f mapped_pos;
-		mapped_pos.x = ofMap(get_position().x, -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
-		mapped_pos.y = ofMap(get_position().y, -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
-		ofVec2f vel/* = ofVec2f(ofRandom(-0.001f, 0.1f), ofRandom(-0.001f, 0.1f))*/;
-		/*vel.x = ofRandom(-0.001f, 0.1f);
-		vel.y = ofRandom(-0.001f, 0.1f);*/
-
-
-		// all collectables direct velocities somewhat towards the centre
-		/*if (get_position().x > 0)
-		{
-			vel.x = ofRandom(-0.1f, 0.001f);
-		}
-		else
-		{
-			vel.x = ofRandom(-0.001f, 0.1f);
-		}
-		if (get_position().y > 0)
-		{
-			vel.y = ofRandom(-0.1f, 0.001f);
-		}
-		else
-		{
-			vel.y = ofRandom(-0.001f, 0.1f);
-		}*/
-
-
-		// randomly select a collectables and target all velocities towards that point's position
-		vector<ofVec2f> point_positions;
-		
+		vector<ofVec2f> point_positions;		
 		for (auto& game_object : *game_objects_)
 		{
 			if (game_object->get_type() == "Collectable")
@@ -137,7 +108,8 @@ void Collectable::random_forces()
 				point_positions.push_back(game_object->get_position());
 			}
 		}
-		
+
+		ofVec2f vel;
 		for (int i = 0; i < point_positions.size(); i++)
 		{
 			if (point_positions[i] == get_position())
@@ -152,9 +124,17 @@ void Collectable::random_forces()
 				//vel = (point_positions[0] - point_positions[i])/* / 1000*/;
 				vel.normalize();
 			}
-		}
+		}		
 		
-		fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
+		for (int i = 0; i < 100; i++)
+		{
+			ofVec2f mapped_pos;
+			mapped_pos.x = ofMap(get_position().x + ofRandom(-starting_radius_, starting_radius_), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+			mapped_pos.y = ofMap(get_position().y + ofRandom(-starting_radius_, starting_radius_), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
+			
+			fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_ * 0.01, true, true, 1);
+		}
+		//fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
 
 		needs_to_pulse_radius_ = true;
 		audio_manager_->event_point_pulsed(get_position());
@@ -424,7 +404,7 @@ void Collectable::draw()
 	if (is_active_ || can_be_collected_)
 	{
 		if (is_active_)
-			alpha_ = ofMap(radius_, base_radius, base_radius * 4, 0, 255);
+			alpha_ = ofMap(radius_, base_radius, base_radius * 2, 0, 255);
 		else if (can_be_collected_)
 			alpha_ = 100;
 
@@ -436,9 +416,12 @@ void Collectable::draw()
 
 	if (gamemode_manager_->get_current_mode_string() == "Sandbox")
 	{
+		ofPushStyle();
+		ofSetLineWidth(0.05);
 		ofNoFill();
-		ofSetColor(255, 255, 0);
+		ofSetColor(0, 255, 0);
 		ofDrawEllipse(pos_.x, pos_.y, base_radius * 3, base_radius * 3);
+		ofPopStyle();
 	}
 
 	ofPopStyle();

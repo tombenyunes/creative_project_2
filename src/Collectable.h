@@ -71,6 +71,8 @@ private:
 			return is_active_;
 		else if (name == "id")
 			return id_;
+		else if (name == "starting_radius")
+			return starting_radius_;
 		else
 			return -1;
 	}	

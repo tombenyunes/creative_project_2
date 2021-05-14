@@ -87,13 +87,21 @@ void SceneManager::save_scene(const string scene_name)
 		xml1_.pushTag("GameObject", i);
 		xml1_.addValue("type", (*entity_manager_->get_game_objects())[i]->get_type());
 		xml1_.addValue("pos.x", (*entity_manager_->get_game_objects())[i]->get_position().x);
-		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
-		xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
-		xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_radius());
+		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);		
 
+		// Mass properties
+		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Mass")
+		{
+			xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
+			xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_radius());
+		}
+		
 		// Collectable properties
 		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Collectable")
 		{
+			xml1_.addValue("mass", (*entity_manager_->get_game_objects())[i]->get_mass());
+			
+			xml1_.addValue("radius", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("starting_radius"));			
 			xml1_.addValue("emission_frequency", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_frequency"));
 			xml1_.addValue("emission_force", ((*entity_manager_->get_game_objects())[i]->get_attribute_by_name("emission_force")));
 			xml1_.addValue("is_active", (*entity_manager_->get_game_objects())[i]->get_attribute_by_name("is_active"));

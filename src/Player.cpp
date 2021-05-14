@@ -229,8 +229,8 @@ void Player::draw_fluid_trail() const
 		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
 		
 		ofVec2f new_pos;
-		new_pos.x = ofMap(pos_.x/* + ofRandom(-radius / 4, radius / 4)*/, -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
-		new_pos.y = ofMap(pos_.y/* + ofRandom(-radius / 4, radius / 4)*/, -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
+		new_pos.x = ofMap(pos_.x + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+		new_pos.y = ofMap(pos_.y + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
 		
 		ofVec2f new_vel;
 		//newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;

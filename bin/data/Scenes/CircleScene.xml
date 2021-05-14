@@ -8,14 +8,14 @@
         <pos.x>82.486137390</pos.x>
         <pos.y>-192.879867554</pos.y>
         <mass>500.000000000</mass>
-        <radius>14.000000000</radius>
+        <radius>25.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
         <pos.x>-47.000000000</pos.x>
         <pos.y>-683.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>38.750000000</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>28.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
         <is_active>0.000000000</is_active>
@@ -25,7 +25,7 @@
         <pos.x>904.000000000</pos.x>
         <pos.y>-99.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>66.379318237</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>29.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
         <is_active>0.000000000</is_active>
@@ -35,7 +35,7 @@
         <pos.x>469.000000000</pos.x>
         <pos.y>729.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>66.818153381</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>99.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
         <is_active>0.000000000</is_active>
@@ -45,7 +45,7 @@
         <pos.x>-547.000000000</pos.x>
         <pos.y>606.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>62.840896606</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>44.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
         <is_active>0.000000000</is_active>
@@ -55,7 +55,7 @@
         <pos.x>-870.000000000</pos.x>
         <pos.y>-192.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>62.096755981</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>31.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
         <is_active>0.000000000</is_active>
