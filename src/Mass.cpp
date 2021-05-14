@@ -77,11 +77,11 @@ void Mass::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_mass_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_, affected_by_gravity_);
+			gui_manager_->update_mass_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else {
-			gui_manager_->update_mass_values(pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_infinite_mass, gui_manager_->gui_node_radius, gui_manager_->gui_node_affected_by_gravity);
+			gui_manager_->update_mass_values(pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_infinite_mass, gui_manager_->gui_node_radius);
 			if (infinite_mass_)
 			{
 				mass_ = 999999999999.0f;
@@ -92,7 +92,6 @@ void Mass::update_gui()
 			}
 			radius_ = gui_manager_->gui_node_radius;
 			infinite_mass_ = gui_manager_->gui_node_infinite_mass;
-			affected_by_gravity_ = gui_manager_->gui_node_affected_by_gravity;
 		}
 	}
 }

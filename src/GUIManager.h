@@ -18,11 +18,11 @@ public:
 	
 	void update();
 	void update_world();
-	void update_player_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
-	void update_mass_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
-	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force, bool is_active, int id);
-	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity);
-	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, bool affected_by_gravity, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
+	void update_player_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius);
+	void update_mass_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius);
+	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float radius, float emission_frequency, float emission_force, bool is_active, int id);
+	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass);
+	void update_spring_values(ofVec2f anchor_position, float k, float damping, float springmass, ofVec2f selected_node_pos, ofVec2f selected_node_vel, ofVec2f selected_node_accel, float selected_node_mass, float selected_node_radius);
 
 	int get_max_point_count();
 	void set_max_point_count(int count);
@@ -74,7 +74,6 @@ public:
 	ofxFloatSlider gui_player_mass;
 	ofxToggle gui_player_infinite_mass;
 	ofxFloatSlider gui_player_radius;
-	ofxToggle gui_player_affected_by_gravity;
 
 	// Node
 	ofxLabel gui_node_pos;
@@ -83,16 +82,10 @@ public:
 	ofxFloatSlider gui_node_mass;
 	ofxToggle gui_node_infinite_mass;
 	ofxFloatSlider gui_node_radius;
-	ofxToggle gui_node_affected_by_gravity;
 
 	// Collectable
 	ofxLabel gui_collectable_pos;
-	ofxLabel gui_collectable_vel;
-	ofxLabel gui_collectable_accel;
-	ofxFloatSlider gui_collectable_mass;
-	ofxToggle gui_collectable_infinite_mass;
 	ofxFloatSlider gui_collectable_radius;
-	ofxToggle gui_collectable_affected_by_gravity;
 	ofxFloatSlider gui_collectable_emission_frequency;
 	ofxFloatSlider gui_collectable_emission_force;
 	ofxToggle gui_collectable_is_active;
@@ -103,7 +96,6 @@ public:
 	ofxFloatSlider gui_spring_k;
 	ofxFloatSlider gui_spring_damping;
 	ofxFloatSlider gui_spring_springmass;
-	ofxToggle gui_spring_affected_by_gravity;
 	ofxButton gui_spring_add_node;
 	
 	// Spring Node

@@ -129,10 +129,10 @@ void Collectable::random_forces()
 		for (int i = 0; i < 100; i++)
 		{
 			ofVec2f mapped_pos;
-			mapped_pos.x = ofMap(get_position().x + ofRandom(-starting_radius_, starting_radius_), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
-			mapped_pos.y = ofMap(get_position().y + ofRandom(-starting_radius_, starting_radius_), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
+			mapped_pos.x = ofMap(get_position().x + ofRandom(-starting_radius_ * 0.8f, starting_radius_ * 0.8f), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+			mapped_pos.y = ofMap(get_position().y + ofRandom(-starting_radius_ * 0.8f, starting_radius_ * 0.8f), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
 			
-			fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_ * 0.01, true, true, 1);
+			fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_ * 0.01f, true, true, 1);
 		}
 		//fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
 
@@ -254,23 +254,13 @@ void Collectable::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_collectable_values(pos_, vel_, accel_, mass_, infinite_mass_, starting_radius_, affected_by_gravity_, emission_frequency_, emission_force_, is_active_, id_);
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, starting_radius_, emission_frequency_, emission_force_, is_active_, id_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else
 		{
-			gui_manager_->update_collectable_values(pos_, vel_, accel_, gui_manager_->gui_collectable_mass, gui_manager_->gui_collectable_infinite_mass, gui_manager_->gui_collectable_radius, gui_manager_->gui_collectable_affected_by_gravity, gui_manager_->gui_collectable_emission_frequency, gui_manager_->gui_collectable_emission_force, gui_manager_->gui_collectable_is_active, id_);
-			if (infinite_mass_)
-			{
-				mass_ = 999999999999.0f;
-			}
-			else
-			{
-				mass_ = gui_manager_->gui_collectable_mass;
-			}
+			gui_manager_->update_collectable_values(pos_, vel_, accel_, gui_manager_->gui_collectable_radius, gui_manager_->gui_collectable_emission_frequency, gui_manager_->gui_collectable_emission_force, gui_manager_->gui_collectable_is_active, id_);
 			starting_radius_ = gui_manager_->gui_collectable_radius;
-			infinite_mass_ = gui_manager_->gui_collectable_infinite_mass;
-			affected_by_gravity_ = gui_manager_->gui_collectable_affected_by_gravity;
 			emission_frequency_ = gui_manager_->gui_collectable_emission_frequency;
 			emission_force_ = gui_manager_->gui_collectable_emission_force;
 			is_active_ = gui_manager_->gui_collectable_is_active;
@@ -404,23 +394,23 @@ void Collectable::draw()
 	if (is_active_ || can_be_collected_)
 	{
 		if (is_active_)
-			alpha_ = ofMap(radius_, base_radius, base_radius * 2, 0, 255);
+			alpha_ = ofMap(radius_, starting_radius_, starting_radius_ * 2, 0, 255);
 		else if (can_be_collected_)
 			alpha_ = 100;
 
-		ofSetLineWidth(ofMap(radius_, base_radius, base_radius * 2, 0.1f, 2.0f));
+		ofSetLineWidth(ofMap(radius_, starting_radius_, starting_radius_ * 2, 0.1f, 2.0f));
 		ofNoFill();
 		get_color();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 	}
 
-	if (gamemode_manager_->get_current_mode_string() == "Sandbox")
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox" && !is_active_)
 	{
 		ofPushStyle();
 		ofSetLineWidth(0.05);
 		ofNoFill();
 		ofSetColor(0, 255, 0);
-		ofDrawEllipse(pos_.x, pos_.y, base_radius * 3, base_radius * 3);
+		ofDrawEllipse(pos_.x, pos_.y, starting_radius_, starting_radius_);
 		ofPopStyle();
 	}
 
