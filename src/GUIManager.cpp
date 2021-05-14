@@ -30,6 +30,8 @@ GUIManager::GUIManager()
 	panel_world.add(gui_world_calculate_fluid.setup("calculate fluid", true));
 	panel_world.add(gui_world_calculate_particles.setup("calculate particles", true));
 	panel_world.add(gui_world_calculate_entities.setup("calculate entities", true));
+	panel_world.add(gui_world_fps.setup("FPS", error_message));
+	panel_world.add(gui_world_frametime.setup("Frametime", error_message));
 	
 	// Player
 	panel_player.setup("Player", "", panel_pixel_buffer_, panel_world.getPosition().y + panel_world.getHeight() + panel_pixel_buffer_);
@@ -41,6 +43,31 @@ GUIManager::GUIManager()
 	panel_player.add(gui_player_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 	panel_player.add(gui_player_affected_by_gravity.setup("gravity", false));
 
+	// Fluid
+	panel_fluid.setup("FluidManager", "", panel_pixel_buffer_, panel_player.getPosition().y + panel_player.getHeight() + panel_pixel_buffer_);
+	panel_fluid.add(gui_fluid_cells.setup("fluid cells", 100, 20, 400));
+	panel_fluid.add(gui_fluid_resize_fluid.setup("resize", true));
+	panel_fluid.add(gui_fluid_color_mult.setup("color mult", 100.0f, 0.0f, 100.0f));
+	panel_fluid.add(gui_fluid_velocity_mult.setup("velocity mult", 7.0f, 0.0f, 100.0f));
+	panel_fluid.add(gui_fluid_viscocity.setup("viscocity", 0.00015f, 0.0f, 0.01f));
+	panel_fluid.add(gui_fluid_color_diffusion.setup("color diffusion", 0.0f, 0.0f, 0.0003f));
+	panel_fluid.add(gui_fluid_fade_speed.setup("fade speed", 0.002f, 0.0f, 0.1f));
+	panel_fluid.add(gui_fluid_solver_iterations.setup("solver interations", 10, 0 /*1*/, 50));
+	panel_fluid.add(gui_fluid_delta_t.setup("delta t", 0.1f, 0.0f, 5.0f));
+	panel_fluid.add(gui_fluid_draw_mode.setup("draw mode", 1, 0, 3));
+	panel_fluid.add(gui_fluid_do_rgb.setup("rgb", true));
+	panel_fluid.add(gui_fluid_do_vorticity_confinement.setup("vorticity confinement", false));
+	panel_fluid.add(gui_fluid_draw_fluid.setup("draw fluid", true));
+	panel_fluid.add(gui_fluid_draw_particles.setup("draw particles", true));
+	panel_fluid.add(gui_fluid_vel_draw_mult.setup("vel draw mult", 1.0f, 0.0f, 20.0f));
+	panel_fluid.add(gui_fluid_vel_draw_threshold.setup("vel draw threshold", 0.0f, 0.0f, 1.0f));
+	panel_fluid.add(gui_fluid_brightness.setup("brightness", 1.0f, 0.0f, 2.0f));
+	panel_fluid.add(gui_fluid_use_additive_blending.setup("additive blending", false));
+	panel_fluid.add(gui_fluid_wrap_x.setup("wrap x", false));
+	panel_fluid.add(gui_fluid_wrap_y.setup("wrap y", false));
+	panel_fluid.add(gui_fluid_tuio_x_scaler.setup("tuio x scaler", 1.0f, 0.0f, 2.0f));
+	panel_fluid.add(gui_fluid_tuio_y_scaler.setup("tuio y scaler", 1.0f, 0.0f, 2.0f));
+	
 	// Mass
 	panel_node.setup("Node", "", ofGetWidth() - panel_node.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
 	panel_node.add(gui_node_pos.setup("pos", error_message));
@@ -65,7 +92,7 @@ GUIManager::GUIManager()
 	panel_collectable.add(gui_collectable_is_active.setup("active", true));
 	panel_collectable.add(gui_collectable_id.setup("id", error_int));
 
-	// Spring
+	// Spring Settings
 	panel_spring_settings.setup("Spring Settings", "", ofGetWidth() - panel_spring_settings.getWidth() - panel_pixel_buffer_, panel_pixel_buffer_);
 	panel_spring_settings.add(gui_spring_anchor_pos.setup("anchor pos", error_message));
 	panel_spring_settings.add(gui_spring_k.setup("springiness", error_int, k_bounds.x, k_bounds.y));
@@ -99,6 +126,9 @@ void GUIManager::update_world()
 {
 	game_controller_->set_gravity(gui_world_gravity);
 	game_controller_->set_use_hard_collisions(gui_world_hard_collisions);
+	
+	gui_world_fps = ofToString(ofGetFrameRate());
+	gui_world_frametime = ofToString(ofGetLastFrameTime());
 }
 
 
@@ -278,9 +308,7 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const int new_no
 		
 
 		if (get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
-		{
-			panel_player.draw();
-
+		{	
 			if (selected_object != nullptr)
 			{
 				if (selected_object->get_type() == "Mass")
@@ -289,11 +317,14 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const int new_no
 				}
 				else if (selected_object->get_type() == "Spring")
 				{
-					// if an object is a spring then it has multiple gui windows to draw
-					panel_spring_settings.draw();
+					// if an object is a spring then it has multiple gui windows to draw					
 					if (multi_node_selected_ == true)
 					{
 						panel_spring_node.draw();
+					}
+					else
+					{
+						panel_spring_settings.draw();
 					}
 				}
 				else if (selected_object->get_type() == "Collectable")
@@ -301,12 +332,12 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const int new_no
 					panel_collectable.draw();
 				}
 			}
-
 			panel_world.draw();
+			panel_player.draw();
+			panel_fluid.draw();
 		}
 		else
 		{
-			FluidManager::draw_gui(draw_particle_gui_);
 			audio_manager_->drawGUI(draw_audio_gui_);
 		}
 	}
@@ -425,6 +456,14 @@ void GUIManager::key_pressed(const int key)
 			draw_particle_gui_ = false;
 			draw_audio_gui_ = true;
 		}
+	}
+	else if (key == 'g')
+	{
+		gui_fluid_viscocity = 0;
+	}
+	else
+	{
+		gui_fluid_viscocity = 0.00015f;
 	}
 }
 

@@ -27,6 +27,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	add_module("mouseHover");
 
 	pixel_buffer_before_drag_ = 2;
+	mouse_over_radius_mult_ = 2;
 
 	// incase a point is added in sandbox mode and is enabled by default
 	if (is_active_)
@@ -445,11 +446,7 @@ void Collectable::draw()
 
 void Collectable::get_color() const
 {
-	if (infinite_mass_)
-	{
-		ofSetColor(255, 0, 0);
-	}
-	else if ((get_is_selected() == true) || (mouse_over_ || mouse_drag_))
+	if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
 	{
 		ofSetColor(selected_color_);
 	}

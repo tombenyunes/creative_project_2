@@ -13,6 +13,9 @@ Spring::Spring(const ofVec2f anchor_pos, vector<float> node_radiuses, vector<flo
 	set_position(anchor_pos);
 	set_radius(8);	// radius of anchor
 
+	// so the anchor point is easier to select/drag
+	mouse_over_radius_mult_ = 3;
+	
 	add_module("screenBounce");
 	add_module("ellipseCollider");
 	add_module("gravity");
@@ -380,7 +383,8 @@ void Spring::draw()
 
 void Spring::get_node_color(const int node_index)
 {
-	if ((get_is_selected() == true) && (selected_node_index_ == -1 || selected_node_index_ == node_index || ((mouse_over_ || mouse_drag_) && mouse_over_index_ == node_index)))
+	// if in sandbox mode && is being hovered/selected/dragged, change colour
+	if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && (((get_is_selected() == true) && (selected_node_index_ == -1 || selected_node_index_ == node_index) || ((mouse_over_ || mouse_drag_) && mouse_over_index_ == node_index))))
 	{
 		ofSetColor(selected_color_);
 	}

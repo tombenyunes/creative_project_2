@@ -18,7 +18,6 @@ public:
 	
 	void update();
 	void update_world();
-
 	void update_player_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
 	void update_mass_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity);
 	void update_collectable_values(ofVec2f pos, ofVec2f vel, ofVec2f accel, float mass, bool infmass, float radius, bool affected_by_gravity, float emission_frequency, float emission_force, bool is_active, int id);
@@ -54,6 +53,7 @@ public:
 	ofxPanel panel_collectable;
 	ofxPanel panel_spring_settings;
 	ofxPanel panel_spring_node;
+	ofxPanel panel_fluid;
 	
 	// ----- Parameters ----- //
 
@@ -64,6 +64,8 @@ public:
 	ofxToggle gui_world_calculate_fluid;
 	ofxToggle gui_world_calculate_particles;
 	ofxToggle gui_world_calculate_entities;
+	ofxLabel gui_world_fps;
+	ofxLabel gui_world_frametime;
 	
 	// Player
 	ofxLabel gui_player_pos;
@@ -110,6 +112,30 @@ public:
 	ofxLabel gui_spring_node_accel;
 	ofxFloatSlider gui_spring_node_radius;
 	ofxFloatSlider gui_spring_node_mass;
+
+	// Fluid
+	ofxIntSlider gui_fluid_cells;
+	ofxButton gui_fluid_resize_fluid;
+	ofxFloatSlider gui_fluid_color_mult;
+	ofxFloatSlider gui_fluid_velocity_mult;
+	ofxFloatSlider gui_fluid_viscocity;
+	ofxFloatSlider gui_fluid_color_diffusion;
+	ofxFloatSlider gui_fluid_fade_speed;
+	ofxIntSlider gui_fluid_solver_iterations;
+	ofxFloatSlider gui_fluid_delta_t;
+	ofxIntSlider gui_fluid_draw_mode;
+	ofxToggle gui_fluid_do_rgb;
+	ofxToggle gui_fluid_do_vorticity_confinement;
+	ofxToggle gui_fluid_draw_fluid;
+	ofxToggle gui_fluid_draw_particles;
+	ofxFloatSlider gui_fluid_vel_draw_mult;
+	ofxFloatSlider gui_fluid_vel_draw_threshold;
+	ofxFloatSlider gui_fluid_brightness;
+	ofxToggle gui_fluid_use_additive_blending;
+	ofxToggle gui_fluid_wrap_x;
+	ofxToggle gui_fluid_wrap_y;
+	ofxFloatSlider gui_fluid_tuio_x_scaler;
+	ofxFloatSlider gui_fluid_tuio_y_scaler;
 	
 
 

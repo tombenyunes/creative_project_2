@@ -175,14 +175,10 @@ void Mass::draw()
 
 void Mass::get_color() const
 {
-	if (infinite_mass_)
-	{
-		ofSetColor(255, 0, 0);
-	}
-	else if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
+	if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
 	{
 		ofSetColor(selected_color_);
-	}	
+	}
 	else
 	{
 		ofSetColor(ofColor(color_.r, color_.g, color_.b));
