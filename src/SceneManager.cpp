@@ -136,7 +136,7 @@ void SceneManager::load_scene(const string path)
 {
 	get_ready_for_new_scene();
 
-	if (xml_.loadFile(path + ".xml")) {
+	if (xml_.loadFile(path)) {
 		xml_.pushTag("Scene");
 
 		cout << "------------SceneManager.cpp------------" << endl;
@@ -211,9 +211,10 @@ void SceneManager::load_scene(const string path)
 				const float emission_frequency = xml_.getValue("emission_frequency", -1);
 				const double emission_force = xml_.getValue("emission_force", -1.0f);
 				const bool is_active = xml_.getValue("is_active", false);
-				cout << emission_force << endl;
+				
 				GameObject* point = new Collectable(pos, mass, radius, emission_frequency, emission_force, is_active);
 				point->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
+				gui_manager_->set_max_point_count(gui_manager_->get_max_point_count() + 1);
 				entity_manager_->add_game_object(point);
 			}
 
@@ -264,42 +265,42 @@ void SceneManager::key_pressed(const int key)
 		if (key == '1')
 		{
 			// load scene 1
-			load_scene("Scenes/Scene1");
+			load_scene("Scenes/Scene1.xml");
 
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '2')
 		{
 			// load scene 2
-			load_scene("Scenes/Scene2");
+			load_scene("Scenes/Scene2.xml");
 
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '3')
 		{
 			// load scene 2
-			load_scene("Scenes/Scene3");
+			load_scene("Scenes/Scene3.xml");
 
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '4')
 		{
 			// load scene 2
-			load_scene("Scenes/Scene4");
+			load_scene("Scenes/Scene4.xml");
 
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '4')
 		{
 			// load scene 2
-			load_scene("Scenes/Scene4");
+			load_scene("Scenes/Scene4.xml");
 
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '5')
 		{
 			// load scene 2
-			load_scene("Scenes/CircleScene");
+			load_scene("Scenes/CircleScene.xml");
 
 			fluid_manager_->explosion(500);
 		}
@@ -317,13 +318,23 @@ void SceneManager::key_pressed(const int key)
 	else if (key == 57352) //f9
 	{
 		// load quick-saved scene
-		load_scene("Scenes/saved_scene");
+		load_scene("Scenes/saved_scene.xml");
 
 		fluid_manager_->explosion(500);
 	}
 	
-	else if (key == 'p') {
+	else if (key == 'p')
+	{
 		load_procedural_scene();
+	}
+	else if (key == 'o')
+	{
+		ofFileDialogResult load_result = ofSystemLoadDialog("Load Scene");
+		if (load_result.bSuccess) {
+			ofDisableDataPath();
+			load_scene(load_result.getPath());
+			ofEnableDataPath();
+		}
 	}
 }
 

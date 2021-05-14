@@ -1,7 +1,7 @@
 #include "FluidManager.h"
 
 FluidManager::FluidManager(): fluid_cells_x_(150),
-                              resize_fluid_(true),
+                              resize_fluid_(false),
                               color_mult_(0),
                               velocity_mult_(0),
                               draw_fluid_(true),
@@ -18,52 +18,25 @@ FluidManager::FluidManager(): fluid_cells_x_(150),
                               prev_velocity_(-1)
 
 {
-	fluid_solver_.setup(100, 100);
-	fluid_solver_.enableRGB(true).setFadeSpeed(0.002f).setDeltaT(0.5f).setVisc(0.00015f).setColorDiffusion(0);
-	fluid_drawer_.setup(&fluid_solver_);
-
-	gui.addSlider("fluidCellsX", fluid_cells_x_, 20, 400);
-	gui.addButton("resizeFluid", resize_fluid_);
-	gui.addSlider("colorMult", color_mult_, 0.0f, 100.0f);
-	gui.addSlider("velocityMult", velocity_mult_, 0.0f, 100.0f);
-	gui.addSlider("fs.viscocity", fluid_solver_.viscocity, 0.0f, 0.01f);
-	gui.addSlider("fs.colorDiffusion", fluid_solver_.colorDiffusion, 0.0f, 0.0003f);
-	gui.addSlider("fs.fadeSpeed", fluid_solver_.fadeSpeed, 0.0f, 0.1f);
-	gui.addSlider("fs.solverIterations", fluid_solver_.solverIterations, 1, 50);
-	gui.addSlider("fs.deltaT", fluid_solver_.deltaT, 0.1f, 5.0f);
-	gui.addComboBox("fd.drawMode", reinterpret_cast<int&>(fluid_drawer_.drawMode), msa::fluid::getDrawModeTitles());
-	gui.addToggle("fs.doRGB", fluid_solver_.doRGB);
-	gui.addToggle("fs.doVorticityConfinement", fluid_solver_.doVorticityConfinement);
-	gui.addToggle("drawFluid", draw_fluid_);
-	gui.addToggle("drawParticles", draw_particles_);
-	gui.addSlider("velDrawMult", fluid_drawer_.velDrawMult, 0.0, 20.0f);
-	gui.addSlider("velDrawThreshold", fluid_drawer_.velDrawThreshold, 0.0, 1.0f);
-	gui.addSlider("brightness", fluid_drawer_.brightness, 0.0, 2.0f);
-	gui.addToggle("useAdditiveBlending", fluid_drawer_.useAdditiveBlending);
-
-	gui.addToggle("fs.wrapX", fluid_solver_.wrap_x);
-	gui.addToggle("fs.wrapY", fluid_solver_.wrap_y);
-	gui.addSlider("tuioXScaler", tuio_x_scaler_, 0, 2.0f);
-	gui.addSlider("tuioYScaler", tuio_y_scaler_, 0, 2.0f);
-
-	gui.currentPage().setXMLName("ofxMSAFluidSettings.xml");
-	gui.loadFromXML();
-	gui.setDefaultKeys(true);
-	gui.setAutoSave(false);
-	gui.show();
-
-	fluid_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
-	//fluid_blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
-	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
 void FluidManager::init(GUIManager* gui_manager)
 {
 	gui_manager_ = gui_manager;
+
+	fluid_solver_.setup(100, 100);
+	fluid_solver_.enableRGB(true).setFadeSpeed(0.002f).setDeltaT(0.5f).setVisc(0.00015f).setColorDiffusion(0);
+	fluid_drawer_.setup(&fluid_solver_);
+
+	update_from_gui();
+
+	fluid_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
 }
 
 void FluidManager::update()
 {
+	update_from_gui();
+	
 	if (resize_fluid_)
 	{
 		fluid_solver_.setSize(fluid_cells_x_, fluid_cells_x_ / msa::getWindowAspectRatio());
@@ -128,6 +101,32 @@ void FluidManager::update()
 	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
+void FluidManager::update_from_gui()
+{
+	//fluid_cells_x_ = gui_manager_->gui_fluid_cells;
+	//resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
+	color_mult_ = gui_manager_->gui_fluid_color_mult;
+	velocity_mult_ = gui_manager_->gui_fluid_velocity_mult;
+	fluid_solver_.viscocity = gui_manager_->gui_fluid_viscocity;
+	fluid_solver_.colorDiffusion = gui_manager_->gui_fluid_color_diffusion;
+	fluid_solver_.fadeSpeed = gui_manager_->gui_fluid_fade_speed;
+	fluid_solver_.solverIterations = gui_manager_->gui_fluid_solver_iterations;
+	fluid_solver_.deltaT = gui_manager_->gui_fluid_delta_t;
+	reinterpret_cast<int&>(fluid_drawer_.drawMode) = gui_manager_->gui_fluid_draw_mode;
+	fluid_solver_.doRGB = gui_manager_->gui_fluid_do_rgb;
+	fluid_solver_.doVorticityConfinement = gui_manager_->gui_fluid_do_vorticity_confinement;
+	draw_fluid_ = gui_manager_->gui_fluid_draw_fluid;
+	draw_particles_ = gui_manager_->gui_fluid_draw_particles;
+	fluid_drawer_.velDrawMult = gui_manager_->gui_fluid_vel_draw_mult;
+	fluid_drawer_.velDrawThreshold = gui_manager_->gui_fluid_vel_draw_threshold;
+	fluid_drawer_.brightness = gui_manager_->gui_fluid_brightness;
+	fluid_drawer_.useAdditiveBlending = gui_manager_->gui_fluid_use_additive_blending;
+	fluid_solver_.wrap_x = gui_manager_->gui_fluid_wrap_x;
+	fluid_solver_.wrap_y = gui_manager_->gui_fluid_wrap_y;
+	tuio_x_scaler_ = gui_manager_->gui_fluid_tuio_x_scaler;
+	tuio_y_scaler_ = gui_manager_->gui_fluid_tuio_y_scaler;
+}
+
 void FluidManager::draw(GameObject* player)
 {
 	render_fluid();
@@ -160,19 +159,6 @@ void FluidManager::render_particles(GameObject* player)
 		{
 			particle_system_.update_and_draw(fluid_solver_, ofVec2f(WORLD_WIDTH, WORLD_HEIGHT), draw_fluid_, player);
 		}
-	}
-}
-
-void FluidManager::draw_gui(const bool enable)
-{
-	if (enable)
-	{
-		gui.show();
-		gui.draw();
-	}
-	else
-	{
-		gui.hide();
 	}
 }
 

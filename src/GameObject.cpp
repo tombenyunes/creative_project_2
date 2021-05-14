@@ -19,6 +19,7 @@ GameObject::GameObject(const ofVec2f pos, const ofColor color)
 	  gravity_mult_(1),
 	  collision_mult_(1),
 	  mouse_over_(false),
+	  mouse_over_radius_mult_(1),
 	  mouse_over_index_(0),
 	  selected_node_index_(0),
 	  mouse_drag_(false),
@@ -313,7 +314,7 @@ void GameObject::mouse_hover()
 		{
 			if (game_controller_->get_mouse_dragged() == false)
 			{
-				if (Collisions::ellipse_compare(pos_, radius_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
+				if (Collisions::ellipse_compare(pos_, get_radius() * mouse_over_radius_mult_, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), 0))
 				{
 					mouse_over_ = true;
 					mouse_offset_from_center_ = pos_ - cam_->get_world_mouse_pos();
@@ -335,7 +336,7 @@ void GameObject::mouse_hover()
 						mouse_offset_from_center_ = node_positions_[i] - cam_->get_world_mouse_pos();
 						break;
 					}
-					else if (Collisions::ellipse_compare(pos_, radius_, cam_->get_world_mouse_pos(), 0))
+					else if (Collisions::ellipse_compare(pos_, get_radius() * mouse_over_radius_mult_, cam_->get_world_mouse_pos(), 0))
 					{
 						mouse_over_ = true;
 						mouse_over_index_ = -1;

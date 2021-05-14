@@ -1323,20 +1323,20 @@ void AudioManager::keyReleased(int key) {
 // triggered every time a point is collected/triggered
 void AudioManager::event_point_collected()
 {
-    cout << "POINT COLLECTED" << endl;
+    //cout << "POINT COLLECTED" << endl;
 }
 
 // triggered every time a collectable pulses/emits particles
 // the position of the point is passed through incase needed for panning etc
 void AudioManager::event_point_pulsed(const ofVec2f point_position)
 {
-    cout << "POINT PULSED: " << point_position << endl;
+    //cout << "POINT PULSED: " << point_position << endl;
 }
 
 // triggered when the final 'point' in a level has been collected
 void AudioManager::event_level_complete()
 {
-    cout << "LEVEL COMPLETE" << endl;
+    //cout << "LEVEL COMPLETE" << endl;
 }
 
 // triggered when a new level is loaded
@@ -1344,7 +1344,7 @@ void AudioManager::event_level_complete()
 // ((i haven't made many levels yet so currently the game is just cycling through procedural levels))
 void AudioManager::event_new_level_loaded()
 {
-    cout << "NEW LEVEL LOADED" << endl;
+    //cout << "NEW LEVEL LOADED" << endl;
 }
 
 // ==================================================================================== //

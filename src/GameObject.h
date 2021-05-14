@@ -100,7 +100,7 @@ protected:
 	ofVec2f pos_;
 	ofVec2f prev_pos_;
 	float mass_;
-	float radius_;
+	float radius_;	
 
 	vector<ofVec2f> node_positions_;
 	vector<ofVec2f> node_velocities_;
@@ -119,6 +119,7 @@ protected:
 	int collision_mult_;
 		
 	bool mouse_over_;
+	float mouse_over_radius_mult_;
 	int mouse_over_index_;
 	int selected_node_index_;
 
