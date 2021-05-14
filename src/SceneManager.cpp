@@ -29,7 +29,11 @@ void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Ca
 
 void SceneManager::update()
 {
-	if (entity_manager_->get_point_count() == Collectable::get_points_collected())
+	if (gamemode_manager_->request_for_new_scene) {
+		load_procedural_scene();
+		gamemode_manager_->request_for_new_scene = false;
+	}
+	else if (entity_manager_->get_point_count() == Collectable::get_points_collected())
 	{
 		static bool trig = false;
 		
@@ -47,13 +51,9 @@ void SceneManager::update()
 				trig = true;
 			}
 		}
-	}
-	else if (gamemode_manager_->request_for_new_scene) {
-		load_procedural_scene();
-		gamemode_manager_->request_for_new_scene = false;
-	}
+	}	
 
-	if (entity_manager_->get_point_count() <= 0) {			
+	if (entity_manager_->get_point_count() <= 0) {
 
 		Collectable::reset_ids();
 		
@@ -174,7 +174,7 @@ void SceneManager::load_scene(const string path)
 			// Player properties
 			if (type == "Player")
 			{
-				GameObject* player = new Player;
+				GameObject* player = new Player();
 				player->init(entity_manager_->get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 				entity_manager_->add_game_object(player);
 			}

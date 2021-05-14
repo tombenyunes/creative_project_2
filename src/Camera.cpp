@@ -2,7 +2,7 @@
 
 Camera::Camera()
 	:	view_(Cam_modes_::player_view)
-	,	position_(0 + (ofGetWidth() / 2), 0 + (ofGetHeight() / 2))
+	,	position_(2000, 1500)
 	,	scale_(1)
 	,	follow_player_(true)
 	,	prev_player_view_scale_(1)
@@ -62,8 +62,10 @@ void Camera::follow_player(const ofVec2f player_pos)
 	{
 		if (view_ == Cam_modes_::player_view)
 		{
-			pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
-			lerping_position_ = true;
+			if (ofGetFrameNum() > 0) { // <-- otherwise the cam briefly stutters on game launch
+				pos_to_lerp_to_.set(ofVec2f(player_pos.x, player_pos.y));
+				lerping_position_ = true;
+			}
 		}
 		else if (view_ == Cam_modes_::map_view)
 		{

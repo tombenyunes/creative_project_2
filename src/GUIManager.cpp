@@ -98,6 +98,12 @@ GUIManager::GUIManager()
 	panel_spring_node.add(gui_spring_node_accel.setup("acceleration", error_message));
 	panel_spring_node.add(gui_spring_node_mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS / 10));
 	panel_spring_node.add(gui_spring_node_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
+
+
+	
+	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 36, true, true);
+	main_mode_bounds = potta_one_main_.getStringBoundingBox("MAIN", ofGetWidth() / 2 - 250, ofGetHeight() / 4);
+	sandbox_mode_bounds = potta_one_main_.getStringBoundingBox("SANDBOX", ofGetWidth() / 2 + 250, ofGetHeight() / 4);
 }
 
 void GUIManager::init(Controller* controller, AudioManager* audio_manager, Camera* cam)
@@ -364,12 +370,12 @@ void GUIManager::draw_menu() const
 
 	ofSetColor(0, 0, 0, 125);
 	ofFill();
-	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-
+	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());	
+	
 	ofSetColor(255);
 	const float w = ofGetWidth() / 2 - 150;
 	const float h = ofGetHeight() / 4;
-	ofDrawBitmapString("Menu", w, h + 16 * 1);
+	/*ofDrawBitmapString("Menu", w, h + 16 * 1);
 	ofDrawBitmapString("'Left Click' to exert a force in a direction", w, h + 16 * 2);
 	ofDrawBitmapString("'Space' to toggle sandbox mode", w, h + 16 * 3);
 	ofDrawBitmapString("'Right Click' to select and move entities", w, h + 16 * 4);
@@ -378,10 +384,28 @@ void GUIManager::draw_menu() const
 	ofDrawBitmapString("'c' to create an entity", w, h + 16 * 7);
 	ofDrawBitmapString("'x' to delete an entity", w, h + 16 * 8);
 	ofDrawBitmapString("'Scroll Wheel' to zoom", w, h + 16 * 9);
-	ofDrawBitmapString("'Tab' to toggle perspectives", w, h + 16 * 10);
+	ofDrawBitmapString("'Tab' to toggle perspectives", w, h + 16 * 10);*/
+
+	if (main_mode_bounds.intersects(ofRectangle(ofGetMouseX(), ofGetMouseY(), 0, 0)))
+		ofSetColor(0, 255, 0);
+	else
+		ofSetColor(255);
+	potta_one_main_.drawString("MAIN", ofGetWidth() / 2 - 250, h);
+	
+	if (sandbox_mode_bounds.intersects(ofRectangle(ofGetMouseX(), ofGetMouseY(), 0, 0)))
+		ofSetColor(0, 255, 0);
+	else
+		ofSetColor(255);
+	potta_one_main_.drawString("SANDBOX", ofGetWidth() / 2 + 250, h);
 
 	ofPopMatrix();
 	ofPopStyle();
+}
+
+void GUIManager::window_resized(int w, int h)
+{
+	main_mode_bounds = potta_one_main_.getStringBoundingBox("MAIN", ofGetWidth() / 2 - 250, ofGetHeight() / 4);
+	sandbox_mode_bounds = potta_one_main_.getStringBoundingBox("SANDBOX", ofGetWidth() / 2 + 250, ofGetHeight() / 4);
 }
 
 void GUIManager::key_pressed(const int key)

@@ -21,7 +21,7 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	fluid_manager.init(&gui_manager);
 	
-	event_manager.init(&entity_manager, &gui_manager);
+	event_manager.init(&entity_manager, &gui_manager, &gamemode_manager);
 	event_manager.show_tutorial(false);
 	event_manager.setup();
 
@@ -29,8 +29,10 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	gamemode_manager.init(&gui_manager);
 	
-	//scene_manager.loadScene("Scenes/StartingScene");
-	scene_manager.load_procedural_scene();
+	scene_manager.load_scene("Scenes/MenuScene.xml");
+	//scene_manager.load_procedural_scene();
+
+	menu_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
 }
 
 void Iota::audio_out(float* output, const int buffer_size, const int n_channels)
@@ -47,11 +49,16 @@ void Iota::update()
 	fluid_manager.update();
 	audio_manager.update(entity_manager.get_player()->get_position());
 	scene_manager.update();
+
+	//menu_blur_.setScale(ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 10));
+	//menu_blur_.setRotation(ofMap(ofGetMouseY(), 0, ofGetHeight(), -PI, PI));
 }
 
 void Iota::draw()
 {	
 	cam.begin();
+
+	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.begin();
 	
 	fluid_manager.draw(entity_manager.get_player());
 
@@ -79,6 +86,9 @@ void Iota::draw()
 
 	ofPopMatrix();
 
+	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.end();
+	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.draw();
+
 	cam.end();
 
 	if (entity_manager.get_selected_game_object() != nullptr && entity_manager.get_selected_game_object()->get_type() == "Spring") {
@@ -91,18 +101,17 @@ void Iota::draw()
 
 void Iota::key_pressed(const int key)
 {
-	audio_manager.keyPressed(key);
-
-	cam.key_pressed(key);
-	fluid_manager.key_pressed(key);
-	event_manager.key_pressed(key);
-	scene_manager.key_pressed(key);
 	gamemode_manager.key_pressed(key);
-	fluid_manager.key_pressed(key);
-	gui_manager.key_pressed(key);
-
+	
 	if (event_manager.is_event_allowed("key_pressed")) {
 		entity_manager.key_pressed(key);
+		audio_manager.keyPressed(key);
+		cam.key_pressed(key);
+		fluid_manager.key_pressed(key);
+		event_manager.key_pressed(key);
+		scene_manager.key_pressed(key);		
+		fluid_manager.key_pressed(key);
+		gui_manager.key_pressed(key);
 	}
 	
 	if (key == 57354) //f11
@@ -113,13 +122,11 @@ void Iota::key_pressed(const int key)
 
 void Iota::key_released(const int key)
 {
-	audio_manager.keyReleased(key);
-	
-	cam.key_released(key);
-	scene_manager.key_released(key);
-
 	if (event_manager.is_event_allowed("key_released")) {
 		entity_manager.key_released(key);
+		audio_manager.keyReleased(key);
+		cam.key_released(key);
+		scene_manager.key_released(key);
 	}
 }
 
@@ -137,10 +144,11 @@ void Iota::mouse_dragged(const int x, const int y, const int button)
 
 void Iota::mouse_pressed(const int x, const int y, const int button)
 {
+	gamemode_manager.mouse_pressed(x, y, button);
+	
 	if (event_manager.is_event_allowed("mouse_pressed", button)) {
 		entity_manager.mouse_pressed(x, y, button);
 		cam.mouse_pressed(x, y, button);
-
 		audio_manager.mousePressed(x, y, button);
 	}
 }
@@ -157,7 +165,6 @@ void Iota::mouse_released(const int x, const int y, const int button)
 	if (event_manager.is_event_allowed("mouse_released", button)) {
 		entity_manager.mouse_released(x, y, button);
 		cam.mouse_released(x, y, button);
-
 		audio_manager.mouseReleased(x, y, button);
 	}
 }
@@ -172,6 +179,7 @@ void Iota::mouse_exited(int x, int y)
 
 void Iota::window_resized(int w, int h)
 {
+	gui_manager.window_resized(w, h);
 }
 
 void Iota::drag_event(ofDragInfo drag_info)

@@ -9,7 +9,7 @@ public:
 
 	EventManager();
 
-	void init(EntityManager* entity_manager, GUIManager* gui_manager);
+	void init(EntityManager* entity_manager, GUIManager* gui_manager, GamemodeManager* gamemode_manager);
 
 	void setup();
 	void update();
@@ -27,6 +27,7 @@ private:
 	
 	EntityManager* entity_manager_;
 	GUIManager* gui_manager_;
+	GamemodeManager* gamemode_manager_;
 
 	vector<string> dialogues_;
 	vector<ofVec2f> positions_;

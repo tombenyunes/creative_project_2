@@ -8,7 +8,7 @@ class Player : public GameObject {
 
 public:
 
-	Player(ofVec2f pos = { 0, 0 }, ofColor color = ofColor(255));
+	Player(ofVec2f pos = { 0, 0 }, ofColor color = ofColor(255), float radius = 14);
 
 private:
 	

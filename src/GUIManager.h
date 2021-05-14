@@ -42,6 +42,7 @@ public:
 
 	// Events
 	void key_pressed(int key);
+	void window_resized(int w, int h);
 
 	
 
@@ -128,7 +129,9 @@ public:
 	ofxToggle gui_fluid_wrap_y;
 	ofxFloatSlider gui_fluid_tuio_x_scaler;
 	ofxFloatSlider gui_fluid_tuio_y_scaler;
-	
+
+	ofRectangle main_mode_bounds;
+	ofRectangle sandbox_mode_bounds;
 
 
 private:		
@@ -136,7 +139,7 @@ private:
 	// Draw
 	void draw_text(int new_node_id, string current_gamemode) const;
 	void draw_border() const;
-	void draw_menu() const;
+	void draw_menu() const;	
 	
 	Controller* game_controller_{};
 	AudioManager* audio_manager_{};
@@ -153,5 +156,7 @@ private:
 	int max_point_count_;
 
 	bool delete_all_;
+
+	ofTrueTypeFont potta_one_main_;
 
 };

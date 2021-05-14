@@ -12,15 +12,16 @@ EventManager::EventManager(): player_gui_visible(false),
 {
 }
 
-void EventManager::init(EntityManager* entity_manager, GUIManager* gui_manager)
+void EventManager::init(EntityManager* entity_manager, GUIManager* gui_manager, GamemodeManager* gamemode_manager)
 {
 	entity_manager_ = entity_manager;
 	gui_manager_ = gui_manager;
+	gamemode_manager_ = gamemode_manager;
 }
 
 void EventManager::setup()
 {
-	if (tutorial_enabled_)
+	/*if (tutorial_enabled_)
 	{
 		potta_one_main_.load("PottaOne-Regular.ttf", 12, true, true);
 		potta_one_context_.load("PottaOne-Regular.ttf", 10, true, true);
@@ -33,12 +34,12 @@ void EventManager::setup()
 			{static_cast<float>(3.95 * static_cast<float>(dialogues_[0].length()) * -1), -125},
 			{static_cast<float>(3.95 * static_cast<float>(dialogues_[1].length()) * -1), -125},
 		};
-	}
+	}*/
 }
 
 void EventManager::update()
 {
-	if (tutorial_enabled_)
+	/*if (tutorial_enabled_)
 	{
 		static bool i0 = false;
 		if (!i0)
@@ -63,21 +64,26 @@ void EventManager::update()
 			t = true;
 			full_input_ = true;
 		}
+	}*/
+
+	if (gamemode_manager_->get_current_mode_string() != "Menu")
+	{
+		full_input_ = true;
 	}
 }
 
 void EventManager::draw_tutorial()
 {
-	if (tutorial_enabled_)
+	/*if (tutorial_enabled_)
 	{
 		potta_one_main_.drawString(dialogues_[current_index_], positions_[current_index_].x, positions_[current_index_].y);
 		if (current_index_ <= 0) potta_one_context_.drawString("Use left/right arrow keys to navigate the tutorial", -177, 490);
-	}
+	}*/
 }
 
 void EventManager::key_pressed(const int key)
 {
-	if (tutorial_enabled_)
+	/*if (tutorial_enabled_)
 	{
 		if (key == 57356 && current_index_ != 0)
 		{
@@ -87,7 +93,7 @@ void EventManager::key_pressed(const int key)
 		{
 			current_index_++;
 		}
-	}
+	}*/
 }
 
 void EventManager::show_tutorial(const bool value)
@@ -127,7 +133,10 @@ bool EventManager::is_event_allowed(const string event, const int button) const
 	}
 	else if (event == "mouse_scrolled")
 	{
-		return true;
+		if (full_input_)
+		{
+			return true;
+		}
 	}
 	else if (event == "mouse_released")
 	{

@@ -16,12 +16,16 @@ public:
 	void log_current_mode() const;
 
 	void key_pressed(int key);
+	void mouse_pressed(int x, int y, int button);
 
 	bool request_for_new_scene;
+	bool game_started_;
 
 private:
 
 	GUIManager* gui_manager_;
 	
 	int current_mode_id_;
+	int prev_mode_id_;
+
 };

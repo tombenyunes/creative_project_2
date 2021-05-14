@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(const ofVec2f pos, const ofColor color)
+Player::Player(const ofVec2f pos, const ofColor color, const float radius)
 	:	movement_speed(0.10f)
 	,	mouse_down_(false)
 	,	mouse_button_(-1)
@@ -13,7 +13,7 @@ Player::Player(const ofVec2f pos, const ofColor color)
 	set_color(color);
 	set_velocity(ofVec2f(0));
 	//set_accel(0);
-	set_radius(14); // 35
+	set_radius(radius);
 	set_mass(500);
 	
 	add_module("screenBounce");
@@ -182,14 +182,17 @@ void Player::boost_player()
 
 void Player::draw()
 {
-	ofSetColor(255);
+	if (gamemode_manager_->game_started_)
+	{
+		ofSetColor(255);
 
-	if (aiming_boost_) draw_boost_direction();
-	draw_particle_trail();
+		if (aiming_boost_) draw_boost_direction();
+		draw_particle_trail();
 
-	ofSetColor(color_);
-	ofFill();
-	ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+		ofSetColor(color_);
+		ofFill();
+		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+	}
 }
 
 void Player::draw_boost_direction() const

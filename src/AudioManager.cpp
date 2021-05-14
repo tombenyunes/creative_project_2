@@ -222,10 +222,7 @@ void AudioManager::envelopeSetup() {
     strings_OscEnv.setSustain(500);
     strings_OscEnv.setRelease(10000);
 
-    //    poly_OscEnv.setAttack(0);
-    //    poly_OscEnv.setDecay(200);
-    //    poly_OscEnv.setSustain(0.2);
-    //    poly_OscEnv.setRelease(2000);
+
 
 
 
@@ -393,8 +390,13 @@ void AudioManager::charNoise() {
 //-----------------------------------//
 void AudioManager::synthLine() {
     //synth arp sound
-    sBass_envOut = sBassEnv.ar(sBass.sinewave(sBassPitch), 0.05, 0.99, 5000, sBassTrigger) * synthLineGain;
-    synthDelay_out = synthDelay.dl(sBass_envOut, 44100 * 0.9, 0.4);
+    //sBass_envOut = sBassEnv.ar(sBass.sinewave(sBassPitch), 0.05, 0.99, 5000, sBassTrigger) * synthLineGain;
+
+    sBass_envOut = sBassEnv.adsr(1, sBassTrigger);
+    sBassOut = (sBass.sinewave(sBassPitch) * sBass_envOut) * synthLineGain;
+
+
+    synthDelay_out = synthDelay.dl(sBassOut, 44100 * 0.9, 0.4);
     sBassStereo.stereo(synthDelay_out, sBassMix, synthLinePan);
 }
 
@@ -414,7 +416,7 @@ void AudioManager::polySynth() {
 
     poly_OscOut = ((poly_Osc.pulse(poly_OscPitch, 0.6) + poly_Osc1Out) * poly_Osc_envOut) * polySynthGain;
 
-    poly_OscFilter_out = poly_OscFilter.lores(poly_OscOut, 500 + poly_Osc_envOut + (poly_LFO_Out * 200), poly_Osc_envOut * 5);
+    poly_OscFilter_out = poly_OscFilter.lores(poly_OscOut, 500 + poly_Osc_envOut + (poly_LFO_Out * 200), poly_Osc_envOut * 2);
 
     poly_OscDelay_out = poly_Delay.dl(poly_OscFilter_out, 44100 * 0.9, 0.4);//?
 
@@ -1006,21 +1008,50 @@ void AudioManager::update(const ofVec2f player_position) {
     player_pos = player_position;
 
     //set low pass filter to player y pos, top of map all frequencies pass bottom of map apply filter effect
-    playerFilter = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 10, 3000);
+    double partWorldHeight = HALF_WORLD_HEIGHT / 3;
+
+    if (player_pos.y > partWorldHeight) {
+        playerFilter = ofMap(player_pos.y, partWorldHeight, HALF_WORLD_HEIGHT, 4000, 20);
+    }
+    else {
+        playerFilter = 4000;
+    }
+
+    //playerFilter = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 50, 3000);
 
     playerDelayFeedback = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 0.1, 0.8);
-
     playerDelayMix = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 0.9, 0.1);
 
-
-    if (player_pos.y > 0) {
-        playerFilterHires = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 200, 0.0);
+    //set hi res filter to activate at the top and bottom of WORLD
+    if (player_pos.y > partWorldHeight) {
+        playerFilterHires = ofMap(player_pos.y, partWorldHeight, HALF_WORLD_HEIGHT, 0, 100.0);
+    }
+    else if (player_pos.y < -partWorldHeight * 2) {
+        playerFilterHires = ofMap(player_pos.y, -partWorldHeight * 2, -HALF_WORLD_HEIGHT, 0, 400.0);
     }
     else {
         playerFilterHires = 0;
     }
 
 
+    //synth line attack and release are afected when player is in the left and right segments of WORLD WIDTH
+    double partWorldWidth = HALF_WORLD_WIDTH / 3;
+    if (player_pos.x > partWorldWidth) {
+        playerSynthLineAttack = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 0, 10000);
+        playerSynthLineRelease = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 400, 800);
+    }
+    else if (player_pos.x < -partWorldWidth) {
+        playerSynthLineAttack = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 0, 4000);
+        playerSynthLineRelease = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 400, 800);
+    }
+    else {
+        playerSynthLineAttack = 1;
+        playerSynthLineRelease = 400;
+    }
+
+
+
+    //std::cout<<playerSynthLineAttack<<std::endl;
 
 
     if (randomSampleTriggered) {
@@ -1079,11 +1110,15 @@ void AudioManager::update(const ofVec2f player_position) {
     poly_OscEnv.setSustain(0.2);
     poly_OscEnv.setRelease(2000 + ((poly_LFO_Out + 1) / 2) * 10000);
 
-
     noiseEnv.setAttack(noiseAttack);
     noiseEnv.setDecay(5);
     noiseEnv.setSustain(5);
     noiseEnv.setRelease(10000);
+
+    sBassEnv.setAttack(playerSynthLineAttack);
+    sBassEnv.setDecay(2);
+    sBassEnv.setSustain(2);
+    sBassEnv.setRelease(playerSynthLineRelease);
 
     //std::cout<<patternSwitch<<std::endl;
 
@@ -1385,6 +1420,7 @@ void AudioManager::keyPressed(int key) {
         patternSwitch++;
         if (patternSwitch > 10) {
             patternSwitch = 0;
+            cout << patternSwitch << endl;
         }
     }
 

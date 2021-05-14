@@ -44,4 +44,5 @@ public:
 	AudioManager audio_manager;
 	FluidManager fluid_manager;
 	Camera cam;
+	ofxBlur menu_blur_;
 };

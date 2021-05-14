@@ -519,7 +519,7 @@ public:
     int strings_OscLinePitch2[4] = { 68, 63, 68, 68 };
     int strings_OscLinePitch3[4] = { 70, 68, 73, 72 };
 
-    int strings_OscLinePitchB[4] = { 77, 77, 77, 77 };
+    int strings_OscLinePitchB[4] = { 77, 75, 77, 77 };
     int strings_OscLinePitch2B[4] = { 78, 78, 78, 78 };
     int strings_OscLinePitch3B[4] = { 82, 82, 82, 82 };
     int strings_OscNote;
@@ -749,6 +749,8 @@ public:
 
 
     //========SYNTH-BASS-LINE-ARP==============//
+    double playerSynthLineAttack;
+    double playerSynthLineRelease;
     int synthPattern = 0;//use to swith synth pattern
     convert mtof;
 
