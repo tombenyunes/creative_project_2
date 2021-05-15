@@ -29,7 +29,7 @@ void Iota::setup(ofBaseApp* app_ptr)
 
 	gamemode_manager.init(&gui_manager);
 	
-	scene_manager.load_scene("Scenes/MenuScene.xml");
+	scene_manager.load_scene("Scenes/menu_scene.xml");
 	//scene_manager.load_procedural_scene();
 
 	menu_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
@@ -49,6 +49,7 @@ void Iota::update()
 	fluid_manager.update();
 	audio_manager.update(entity_manager.get_player()->get_position());
 	scene_manager.update();
+	gamemode_manager.update();
 
 	//menu_blur_.setScale(ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 10));
 	//menu_blur_.setRotation(ofMap(ofGetMouseY(), 0, ofGetHeight(), -PI, PI));
@@ -85,6 +86,8 @@ void Iota::draw()
 	event_manager.draw_tutorial();
 
 	ofPopMatrix();
+	
+	gamemode_manager.draw();
 
 	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.end();
 	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.draw();
@@ -179,7 +182,7 @@ void Iota::mouse_exited(int x, int y)
 
 void Iota::window_resized(int w, int h)
 {
-	gui_manager.window_resized(w, h);
+	gui_manager.window_resized();
 }
 
 void Iota::drag_event(ofDragInfo drag_info)

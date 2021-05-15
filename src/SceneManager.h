@@ -14,9 +14,13 @@ public:
 		void update();
 
 		void save_scene(string scene_name);
+	
 		void get_ready_for_new_scene() const;
+	
 		void load_scene(string path);
 		void load_procedural_scene() const;
+		void load_blank_scene();
+	
 		void destroy_current_scene() const;
 		void reset_fluid() const;
 

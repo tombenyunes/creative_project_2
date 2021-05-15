@@ -29,9 +29,13 @@ void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Ca
 
 void SceneManager::update()
 {
-	if (gamemode_manager_->request_for_new_scene) {
+	if (gamemode_manager_->get_request_for_procedural_scene()) {
 		load_procedural_scene();
-		gamemode_manager_->request_for_new_scene = false;
+		gamemode_manager_->set_request_for_procedural_scene(false);
+	}
+	else if (gamemode_manager_->get_request_for_blank_scene()) {
+		load_blank_scene();
+		gamemode_manager_->set_request_for_blank_scene(false);
 	}
 	else if (entity_manager_->get_point_count() == Collectable::get_points_collected())
 	{
@@ -254,6 +258,12 @@ void SceneManager::load_procedural_scene() const
 	cout << "----------------------------------------" << endl;
 }
 
+void SceneManager::load_blank_scene()
+{
+	load_scene("Scenes/blank_scene.xml");
+	fluid_manager_->explosion(500);
+}
+
 void SceneManager::destroy_current_scene() const
 {	
 	for (auto& i : *entity_manager_->get_game_objects())
@@ -294,7 +304,7 @@ void SceneManager::key_pressed(const int key)
 		else if (key == '4')
 		{
 			// load scene 2
-			load_scene("Scenes/Scene4.xml");
+			load_scene("Scenes/blank_scene.xml");
 
 			fluid_manager_->explosion(500);
 		}
@@ -308,7 +318,7 @@ void SceneManager::key_pressed(const int key)
 		else if (key == '5')
 		{
 			// load scene 2
-			load_scene("Scenes/CircleScene.xml");
+			load_scene("Scenes/circle_scene.xml");
 
 			fluid_manager_->explosion(500);
 		}

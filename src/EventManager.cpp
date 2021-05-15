@@ -70,6 +70,10 @@ void EventManager::update()
 	{
 		full_input_ = true;
 	}
+	else
+	{
+		full_input_ = false;
+	}
 }
 
 void EventManager::draw_tutorial()

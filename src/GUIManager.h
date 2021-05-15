@@ -42,7 +42,7 @@ public:
 
 	// Events
 	void key_pressed(int key);
-	void window_resized(int w, int h);
+	void window_resized();
 
 	
 
@@ -131,6 +131,7 @@ public:
 	ofxFloatSlider gui_fluid_tuio_y_scaler;
 
 	ofRectangle main_mode_bounds;
+	ofRectangle tutorial_mode_bounds;
 	ofRectangle sandbox_mode_bounds;
 
 
@@ -157,6 +158,7 @@ private:
 
 	bool delete_all_;
 
+	ofTrueTypeFont potta_one_title_;
 	ofTrueTypeFont potta_one_main_;
 
 };

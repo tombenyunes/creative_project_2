@@ -69,6 +69,11 @@ void Player::follow_mouse()
 	{
 		set_position(ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
 	}
+	// to avoid the player moving after the menu is open
+	else if (gamemode_manager_->get_current_mode_string() == "Menu" && mouse_down_)
+	{
+		mouse_down_ = false;
+	}
 }
 
 void Player::pull_points()
@@ -140,29 +145,18 @@ void Player::mouse_released(const float x, const float y, const int button)
 
 void Player::key_pressed(const int key)
 {
-	if (key == 'r')
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox")
 	{
-		accel_ = { 0, 0 };
-		vel_ = { 0, 0 };
-		pos_ = { 0, 0 };
-	}
-	else if (key == 32)
-	{
-		//aimingBoost = true;
-	}
-	else if (gamemode_manager_->get_current_mode_string() == "Sandbox" && key == 't')
-	{
-		player_following_mouse_ = true;
+		if (key == 't')
+		{
+			player_following_mouse_ = true;
+		}
 	}
 }
 
 void Player::key_released(const int key)
 {
-	if (key == 32)
-	{
-		//boostPlayer();
-	}
-	else if (key == 't')
+	if (key == 't')
 	{
 		player_following_mouse_ = false;
 	}
