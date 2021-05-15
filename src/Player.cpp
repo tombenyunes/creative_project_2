@@ -43,6 +43,11 @@ void Player::apply_all_forces()
 	if (player_can_move())
 	{
 		apply_force(accel_, get_movement_vector(), true, movement_speed);
+		audio_manager_->event_player_started_moving();
+	}
+	else
+	{
+		audio_manager_->event_player_stopped_moving();
 	}
 }
 
@@ -72,7 +77,7 @@ void Player::follow_mouse()
 	// to avoid the player moving after the menu is open
 	else if (gamemode_manager_->get_current_mode_string() == "Menu" && mouse_down_)
 	{
-		mouse_down_ = false;
+		mouse_down_ = false;		
 	}
 }
 
@@ -128,7 +133,7 @@ void Player::mouse_pressed(const float x, const float y, const int button)
 {
 	mouse_down_ = true;
 	mouse_button_ = button;
-	mouse_pos_ = { x, y };
+	mouse_pos_ = { x, y };	
 }
 
 void Player::mouse_dragged(const float x, const float y, const int button)

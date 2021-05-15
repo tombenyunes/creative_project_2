@@ -52,6 +52,8 @@ public:
     void event_point_pulsed(ofVec2f point_position);
     void event_level_complete();
     void event_new_level_loaded();
+    void event_player_started_moving();
+    void event_player_stopped_moving();
 
     // the player pos starts at (0, 0) and ranges from (-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH) horizontally, and (-HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT) vertically
     ofVec2f player_pos;
