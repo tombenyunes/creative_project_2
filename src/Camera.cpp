@@ -32,12 +32,14 @@ void Camera::update(const ofVec2f player_pos)
 
 void Camera::calculate_mouse_coords()
 {
+	const float mult = ofGetHeight() / 1080.0f;
+	
 	// calculate local + world mouse positions	
 	const ofVec3f local_pos = ofVec3f(ofGetMouseX() - HALF_WORLD_WIDTH, ofGetMouseY() - HALF_WORLD_HEIGHT, 0);
 	
 	ofVec3f world_pos = screen_to_world(local_pos);
-	world_pos.x += WORLD_WIDTH * ofMap(get_scale(), 1.0f, 3.0f, 0.0f, 1.0f);
-	world_pos.y += WORLD_HEIGHT * ofMap(get_scale(), 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.x += WORLD_WIDTH * ofMap(get_scale() / mult, 1.0f, 3.0f, 0.0f, 1.0f);
+	world_pos.y += WORLD_HEIGHT * ofMap(get_scale() / mult, 1.0f, 3.0f, 0.0f, 1.0f);
 
 	local_mouse_pos_ = ofVec2f(ofGetMouseX() / 2 - ofGetWidth() / 2, ofGetMouseY() - ofGetHeight() / 2);
 	world_mouse_pos_ = world_pos;
@@ -86,7 +88,8 @@ void Camera::lerp_position()
 
 void Camera::handle_scale()
 {
-	cam_.setScale(scale_, scale_, 1);
+	const float mult = ofGetHeight() / 1080.0f;
+	cam_.setScale(get_scale() / mult, get_scale() / mult, 1);
 	
 	handle_bounds();
 	
@@ -131,28 +134,38 @@ void Camera::lerp_scale()
 	}
 }
 
+void Camera::set_zoom_mode(const Cam_modes_ view)
+{
+	if (view_ == Cam_modes_::player_view)
+	{
+		prev_player_view_scale_ = get_scale();
+
+		scale_to_lerp_to_ = 2.9f;
+		lerping_scale_ = true;
+
+		follow_player_ = false;
+	}
+	else
+	{
+		scale_to_lerp_to_ = prev_player_view_scale_;
+		lerping_scale_ = true;
+
+		follow_player_ = true;
+	}
+
+	view_ = view;
+}
+
 void Camera::toggle_zoom_mode()
 {
 	// toggle between 'player view' and 'map view' camera perspectives
 	if (view_ == Cam_modes_::player_view)
 	{
-		prev_player_view_scale_ = get_scale();
-		
-		scale_to_lerp_to_ = 2.9f;
-		lerping_scale_ = true;
-		
-		follow_player_ = false;
-		
-		view_ = Cam_modes_::map_view;		
+		set_zoom_mode(Cam_modes_::map_view);
 	}
 	else
-	{		
-		scale_to_lerp_to_ = prev_player_view_scale_;
-		lerping_scale_ = true;
-		
-		follow_player_ = true;
-		
-		view_ = Cam_modes_::player_view;
+	{
+		set_zoom_mode(Cam_modes_::player_view);
 	}
 }
 
@@ -235,7 +248,7 @@ void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scro
 			scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
 			lerping_scale_ = true;
 
-			//cout << "Zoom level: " << get_scale() << endl;
+			//cout << "Zoom level: " << scale_to_lerp_to_ << endl;
 		}
 		else
 		{

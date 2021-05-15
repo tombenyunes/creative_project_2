@@ -48,7 +48,7 @@ void SceneManager::update()
 				load_procedural_scene();
 
 				// zoom into the player
-				cam_->toggle_zoom_mode();
+				cam_->set_zoom_mode(Camera::player_view);
 
 				enter_pressed_ = false;
 				trig = false;
@@ -58,7 +58,7 @@ void SceneManager::update()
 				if (!trig)
 				{
 					// zoom out to view the completed level
-					cam_->toggle_zoom_mode();
+					cam_->set_zoom_mode(Camera::map_view);
 
 					// play level complete queue
 					audio_manager_->event_level_complete();

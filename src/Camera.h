@@ -8,20 +8,23 @@ class Camera {
 public:
 	
 	Camera();
-
-	// Updated
+	
 	void update(ofVec2f player_pos);
 	void calculate_mouse_coords();
 	void follow_player(ofVec2f player_pos);
 
+	// Position/scale handling + interpolation
 	void handle_position(ofVec2f player_pos);
-
 	void handle_scale();
 	void handle_bounds();
 	void lerp_scale();
 	void lerp_position();
 
-	// Helpers
+	// Modes
+	enum Cam_modes_ { player_view, map_view, free_view };
+
+	Cam_modes_ get_zoom_mode() const { return view_; }
+	void set_zoom_mode(const Cam_modes_ view);
 	void toggle_zoom_mode();
 
 	void begin();
@@ -54,12 +57,11 @@ public:
 	void mouse_pressed(int x, int y, int button);
 	void mouse_scrolled(int x, int y, float scroll_x, float scroll_y);
 	void mouse_released(int x, int y, int button);
-
+	
 private:
 
-	ofEasyCam cam_;	
-
-	enum Cam_modes_ { player_view, map_view, free_view };
+	ofEasyCam cam_;
+	
 	Cam_modes_ view_;
 
 	ofVec2f position_;
