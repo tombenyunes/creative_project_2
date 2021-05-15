@@ -60,7 +60,7 @@ void AudioManager::guiSetup() {
     //------------------------------------------------//
     gui.add(metGain.set("metronome gain", 0.02, 0, 1.0));
     //------------------------------------------------//
-    gui.add(sampleHitGain.set("sample Hit Gain", 1.38, 0.0, 4.0));
+    gui.add(sampleHitGain.set("sample Hit Gain", 1.8, 0.0, 4.0));
     gui.add(atmosGain.set("atmos gain", 2.0, 0, 7.0));
     //------------------------------------------------//
     gui.add(keyLoopGain.set("key loop gain", 0.0, 0, 4.0));
@@ -72,20 +72,21 @@ void AudioManager::guiSetup() {
     gui.add(keyLowGain.set("keys Low gain", 0., 0, 3.5));
     gui.add(keyLowPan.set("keys Low Pan", 0.1, 0, 1.0));
     //------------------------------------------------//
-    gui.add(synthLineGain.set("synth line gain", 0.18, 0, 0.5));
+    gui.add(synthLineGain.set("synth line gain", 0.8, 0, 2.0));
     gui.add(synthLinePan.set("synth line Pan", 0.05, 0, 1.0));
 
-    gui.add(subBassGain.set("sub Bass Gain", 0.14, 0.0, 1.0));
-    gui.add(polySynthGain.set("poly Synth Gain", 0.065, 0.0, 1.0));
+    gui.add(subBassGain.set("sub Bass Gain", 0.2, 0.0, 1.0));
+    gui.add(polySynthGain.set("poly Synth Gain", 0.26, 0.0, 1.0));
     gui.add(polySynthPan.set("poly Synth Pan", 0.215, 0.0, 1.0));
 
     gui.add(noiseAttack.set("Character Noise Attack", 1500, 0.0, 20000));
-    gui.add(noiseLevel.set("Noise Level", 0.004, 0.0, 0.05));
+    gui.add(noiseLevel.set("Noise Level", 0.009, 0.0, 0.05));
 
-    gui.add(squareBassGain.set("square Bass Gain", 0.05, 0.0, 1.0));
-    gui.add(sawSynthGain.set("saw Synth Gain", 0.15, 0.0, 1.0));
+    gui.add(squareBassGain.set("square Bass Gain", 0.03, 0.0, 1.0));
 
-    gui.add(stringsSynthGain.set("strings Synth Gain ", 0.215, 0.0, 1.0));
+    gui.add(sawSynthGain.set("saw Synth Gain", 0.195, 0.0, 1.0));
+
+    gui.add(stringsSynthGain.set("strings Synth Gain ", 0.3, 0.0, 1.0));
     gui.add(stringsSynthPan.set("strings Synth Pan", 0.215, 0.0, 1.0));
 
 
@@ -94,10 +95,10 @@ void AudioManager::guiSetup() {
     gui.add(beatGain.set("beat gain", 1.2, 0.0, 4.0));
     //------------------------------------------------//
     gui.add(lowResFreq.set("low-Res filter freq", 4000, 0, 4000));
-    gui.add(lowResQ.set("low-Res Filter Q", 0.5, 0, 4));
+    gui.add(lowResQ.set("low-Res Filter Q", 0.5, 0, 0));
 
     gui.add(hiResFreq.set("hi-Res filter freq", 00, 0, 500));
-    gui.add(hiResQ.set("hi-Res Filter Q", 0.5, 0, 4));
+    gui.add(hiResQ.set("hi-Res Filter Q", 0.5, 0, 0));
     //------------------------------------------------//
     gui.add(dryDelayMix.set("delay Wet/Dry Mix", 0.7, 0, 1));
     gui.add(delayFeedback.set("delay feedback", 0.5, 0, 0.9));
@@ -391,9 +392,15 @@ void AudioManager::charNoise() {
 void AudioManager::synthLine() {
     //synth arp sound
     //sBass_envOut = sBassEnv.ar(sBass.sinewave(sBassPitch), 0.05, 0.99, 5000, sBassTrigger) * synthLineGain;
+    if (synthPattern == 5) {
+        sBassDynamicVolume = -0.7;
+    }
+    else {
+        sBassDynamicVolume = 0;
+    }
 
     sBass_envOut = sBassEnv.adsr(1, sBassTrigger);
-    sBassOut = (sBass.sinewave(sBassPitch) * sBass_envOut) * synthLineGain;
+    sBassOut = (sBass.sinewave(sBassPitch) * sBass_envOut) * (synthLineGain + sBassDynamicVolume);
 
 
     synthDelay_out = synthDelay.dl(sBassOut, 44100 * 0.9, 0.4);
@@ -513,6 +520,8 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             //use to trigger patterns at the beginning of every 4 bars
             pattern_trigger = pattern_triggerLine[playHead % 64];
 
+            pattern_triggerB = pattern_triggerLineB[playHead % 16];
+
             //-----------loop-triggers------------//
             keyArpTrigger = keyArpSeq[playHead % 32];
             keyHiTrigger = keyHiSeq[playHead % 64];
@@ -613,6 +622,10 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             else if (synthPattern == 4) {
                 sBassTrigger = sBassLineTrigger3[playHead % 32];
             }
+            else if (synthPattern == 5) {
+                sBassTrigger = sBassLineTrigger4[playHead % 16];
+            }
+
 
             //switch pitch pattern sequence
 
@@ -654,23 +667,42 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                     }
 
                 }
+                else if (synthPattern == 5) {
+
+                    sBassPitch = mtof.mtof(sBassLinePitch5[sBassNote]);
+                    sBassNote++; //increment the pitch line
+                    if (sBassNote > 15) {
+                        sBassNote = 0;
+                    }
+
+                }
             }
 
             //--------------------SQAURE-BASS--------------------//
             if (squarePattern == 1) {
-
                 sq_BassTrigger = sq_BassLineTrigger[playHead % 64];
-
+            }
+            else if (squarePattern == 2) {
+                sq_BassTrigger = sq_BassLineTriggerB[playHead % 64];
             }
 
 
             if (sq_BassTrigger == 1) {
 
-                sq_BassPitch = mtof.mtof(sq_BassLinePitch[sequenceNote]);
-                //                sq_BassNote++; //increment the pitch line
-                //                if (sq_BassNote > 3) {
-                //                    sq_BassNote = 0;
-                //                }
+                if (squarePattern == 1) {
+                    sq_BassPitch = mtof.mtof(sq_BassLinePitch[sequenceNote]);
+
+                }
+                else if (squarePattern == 2) {
+                    sq_BassPitch = mtof.mtof(sq_BassLinePitchB[sq_BassNote]);
+
+                    sq_BassNote++; //increment the pitch line
+                    if (sq_BassNote > 0) {
+                        sq_BassNote = 0;
+                    }
+
+                }
+
 
             }
             //=============================================================//
@@ -697,6 +729,9 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             if (stringsPattern == 1 || stringsPattern == 2) {
                 strings_OscTrigger = strings_OscLineTrigger[playHead % 64];
             }
+            else if (stringsPattern == 3) {
+                strings_OscTrigger = pattern_triggerLineB[playHead % 16];
+            }
 
 
             if (strings_OscTrigger == 1) {
@@ -718,6 +753,12 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                     strings_Osc1Pitch = mtof.mtof(strings_OscLinePitch2B[sequenceNote]);
                     strings_Osc2Pitch = mtof.mtof(strings_OscLinePitch3B[sequenceNote]);
                 }
+                else if (stringsPattern == 3) {
+                    strings_OscPitch = mtof.mtof(strings_OscLinePitchC[sequenceNoteB]);
+                    strings_Osc1Pitch = mtof.mtof(strings_OscLinePitch2C[sequenceNoteB]);
+                    strings_Osc2Pitch = mtof.mtof(strings_OscLinePitch3C[sequenceNoteB]);
+                }
+
 
             }
 
@@ -753,6 +794,9 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                 poly_OscTrigger = poly_OscLineTrigger4[playHead % 16];
             }
             else if (polyPattern == 5) {
+                poly_OscTrigger = poly_OscLineTrigger[playHead % 16];
+            }
+            else if (polyPattern == 6) {
                 poly_OscTrigger = poly_OscLineTrigger[playHead % 16];
             }
 
@@ -792,9 +836,20 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                     poly_Osc1Pitch = mtof.mtof(poly_OscLinePitch4b[sequenceNote - 1]);
 
                 }
+                else if (polyPattern == 6) {
+                    poly_OscPitch = mtof.mtof(poly_OscLinePitch5[sequenceNoteB - 1]);
+                    poly_Osc1Pitch = mtof.mtof(poly_OscLinePitch5[sequenceNoteB - 1] + 12);
+
+                }
 
             }
             //=============================================================//
+            if (pattern_triggerB == 1) {
+                sequenceNoteB++;
+                if (sequenceNoteB > 3) {
+                    sequenceNoteB = 0;
+                }
+            }
 
             if (pattern_trigger == 1) {
                 sequenceNote++;
@@ -815,6 +870,15 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         //--------------//
         //SAWTOOTH-SYNTH//
         //--------------//
+
+        if (stringsPattern == 3) {
+            stringsDynamicVolume = -0.18;
+            stringsDynamicFilterFreq = 500;
+        }
+        else {
+            stringsDynamicVolume = 0;
+            stringsDynamicFilterFreq = 1000;
+        }
         strings_Osc_envOut = strings_OscEnv.adsr(1., strings_OscTrigger);
 
         strings_LFO_Out = strings_LFO.sinewave(strings_Osc_envOut);
@@ -829,8 +893,8 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         strings_OscFilter_out = strings_OscFilter.hires(strings_OscOut, 500 + strings_Osc_envOut * 10, 0);
         strings_OscFilter_out1 = strings_OscFilter1.hires(strings_Osc1Out, 500 + strings_Osc_envOut * 10, 0);
 
-        strings_OscOutMix = (strings_OscOut + strings_Osc1Out + strings_Osc2Out) * stringsSynthGain;
-        strings_OscFilter_out2 = strings_OscFilter.lores(strings_OscOutMix, 1000 - strings_Osc_envOut * 1000, 2);
+        strings_OscOutMix = (strings_OscOut + strings_Osc1Out + strings_Osc2Out) * (stringsSynthGain + stringsDynamicVolume);
+        strings_OscFilter_out2 = strings_OscFilter.lores(strings_OscOutMix, stringsDynamicFilterFreq - strings_Osc_envOut * 1000, 2);
 
 
         strings_OscStereo.stereo(strings_OscOutMix, strings_OscMix, stringsSynthPan);
@@ -959,6 +1023,7 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         sub_BassTrigger = 0;
         sq_BassTrigger = 0;
         sBassTrigger = 0;
+        strings_OscTrigger = 0;
 
         snareTrigger = 0;
         kickTrigger = 0;
@@ -1037,16 +1102,16 @@ void AudioManager::update(const ofVec2f player_position) {
     //synth line attack and release are afected when player is in the left and right segments of WORLD WIDTH
     double partWorldWidth = HALF_WORLD_WIDTH / 3;
     if (player_pos.x > partWorldWidth) {
-        playerSynthLineAttack = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 0, 10000);
-        playerSynthLineRelease = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 400, 800);
+        playerSynthLineAttack = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 3, 500);
+        playerSynthLineRelease = ofMap(player_pos.x, partWorldWidth, HALF_WORLD_WIDTH, 600, 700);
     }
     else if (player_pos.x < -partWorldWidth) {
-        playerSynthLineAttack = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 0, 4000);
-        playerSynthLineRelease = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 400, 800);
+        playerSynthLineAttack = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 3, 500);
+        playerSynthLineRelease = ofMap(player_pos.x, -partWorldWidth, -HALF_WORLD_WIDTH, 600, 200);
     }
     else {
-        playerSynthLineAttack = 1;
-        playerSynthLineRelease = 400;
+        playerSynthLineAttack = 3;
+        playerSynthLineRelease = 600;
     }
 
 
@@ -1229,6 +1294,51 @@ void AudioManager::update(const ofVec2f player_position) {
         sawPattern = 0;
         synthPattern = 4;
         stringsPattern = 2;
+    }
+    else if (patternSwitch == 12) {
+        drumPattern = 1;
+        polyPattern = 1;
+        sub_BassPattern = 1;
+        squarePattern = 2;
+        sawPattern = 0;
+        synthPattern = 4;
+        stringsPattern = 2;
+    }
+    else if (patternSwitch == 13) {
+        drumPattern = 0;
+        polyPattern = 6;
+        sub_BassPattern = 0;
+        squarePattern = 0;
+        sawPattern = 0;
+        synthPattern = 0;
+        stringsPattern = 0;
+    }
+    else if (patternSwitch == 14) {
+        drumPattern = 0;
+        polyPattern = 6;
+        sub_BassPattern = 0;
+        squarePattern = 0;
+        sawPattern = 0;
+        synthPattern = 0;
+        stringsPattern = 3;
+    }
+    else if (patternSwitch == 15) {
+        drumPattern = 2;
+        polyPattern = 6;
+        sub_BassPattern = 0;
+        squarePattern = 0;
+        sawPattern = 0;
+        synthPattern = 5;
+        stringsPattern = 3;
+    }
+    else if (patternSwitch == 16) {
+        drumPattern = 3;
+        polyPattern = 0;
+        sub_BassPattern = 1;
+        squarePattern = 2;
+        sawPattern = 0;
+        synthPattern = 5;
+        stringsPattern = 0;
     }
 
 
@@ -1420,7 +1530,6 @@ void AudioManager::keyPressed(int key) {
         patternSwitch++;
         if (patternSwitch > 10) {
             patternSwitch = 0;
-            cout << patternSwitch << endl;
         }
     }
 
@@ -1454,7 +1563,7 @@ void AudioManager::keyReleased(int key) {
 // triggered every time a point is collected/triggered
 void AudioManager::event_point_collected()
 {
-    //cout << "POINT COLLECTED" << endl;
+    cout << "POINT COLLECTED" << endl;
     playRandomSample(); // play random hit sample when point collected
 }
 
@@ -1462,13 +1571,13 @@ void AudioManager::event_point_collected()
 // the position of the point is passed through incase needed for panning etc
 void AudioManager::event_point_pulsed(const ofVec2f point_position)
 {
-    //cout << "POINT PULSED: " << point_position << endl;
+    cout << "POINT PULSED: " << point_position << endl;
 }
 
 // triggered when the final 'point' in a level has been collected
 void AudioManager::event_level_complete()
 {
-    //cout << "LEVEL COMPLETE" << endl;
+    cout << "LEVEL COMPLETE" << endl;
 
     hitSub.trigger(); //reset sample position to allow for retriggering
     subHitTrigger = 1; // play sub hit sample when all items collected
@@ -1480,15 +1589,15 @@ void AudioManager::event_level_complete()
 // ((i haven't made many levels yet so currently the game is just cycling through procedural levels))
 void AudioManager::event_new_level_loaded()
 {
-    //cout << "NEW LEVEL LOADED" << endl;
+    cout << "NEW LEVEL LOADED" << endl;
 
 
     //once level has finished change audio pattern
     patternSwitch++;
-    if (patternSwitch > 11) {
+    if (patternSwitch > 16) {
         patternSwitch = 0;
     }
-
+    cout << "pattern: " << patternSwitch << endl;
 }
 
 void AudioManager::event_player_started_moving()

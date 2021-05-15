@@ -174,6 +174,10 @@ public:
                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
     int sequenceNote = 0;
+
+    int pattern_triggerB;
+    int pattern_triggerLineB[16] = { 1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+    int sequenceNoteB = 0;
     //================//
 
     //===========BEATS================//
@@ -484,6 +488,8 @@ public:
 
     //=====STRINGS-SYNTH======//
     int stringsPattern;
+    double stringsDynamicVolume;
+    double stringsDynamicFilterFreq;
     //OSCILLATORS
     maxiOsc strings_Osc, strings_Osc1, strings_Osc2;
     double strings_OscOut, strings_Osc1Out, strings_Osc2Out, strings_OscOutMix;
@@ -524,6 +530,11 @@ public:
     int strings_OscLinePitchB[4] = { 77, 75, 77, 77 };
     int strings_OscLinePitch2B[4] = { 78, 78, 78, 78 };
     int strings_OscLinePitch3B[4] = { 82, 82, 82, 82 };
+
+
+    int strings_OscLinePitchC[4] = { 77, 75, 77, 77 };
+    int strings_OscLinePitch2C[4] = { 78, 78, 78, 78 };
+    int strings_OscLinePitch3C[4] = { 82, 80, 85, 87 };
     int strings_OscNote;
     //========================================//
     //========================================//
@@ -578,6 +589,9 @@ public:
 
     int poly_OscLinePitch4[4] = { 51, 56, 58, 56 };
     int poly_OscLinePitch4b[4] = { 58, 61, 66, 65 };
+
+    int poly_OscLinePitch5[4] = { 23, 30, 27, 20 };
+    int poly_OscLinePitch5b[4] = { 58, 61, 66, 65 };
 
     //    27, 32, 30, 25
     int poly_OscNote;
@@ -705,9 +719,17 @@ public:
                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 
+    int sq_BassLineTriggerB[64] = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0,
+                                    0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+                                    0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+                                    0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+
+
     //PITCH LINE
     float sq_BassPitch;
     int sq_BassLinePitch[4] = { 27, 32, 30, 25 };
+
+    int sq_BassLinePitchB[4] = { 27, 32, 30, 25 };
     int sq_BassNote;
     //========================================//
     //========================================//
@@ -753,6 +775,7 @@ public:
     //========SYNTH-BASS-LINE-ARP==============//
     double playerSynthLineAttack;
     double playerSynthLineRelease;
+    double sBassDynamicVolume;
     int synthPattern = 0;//use to swith synth pattern
     convert mtof;
 
@@ -780,6 +803,8 @@ public:
     int sBassLineTrigger3[32] = { 1,1,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,0,
                                   0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 
+    int sBassLineTrigger4[16] = { 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1 };
+
 
     //PITCH LINE
     float sBassPitch;
@@ -801,9 +826,17 @@ public:
                                 68, 70, 61
     };
 
+    int sBassLinePitch5[16] = { 58, 61, 63, 65,
+                                68, 70, 73, 75,
+                                77, 80, 82, 85,
+                                87, 89, 92, 94 };
+
+
+
 
 
     int sBassNote;
+
 
     //========================================//
     //========================================//
