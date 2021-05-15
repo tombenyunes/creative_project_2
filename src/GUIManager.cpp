@@ -103,6 +103,7 @@ GUIManager::GUIManager()
 
 	potta_one_title_.load("Fonts/PottaOne-Regular.ttf", 96, true, true);
 	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 24, true, true);
+	potta_one_sub_.load("Fonts/PottaOne-Regular.ttf", 16, true, true);
 	window_resized();
 }
 
@@ -277,9 +278,9 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const int new_no
 	else
 	{
 		draw_text(new_node_id, current_gamemode);
-
+		
 		if (current_gamemode == "Sandbox")
-		{
+		{			
 			draw_border();
 		}
 
@@ -340,13 +341,26 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 		break;
 	}
 
-	if (points_collected_ == max_point_count_)
+	if (current_gamemode == "Sandbox")
 	{
-		ofDrawBitmapString("Press 'Enter' to move to next level", glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 200));
+		ofDrawBitmapString("Entity Type: " + entity_type, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 150));
 	}
-	ofDrawBitmapString("Entity Type: " + entity_type, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 150));
-	ofDrawBitmapString("GameMode: " + current_gamemode, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
-	ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
+	else if (current_gamemode == "Procedural")
+	{
+		if (points_collected_ == max_point_count_)
+		{
+			potta_one_sub_.drawString("Press 'Enter' to move to next level", (ofGetWidth() / 2) - potta_one_sub_.stringWidth("Press 'Enter' to move to next level") / 2, ofGetHeight() - 150);
+			static bool init = false;
+			if (!init)
+			{
+				init = true;
+				cam_->toggle_zoom_mode();
+			}
+		}
+	}
+	
+	//ofDrawBitmapString("GameMode: " + current_gamemode, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
+	//ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
 }
 
 void GUIManager::draw_border() const
@@ -394,18 +408,12 @@ void GUIManager::draw_menu() const
 	else
 		ofSetColor(255);
 	potta_one_main_.drawString("Start", w - potta_one_main_.stringWidth("Start") / 2, h + (v_buf * 1));
-
-	if (tutorial_mode_bounds.intersects(ofRectangle(ofGetMouseX(), ofGetMouseY(), 0, 0)))
-		ofSetColor(155);
-	else
-		ofSetColor(255);
-	potta_one_main_.drawString("Tutorial", w - potta_one_main_.stringWidth("Tutorial") / 2, h + (v_buf * 2));
 	
 	if (sandbox_mode_bounds.intersects(ofRectangle(ofGetMouseX(), ofGetMouseY(), 0, 0)))
 		ofSetColor(155);
 	else
 		ofSetColor(255);
-	potta_one_main_.drawString("Sandbox Mode", w - potta_one_main_.stringWidth("Sandbox Mode") / 2, h + (v_buf * 3));
+	potta_one_main_.drawString("Sandbox Mode", w - potta_one_main_.stringWidth("Sandbox Mode") / 2, h + (v_buf * 2));
 	
 	ofPopMatrix();
 	ofPopStyle();
@@ -417,8 +425,7 @@ void GUIManager::window_resized()
 	const float h = ofGetHeight() / 2;
 	const float v_buf = 48;
 	main_mode_bounds = potta_one_main_.getStringBoundingBox("Start", w - potta_one_main_.stringWidth("Start") / 2, h + (v_buf * 1));
-	tutorial_mode_bounds = potta_one_main_.getStringBoundingBox("Tutorial", w - potta_one_main_.stringWidth("Tutorial") / 2, h + (v_buf * 2));
-	sandbox_mode_bounds = potta_one_main_.getStringBoundingBox("Sandbox Mode", w - potta_one_main_.stringWidth("Sandbox Mode") / 2, h + (v_buf * 3));
+	sandbox_mode_bounds = potta_one_main_.getStringBoundingBox("Sandbox Mode", w - potta_one_main_.stringWidth("Sandbox Mode") / 2, h + (v_buf * 2));
 }
 
 void GUIManager::key_pressed(const int key)

@@ -26,13 +26,16 @@ public:
 	void set_request_for_blank_scene(const bool req) { request_for_blank_scene_ = req; }
 	bool get_request_for_blank_scene() const { return request_for_blank_scene_; }
 
+	void set_is_transitioning(const bool val) { transitioning_ = val;  }
+	bool get_is_transitioning() const { return transitioning_; }
+	
 	void scene_load_fade();
 	void transition_scene();
 
 	void key_pressed(int key);
 	void mouse_pressed(int x, int y, int button);
 	
-	bool game_started_;
+	bool game_started_;	
 
 private:
 
@@ -44,7 +47,8 @@ private:
 	bool request_for_procedural_scene_;
 	bool request_for_blank_scene_;
 
-	bool transitioning_scenes_;
+	bool fading_;
+	bool transitioning_;
 	float fill_alpha_;
 	float text_alpha1_;
 	float text_alpha2_;

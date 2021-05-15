@@ -66,7 +66,7 @@ void EventManager::update()
 		}
 	}*/
 
-	if (gamemode_manager_->get_current_mode_string() != "Menu")
+	if (gamemode_manager_->get_current_mode_string() != "Menu" && gamemode_manager_->get_is_transitioning() != true)
 	{
 		full_input_ = true;
 	}

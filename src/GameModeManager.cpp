@@ -7,12 +7,13 @@ GamemodeManager::GamemodeManager(const int game_mode_id)
 	,	prev_mode_id_(game_mode_id)
 	,	request_for_procedural_scene_(false)
 	,	request_for_blank_scene_(false)
-	,	transitioning_scenes_(false)
+	,	fading_(false)
+	,	transitioning_(false)
 	,	fill_alpha_(0)
 {
 	log_current_mode();
 
-	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 24, true, true);
+	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 16, true, true);
 }
 
 void GamemodeManager::init(GUIManager* gui_manager)
@@ -27,16 +28,16 @@ void GamemodeManager::update()
 
 void GamemodeManager::draw()
 {
-	if (transitioning_scenes_)
+	if (fading_)
 	{
 		ofPushMatrix();
 		ofPushStyle();
 		ofSetColor(0, 0, 0, fill_alpha_);
 		ofDrawRectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 		ofSetColor(255, 255, 255, text_alpha1_);
-		potta_one_main_.drawString("Click to propell yourself", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Click to propell yourself") / 2, HALF_WORLD_HEIGHT);
+		potta_one_main_.drawString("Click to propell yourself", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Click to propell yourself") / 2, HALF_WORLD_HEIGHT - potta_one_main_.stringHeight("Click to propell yourself"));
 		ofSetColor(255, 255, 255, text_alpha2_);
-		potta_one_main_.drawString("Follow the trail", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Follow the trail") / 2, HALF_WORLD_HEIGHT + 50);
+		potta_one_main_.drawString("Follow the trail", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Follow the trail") / 2, HALF_WORLD_HEIGHT - potta_one_main_.stringHeight("Follow the trail") + 56);
 		ofPopStyle();
 		ofPopMatrix();
 	}
@@ -102,7 +103,7 @@ void GamemodeManager::log_current_mode() const
 
 void GamemodeManager::scene_load_fade()
 {
-	if (transitioning_scenes_)
+	if (fading_)
 	{
 		if (transitioning_text1_)
 		{
@@ -131,17 +132,23 @@ void GamemodeManager::scene_load_fade()
 			fill_alpha_ -= 0.5f;
 			text_alpha1_ -= 2;
 			text_alpha2_ -= 2;
+			
+			if (text_alpha1_ <= 0)
+			{
+				transitioning_ = false;
+			}
 			if (fill_alpha_ <= 0)
 			{
-				transitioning_scenes_ = false;
-			}			
+				fading_ = false;
+			}
 		}
 	}
 }
 
 void GamemodeManager::transition_scene()
 {
-	transitioning_scenes_ = true;
+	fading_ = true;
+	transitioning_ = true;
 	fill_alpha_ = 255;
 	text_alpha1_ = text_alpha2_ = 0;
 	transitioning_text1_ = transitioning_text2_ = true;
@@ -200,7 +207,7 @@ void GamemodeManager::mouse_pressed(const int x, const int y, const int button)
 			set_current_mode_id(0);
 			set_request_for_blank_scene(true);
 
-			transition_scene();
+			//transition_scene();
 		}
 	}
 }

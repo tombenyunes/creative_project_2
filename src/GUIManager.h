@@ -131,7 +131,6 @@ public:
 	ofxFloatSlider gui_fluid_tuio_y_scaler;
 
 	ofRectangle main_mode_bounds;
-	ofRectangle tutorial_mode_bounds;
 	ofRectangle sandbox_mode_bounds;
 
 
@@ -160,5 +159,6 @@ private:
 
 	ofTrueTypeFont potta_one_title_;
 	ofTrueTypeFont potta_one_main_;
+	ofTrueTypeFont potta_one_sub_;
 
 };
