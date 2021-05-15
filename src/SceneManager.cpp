@@ -37,25 +37,37 @@ void SceneManager::update()
 		load_blank_scene();
 		gamemode_manager_->set_request_for_blank_scene(false);
 	}
-	else if (entity_manager_->get_point_count() == Collectable::get_points_collected())
+	else if (gamemode_manager_->get_current_mode_string() == "Procedural")
 	{
-		static bool trig = false;
-		
-		if (enter_pressed_)
+		if (entity_manager_->get_point_count() == Collectable::get_points_collected())
 		{
-			load_procedural_scene();
-			enter_pressed_ = false;
-			trig = false;
-		}
-		else
-		{			
-			if (!trig)
+			static bool trig = false;
+
+			if (enter_pressed_)
 			{
-				audio_manager_->event_level_complete();
-				trig = true;
+				load_procedural_scene();
+
+				// zoom into the player
+				cam_->toggle_zoom_mode();
+
+				enter_pressed_ = false;
+				trig = false;
+			}
+			else
+			{
+				if (!trig)
+				{
+					// zoom out to view the completed level
+					cam_->toggle_zoom_mode();
+
+					// play level complete queue
+					audio_manager_->event_level_complete();
+
+					trig = true;
+				}
 			}
 		}
-	}	
+	}
 
 	if (entity_manager_->get_point_count() <= 0) {
 

@@ -350,12 +350,6 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 		if (points_collected_ == max_point_count_)
 		{
 			potta_one_sub_.drawString("Press 'Enter' to move to next level", (ofGetWidth() / 2) - potta_one_sub_.stringWidth("Press 'Enter' to move to next level") / 2, ofGetHeight() - 150);
-			static bool init = false;
-			if (!init)
-			{
-				init = true;
-				cam_->toggle_zoom_mode();
-			}
 		}
 	}
 	

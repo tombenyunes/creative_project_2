@@ -136,8 +136,7 @@ void Collectable::random_forces()
 		}
 		//fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
 
-		needs_to_pulse_radius_ = true;
-		audio_manager_->event_point_pulsed(get_position());
+		needs_to_pulse_radius_ = true;		
 
 		if (make_active_on_next_emission_)
 		{
@@ -186,6 +185,8 @@ void Collectable::pulse_radius()
 		set_radius(starting_radius_ * 2);
 		draw_particle_burst();
 		needs_to_pulse_radius_ = false;
+
+		audio_manager_->event_point_pulsed(get_position());
 	}
 	else if (get_radius() > starting_radius_)
 	{
@@ -391,11 +392,11 @@ void Collectable::draw()
 	}
 
 	// Draw outline
-	if (is_active_ || can_be_collected_)
+	if (is_active_ || can_be_collected_ || make_active_on_next_emission_)
 	{
 		if (is_active_)
 			alpha_ = ofMap(radius_, starting_radius_, starting_radius_ * 2, 0, 255);
-		else if (can_be_collected_)
+		else if (can_be_collected_ || make_active_on_next_emission_)
 			alpha_ = 100;
 
 		ofSetLineWidth(ofMap(radius_, starting_radius_, starting_radius_ * 2, 0.1f, 2.0f));
