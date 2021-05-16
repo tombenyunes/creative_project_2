@@ -103,28 +103,27 @@ void FluidManager::update()
 
 void FluidManager::update_from_gui()
 {
-	fluid_cells_x_ = gui_manager_->gui_fluid_cells;
-	resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
-	color_mult_ = gui_manager_->gui_fluid_color_mult;
+	//fluid_cells_x_ = gui_manager_->gui_fluid_cells;
+	//resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
+	//color_mult_ = gui_manager_->gui_fluid_color_mult;
 	velocity_mult_ = gui_manager_->gui_fluid_velocity_mult;
 	fluid_solver_.viscocity = gui_manager_->gui_fluid_viscocity;
-	fluid_solver_.colorDiffusion = gui_manager_->gui_fluid_color_diffusion;
-	fluid_solver_.fadeSpeed = gui_manager_->gui_fluid_fade_speed;
-	fluid_solver_.solverIterations = gui_manager_->gui_fluid_solver_iterations;
+	//fluid_solver_.colorDiffusion = gui_manager_->gui_fluid_color_diffusion;
+	//fluid_solver_.fadeSpeed = gui_manager_->gui_fluid_fade_speed;
+	//fluid_solver_.solverIterations = gui_manager_->gui_fluid_solver_iterations;
 	fluid_solver_.deltaT = gui_manager_->gui_fluid_delta_t;
 	reinterpret_cast<int&>(fluid_drawer_.drawMode) = gui_manager_->gui_fluid_draw_mode;
-	fluid_solver_.doRGB = gui_manager_->gui_fluid_do_rgb;
+	//fluid_solver_.doRGB = gui_manager_->gui_fluid_do_rgb;
 	fluid_solver_.doVorticityConfinement = gui_manager_->gui_fluid_do_vorticity_confinement;
-	draw_fluid_ = gui_manager_->gui_fluid_draw_fluid;
-	draw_particles_ = gui_manager_->gui_fluid_draw_particles;
-	fluid_drawer_.velDrawMult = gui_manager_->gui_fluid_vel_draw_mult;
-	fluid_drawer_.velDrawThreshold = gui_manager_->gui_fluid_vel_draw_threshold;
+	//draw_fluid_ = gui_manager_->gui_fluid_draw_fluid;
+	//draw_particles_ = gui_manager_->gui_fluid_draw_particles;
+	//fluid_drawer_.velDrawMult = gui_manager_->gui_fluid_vel_draw_mult;
+	//fluid_drawer_.velDrawThreshold = gui_manager_->gui_fluid_vel_draw_threshold;
 	fluid_drawer_.brightness = gui_manager_->gui_fluid_brightness;
-	fluid_drawer_.useAdditiveBlending = gui_manager_->gui_fluid_use_additive_blending;
-	fluid_solver_.wrap_x = gui_manager_->gui_fluid_wrap_x;
-	fluid_solver_.wrap_y = gui_manager_->gui_fluid_wrap_y;
-	tuio_x_scaler_ = gui_manager_->gui_fluid_tuio_x_scaler;
-	tuio_y_scaler_ = gui_manager_->gui_fluid_tuio_y_scaler;
+	//fluid_drawer_.useAdditiveBlending = gui_manager_->gui_fluid_use_additive_blending;
+	fluid_solver_.wrap_x = fluid_solver_.wrap_y = gui_manager_->gui_fluid_wrap_edges;
+	//tuio_x_scaler_ = gui_manager_->gui_fluid_tuio_x_scaler;
+	//tuio_y_scaler_ = gui_manager_->gui_fluid_tuio_y_scaler;
 }
 
 void FluidManager::draw(GameObject* player)
@@ -135,7 +134,7 @@ void FluidManager::draw(GameObject* player)
 
 void FluidManager::render_fluid()
 {
-	if (gui_manager_->gui_world_calculate_fluid)
+	if (gui_manager_->gui_fluid_calculate_fluid)
 	{
 		fluid_blur_.begin();
 		if (draw_fluid_)
@@ -153,7 +152,7 @@ void FluidManager::render_fluid()
 
 void FluidManager::render_particles(GameObject* player)
 {
-	if (gui_manager_->gui_world_calculate_particles)
+	if (gui_manager_->gui_fluid_calculate_particles)
 	{
 		if (draw_particles_)
 		{

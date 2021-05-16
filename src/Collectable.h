@@ -20,6 +20,7 @@ public:
 		last_id_collected_ = -404;
 		cur_id_ = -1;
 		points_collected_ = 0;
+		collectable_count_ = 0;
 	}
 	static int get_points_collected()
 	{
@@ -99,7 +100,7 @@ private:
 	static int last_id_collected_;
 
 	static int cur_id_;
-	int collectable_count_;
+	static int collectable_count_;
 
 	static int points_collected_;
 };

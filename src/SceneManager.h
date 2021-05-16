@@ -16,8 +16,10 @@ public:
 		void save_scene(string scene_name);
 	
 		void get_ready_for_new_scene() const;
-	
-		void load_scene(string path);
+
+		void load_scene_dialogue();
+		void load_scene(string path);	
+		void load_next_scene_in_sequence();
 		void load_procedural_scene() const;
 		void load_blank_scene();
 	
@@ -42,6 +44,8 @@ private:
 		ofxXmlSettings xml_;
 		ofxXmlSettings xml1_;
 
+		int current_scene_;
+	
 		bool enter_pressed_{};
 	
 };

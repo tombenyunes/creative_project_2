@@ -10,6 +10,7 @@ GamemodeManager::GamemodeManager(const int game_mode_id)
 	,	fading_(false)
 	,	transitioning_(false)
 	,	fill_alpha_(0)
+	,	main_mode_started_(false)
 {
 	log_current_mode();
 
@@ -62,6 +63,9 @@ string GamemodeManager::get_current_mode_string() const
 	case 2:
 		mode_text = "Menu";
 		break;
+	case 3:
+		mode_text = "Main";
+		break;
 	default:
 		mode_text = "[MODE ID UNDEFINED]";
 		break;
@@ -78,14 +82,20 @@ void GamemodeManager::set_current_mode_id(const int game_mode_id)
 	case 0: // sandbox mode
 		// show gui
 		gui_manager_->set_gui_visible(true);
-		if (!game_started_) game_started_ = true;
+		game_started_ = true;
 		break;
 	case 1: // procedural mode
 		// disable gui
 		gui_manager_->set_gui_visible(false);
-		if (!game_started_) game_started_ = true;
+		game_started_ = true;
 		break;
 	case 2: // menu mode
+		break;
+	case 3: // main mode
+		// disable gui
+		gui_manager_->set_gui_visible(false);
+		game_started_ = true;
+		main_mode_started_ = true;
 		break;
 	default:
 		break;
@@ -159,12 +169,13 @@ void GamemodeManager::key_pressed(const int key)
 {
 	if (key == 32) // 'space' toggles between modes
 	{
-		if (get_current_mode_id() == 0)
+		if (get_current_mode_string() == "Sandbox")
 		{
-			set_current_mode_id(1);
+			set_current_mode_id(prev_mode_id_);
 		}
-		else if (get_current_mode_id() == 1)
+		else if (get_current_mode_string() == "Procedural" || get_current_mode_string() == "Main")
 		{
+			prev_mode_id_ = get_current_mode_id();
 			set_current_mode_id(0);
 		}
 	}
@@ -193,14 +204,21 @@ void GamemodeManager::key_pressed(const int key)
 
 void GamemodeManager::mouse_pressed(const int x, const int y, const int button)
 {
-	if (get_current_mode_id() == 2)
+	if (get_current_mode_string() == "Menu")
 	{
 		if (button == 0 && gui_manager_->main_mode_bounds.intersects(ofRectangle(x, y, 0, 0)))
 		{
+			set_current_mode_id(3);
+			set_request_for_main_mode(true);
+			
+			//transition_scene();
+		}
+		else if (button == 0 && gui_manager_->procedural_mode_bounds.intersects(ofRectangle(x, y, 0, 0)))
+		{
 			set_current_mode_id(1);
 			set_request_for_procedural_scene(true);
-			
-			transition_scene();
+
+			//transition_scene();
 		}
 		else if (button == 0 && gui_manager_->sandbox_mode_bounds.intersects(ofRectangle(x, y, 0, 0)))
 		{

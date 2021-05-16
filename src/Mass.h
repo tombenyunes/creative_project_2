@@ -15,6 +15,7 @@ private:
 
 	// Physics/movement
 	void update_forces();
+	ofVec2f get_fluid_force();
 	void reset_forces();
 	
 	void drag_nodes();

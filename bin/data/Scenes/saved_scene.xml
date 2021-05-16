@@ -8,4 +8,25 @@
         <pos.x>0.000000000</pos.x>
         <pos.y>0.000000000</pos.y>
     </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>260.603973389</pos.x>
+        <pos.y>-193.970062256</pos.y>
+        <mass>1906.000000000</mass>
+        <radius>114.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>491.603820801</pos.x>
+        <pos.y>-19.958267212</pos.y>
+        <mass>2178.000000000</mass>
+        <radius>40.000000000</radius>
+    </GameObject>
+    <GameObject>
+        <type>Mass</type>
+        <pos.x>414.408264160</pos.x>
+        <pos.y>162.445663452</pos.y>
+        <mass>1864.000000000</mass>
+        <radius>219.000000000</radius>
+    </GameObject>
 </Scene>

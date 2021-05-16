@@ -45,15 +45,6 @@ void Spring::create_node(const ofVec2f node_pos, const ofVec2f node_vel, const o
 
 void Spring::update()
 {	
-	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
-	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);
-
-	for (int i = 0; i < node_positions_.size(); i++)
-	{
-		fluid_velocities_[i] = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(node_positions_[i].x + HALF_WORLD_WIDTH, node_positions_[i].y + HALF_WORLD_HEIGHT) * inv_window_size) * (1 * 0.06f) * window_size + fluid_velocities_[i] * 0.5f;
-		apply_force(node_accelerations_[i], fluid_velocities_[i], true, 10.0f);
-	}
-	
 	update_forces();
 	drag_nodes();
 	update_gui();
@@ -70,11 +61,20 @@ void Spring::apply_all_forces()
 {
 	for (int i = 0; i < node_positions_.size(); i++)
 	{
-		apply_force(node_accelerations_[i], update_springs(i) * time_step_, false);
+		apply_force(node_accelerations_[i], get_spring_force(i) * time_step_, false);
+		apply_force(node_accelerations_[i], get_fluid_force(i), true, 10.0f);
 	}
 }
 
-ofVec2f Spring::update_springs(const int node)
+ofVec2f Spring::get_fluid_force(const int node)
+{
+	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
+	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);
+	
+	return fluid_velocities_[node] = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(node_positions_[node].x + HALF_WORLD_WIDTH, node_positions_[node].y + HALF_WORLD_HEIGHT) * inv_window_size) * ofMap(node_masses_[node], 0, 500, 0.06f, 0.006f) * window_size + fluid_velocities_[node] * 0.5f;
+}
+
+ofVec2f Spring::get_spring_force(const int node)
 {
 	vector<ofVec2f> mass_spring_forces;
 	for (int i = 0; i < node_positions_.size(); i++)

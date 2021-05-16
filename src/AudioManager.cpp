@@ -1597,7 +1597,7 @@ void AudioManager::event_new_level_loaded()
     if (patternSwitch > 16) {
         patternSwitch = 0;
     }
-    cout << "pattern: " << patternSwitch << endl;
+    cout << "AudioManager: pattern: " << patternSwitch << endl;
 }
 
 void AudioManager::event_player_started_moving()

@@ -20,6 +20,7 @@ Player::Player(const ofVec2f pos, const ofColor color, const float radius)
 	add_module("ellipseCollider");
 	add_module("gravity");
 	add_module("friction");
+	add_module("mouseHover");
 }
 
 void Player::update()
@@ -107,16 +108,19 @@ void Player::pull_points()
 
 void Player::update_gui()
 {
-	static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
-	if (!initiai_values_triggered) {
-		initiai_values_triggered = true;
-		gui_manager_->update_player_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_);
-	}
-	else {
-		gui_manager_->update_player_values(pos_, vel_, accel_, gui_manager_->gui_player_mass, gui_manager_->gui_player_infinite_mass, gui_manager_->gui_player_radius); // receiving and updating the results from the GUI_Manager
-		if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->gui_player_mass;
-		radius_ = gui_manager_->gui_player_radius;
-		infinite_mass_ = gui_manager_->gui_player_infinite_mass;
+	if (get_is_selected())
+	{
+		static bool initiai_values_triggered = false; // initial values are sent to the gui_manager initially, after which it will update the results internally, and the object can receive the values back
+		if (!initiai_values_triggered) {
+			initiai_values_triggered = true;
+			gui_manager_->update_player_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_);
+		}
+		else {
+			gui_manager_->update_player_values(pos_, vel_, accel_, gui_manager_->gui_player_mass, gui_manager_->gui_player_infinite_mass, gui_manager_->gui_player_radius); // receiving and updating the results from the GUI_Manager
+			if (infinite_mass_) mass_ = 9999999999999999999.0f; else mass_ = gui_manager_->gui_player_mass;
+			radius_ = gui_manager_->gui_player_radius;
+			infinite_mass_ = gui_manager_->gui_player_infinite_mass;
+		}
 	}
 }
 
@@ -133,7 +137,23 @@ void Player::mouse_pressed(const float x, const float y, const int button)
 {
 	mouse_down_ = true;
 	mouse_button_ = button;
-	mouse_pos_ = { x, y };	
+	mouse_pos_ = { x, y };
+
+	if (button == 2 && mouse_over_)
+	{
+		if (get_is_selected() == false)
+		{
+			// select object
+			set_request_to_be_selected(true);
+
+			gui_values_need_to_be_set_ = true;
+		}
+		else
+		{
+			// deselect object
+			//set_request_to_be_deselected(true);
+		}
+	}
 }
 
 void Player::mouse_dragged(const float x, const float y, const int button)
@@ -181,9 +201,18 @@ void Player::boost_player()
 
 void Player::draw()
 {
-	if (gamemode_manager_->game_started_)
-	{
-		ofSetColor(255);
+	ofPushStyle();
+	
+	if (gamemode_manager_->get_current_mode_string() != "Menu")
+	{		
+		if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
+		{
+			set_color(selected_color_);
+		}
+		else
+		{
+			set_color(passive_color_);
+		}
 
 		if (aiming_boost_) draw_boost_direction();
 		draw_particle_trail();
@@ -192,6 +221,8 @@ void Player::draw()
 		ofFill();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 	}
+
+	ofPopStyle();
 }
 
 void Player::draw_boost_direction() const

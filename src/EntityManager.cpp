@@ -8,7 +8,7 @@ EntityManager::EntityManager(): selected_game_object_(nullptr),
 								audio_manager_(nullptr),
 								gamemode_manager_(nullptr),
 								cam_(nullptr),
-								new_node_type_id_(0)
+								new_node_type_id_(2)
 {	
 }
 
@@ -40,16 +40,13 @@ void EntityManager::add_game_object(GameObject* _gameobject) const
 
 void EntityManager::update()
 {
-	if (gui_manager_->gui_world_calculate_entities)
-	{
-		delete_game_objects();
-		find_selected();
+	delete_game_objects();
+	find_selected();
 
-		// update all gameobjects
-		for (auto& i : *get_game_objects())
-		{
-			i->root_update();
-		}
+	// update all gameobjects
+	for (auto& i : *get_game_objects())
+	{
+		i->root_update();
 	}
 }
 
@@ -199,19 +196,16 @@ void EntityManager::create_entity(const string entity_type, const ofVec2f pos, c
 		add_game_object(player);
 	}
 	if (entity_type == "Mass") {
-		cout << "Mass created" << endl;
 		GameObject* object = new Mass(pos, ofRandom(MASS_LOWER_BOUND, MASS_UPPER_BOUND), ofRandom(RADIUS_LOWER_BOUND, RADIUS_UPPER_BOUND));
 		object->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(object);
 	}
 	else if (entity_type == "Spring") {
-		cout << "Spring created" << endl;
 		GameObject* spring = new Spring(pos, { ofRandom(25, 50), ofRandom(25, 50) }, { ofRandom(25, 75), ofRandom(25, 75) }, 2, 2, 22);
 		spring->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(spring);
 	}
 	else if (entity_type == "Collectable") {
-		cout << "Collectable created" << endl;
 		// if collectable is created by player (e.g. sandbox mode) activate it by default
 		GameObject* point = new Collectable(pos, 15, 25, created_by_player);
 		point->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
@@ -268,6 +262,10 @@ void EntityManager::key_pressed(const int key)
 			{
 				set_new_node_type(get_new_node_type() + 1); // next
 			}
+			else
+			{
+				set_new_node_type(0);
+			}
 		}
 		else if (key == 'a')
 		{
@@ -277,7 +275,7 @@ void EntityManager::key_pressed(const int key)
 			}
 			else
 			{
-				set_new_node_type(0);
+				set_new_node_type(2);
 			}
 		}
 	}

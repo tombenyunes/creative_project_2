@@ -1,12 +1,14 @@
 #include "SceneManager.h"
 
-SceneManager::SceneManager(): game_controller_(nullptr),
-							  gui_manager_(nullptr),
-							  fluid_manager_(nullptr),
-                              audio_manager_(nullptr),
-                              entity_manager_(nullptr),
-                              gamemode_manager_(nullptr),
-                              cam_(nullptr)
+SceneManager::SceneManager()
+	:	game_controller_(nullptr)
+	,	gui_manager_(nullptr)
+	,	fluid_manager_(nullptr)
+	,	audio_manager_(nullptr)
+	,	entity_manager_(nullptr)
+	,	gamemode_manager_(nullptr)
+	,	cam_(nullptr)
+	,	current_scene_(-1)
 {
 	cout << "------------SceneManager.cpp------------" << endl;
 	cout << " - Press '1-4' to load preset scenes" << endl;
@@ -28,7 +30,13 @@ void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Ca
 }
 
 void SceneManager::update()
-{
+{	
+	if (gamemode_manager_->get_request_for_main_mode()) {
+		// Start sequence from beginning
+		current_scene_ = -1;
+		load_next_scene_in_sequence();
+		gamemode_manager_->set_request_for_main_mode(false);
+	}
 	if (gamemode_manager_->get_request_for_procedural_scene()) {
 		load_procedural_scene();
 		gamemode_manager_->set_request_for_procedural_scene(false);
@@ -37,7 +45,36 @@ void SceneManager::update()
 		load_blank_scene();
 		gamemode_manager_->set_request_for_blank_scene(false);
 	}
-	else if (gamemode_manager_->get_current_mode_string() == "Procedural")
+	else if (gui_manager_->gui_scene_new)
+	{
+		if (gui_manager_->get_request_new_scene()) {
+			gui_manager_->toggle_new_scene();
+			load_blank_scene();
+		}
+	}
+	else if (gui_manager_->gui_scene_save)
+	{
+		if (gui_manager_->get_request_save_scene()) {
+			gui_manager_->toggle_save_scene();
+			save_scene("Scenes/saved_scene");
+		}
+	}
+	else if (gui_manager_->gui_scene_quickload)
+	{
+		if (gui_manager_->get_request_quickload_scene()) {
+			gui_manager_->toggle_quickload_scene();
+			load_scene("Scenes/saved_scene.xml");
+		}
+	}
+	else if (gui_manager_->gui_scene_load)
+	{
+		if (gui_manager_->get_request_load_scene()) {
+			gui_manager_->toggle_load_scene();
+			load_scene_dialogue();
+		}
+	}
+	
+	if (gamemode_manager_->get_current_mode_string() == "Main" || gamemode_manager_->get_current_mode_string() == "Procedural")
 	{
 		if (entity_manager_->get_point_count() == Collectable::get_points_collected())
 		{
@@ -45,7 +82,14 @@ void SceneManager::update()
 
 			if (enter_pressed_)
 			{
-				load_procedural_scene();
+				if (gamemode_manager_->get_current_mode_string() == "Main")
+				{
+					load_next_scene_in_sequence();
+				}
+				else if (gamemode_manager_->get_current_mode_string() == "Procedural")
+				{
+					load_procedural_scene();
+				}
 
 				// zoom into the player
 				cam_->set_zoom_mode(Camera::player_view);
@@ -67,13 +111,9 @@ void SceneManager::update()
 				}
 			}
 		}
-	}
-
-	if (entity_manager_->get_point_count() <= 0) {
-
-		Collectable::reset_ids();
-		
-		if (gamemode_manager_->get_current_mode_id() == 1) {
+		if (entity_manager_->get_point_count() <= 0)
+		{
+			Collectable::reset_ids();
 			load_procedural_scene();
 		}
 	}
@@ -154,6 +194,16 @@ void SceneManager::get_ready_for_new_scene() const
 
 	gui_manager_->reset_point_counters();
 	Collectable::reset_ids();
+}
+
+void SceneManager::load_scene_dialogue()
+{
+	ofFileDialogResult load_result = ofSystemLoadDialog("Load Scene");
+	if (load_result.bSuccess) {
+		ofDisableDataPath();
+		load_scene(load_result.getPath());
+		ofEnableDataPath();
+	}
 }
 
 void SceneManager::load_scene(const string path)
@@ -251,6 +301,33 @@ void SceneManager::load_scene(const string path)
 	}
 }
 
+void SceneManager::load_next_scene_in_sequence()
+{
+	current_scene_++;
+
+	switch (current_scene_)
+	{
+	case 0:
+		load_scene("Scenes/scene_0.xml");
+		break;
+	case 1:
+		load_scene("Scenes/scene_3.xml");
+		break;
+	case 2:
+		load_scene("Scenes/scene_2.xml");
+		break;
+	case 3:
+		// Return to menu after completion
+		gamemode_manager_->set_current_mode_id(2);
+		break;
+	default:
+		cout << "[ Error >> SceneManager::load_next_scene_in_sequence >> 'current_scene_' undefined ]" << endl;		
+		break;		
+	}
+
+	fluid_manager_->explosion(500);
+}
+
 void SceneManager::load_procedural_scene() const
 {
 	get_ready_for_new_scene();
@@ -262,7 +339,8 @@ void SceneManager::load_procedural_scene() const
 	entity_manager_->create_entity("Player");
 	
 	for (int i = 0; i < 5; i++) {
-		entity_manager_->create_entity("Collectable", ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2)));
+		const ofVec2f pos = ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2));
+		entity_manager_->create_entity("Collectable", pos);
 	}	
 
 	cout << "------------SceneManager.cpp------------" << endl;
@@ -291,50 +369,44 @@ void SceneManager::reset_fluid() const
 
 void SceneManager::key_pressed(const int key)
 {
-	if (gamemode_manager_->get_current_mode_string() == "Sandbox") {
+	/*if (gamemode_manager_->get_current_mode_string() == "Sandbox") {
 		if (key == '1')
 		{
 			// load scene 1
 			load_scene("Scenes/Scene1.xml");
-
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '2')
 		{
 			// load scene 2
 			load_scene("Scenes/Scene2.xml");
-
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '3')
 		{
 			// load scene 2
 			load_scene("Scenes/Scene3.xml");
-
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '4')
 		{
 			// load scene 2
 			load_scene("Scenes/blank_scene.xml");
-
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '4')
 		{
 			// load scene 2
 			load_scene("Scenes/Scene4.xml");
-
 			fluid_manager_->explosion(500);
 		}
 		else if (key == '5')
 		{
 			// load scene 2
 			load_scene("Scenes/circle_scene.xml");
-
 			fluid_manager_->explosion(500);
 		}
-	}
+	}*/
 	
 	if (key == 13) //enter
 	{
@@ -349,22 +421,16 @@ void SceneManager::key_pressed(const int key)
 	{
 		// load quick-saved scene
 		load_scene("Scenes/saved_scene.xml");
-
-		fluid_manager_->explosion(500);
 	}
 	
 	else if (key == 'p')
 	{
-		load_procedural_scene();
+		//load_procedural_scene();
+		load_next_scene_in_sequence();
 	}
 	else if (key == 'o')
 	{
-		ofFileDialogResult load_result = ofSystemLoadDialog("Load Scene");
-		if (load_result.bSuccess) {
-			ofDisableDataPath();
-			load_scene(load_result.getPath());
-			ofEnableDataPath();
-		}
+		load_scene_dialogue();
 	}
 }
 

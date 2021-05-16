@@ -16,7 +16,8 @@ private:
 	// Physics/spring calculations
 	void update_forces();
 	void apply_all_forces();
-	ofVec2f update_springs(int node);
+	ofVec2f get_fluid_force(int node);
+	ofVec2f get_spring_force(int node);
 	void add_forces();
 	void reset_forces();
 

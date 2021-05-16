@@ -147,7 +147,8 @@ void Camera::set_zoom_mode(const Cam_modes_ view)
 	}
 	else
 	{
-		scale_to_lerp_to_ = prev_player_view_scale_;
+		//scale_to_lerp_to_ = prev_player_view_scale_;
+		scale_to_lerp_to_ = 1.0f;
 		lerping_scale_ = true;
 
 		follow_player_ = true;
@@ -186,11 +187,9 @@ void Camera::key_pressed(const int key)
 	}
 	else if (key == 'r')
 	{
-		if (view_ == Cam_modes_::player_view)
-		{
-			scale_to_lerp_to_ = 1;
-			lerping_scale_ = true;
-		}
+		set_zoom_mode(Cam_modes_::player_view);
+		scale_to_lerp_to_ = 1;
+		lerping_scale_ = true;
 	}
 	else if (key == 3682) // ctrl
 	{		

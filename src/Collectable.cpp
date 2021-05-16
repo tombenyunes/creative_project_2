@@ -11,7 +11,6 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	,	alpha_(0)
 	,	can_be_collected_(false)
 	,	id_(get_cur_id())
-	,	collectable_count_(0)
 {
 	set_type("Collectable");
 	set_position(pos);
@@ -35,9 +34,8 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 }
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const bool is_active)
-	: Collectable(pos, mass, radius, static_cast<int>(ofRandom(25, 100)), 0.1f, is_active)
-{
-}
+	: Collectable(pos, mass, ofRandom(15, 100), static_cast<int>(ofRandom(75, 100)), 0.1f, is_active)
+{}
 
 
 
@@ -46,6 +44,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 bool Collectable::first_point_ = true;
 int Collectable::last_id_collected_ = -404;
 int Collectable::cur_id_ = -1;
+int Collectable::collectable_count_ = 0;
 
 bool Collectable::first_point()
 {
@@ -60,6 +59,8 @@ bool Collectable::first_point()
 }
 int Collectable::get_cur_id()
 {
+	collectable_count_++;
+	
 	cur_id_++;
 	return cur_id_;
 }
@@ -83,7 +84,7 @@ void Collectable::update()
 	update_forces();
 	drag_nodes();
 	update_gui();
-	reset_forces();	
+	reset_forces();
 }
 
 bool Collectable::can_emit() const
@@ -197,7 +198,7 @@ void Collectable::pulse_radius()
 void Collectable::check_if_active()
 {
 	int next_id;
-	if (last_id_collected_ == 4)
+	if (last_id_collected_ == collectable_count_ - 1)
 		next_id = 0;
 	else
 		next_id = last_id_collected_ + 1;
@@ -405,12 +406,12 @@ void Collectable::draw()
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 	}
 
-	if (gamemode_manager_->get_current_mode_string() == "Sandbox" && !is_active_)
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox" && !is_active_ && !make_active_on_next_emission_)
 	{
 		ofPushStyle();
 		ofSetLineWidth(0.05);
 		ofNoFill();
-		ofSetColor(0, 255, 0);
+		(can_be_collected_) ? ofSetColor(0, 255, 0) : ofSetColor(255, 0, 0);
 		ofDrawEllipse(pos_.x, pos_.y, starting_radius_, starting_radius_);
 		ofPopStyle();
 	}

@@ -19,13 +19,7 @@ Mass::Mass(const ofVec2f pos, const float mass, const float radius)
 }
 
 void Mass::update()
-{
-	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
-	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);
-	
-	force_ = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(pos_.x + HALF_WORLD_WIDTH, pos_.y + HALF_WORLD_HEIGHT) * inv_window_size) * (1 * 0.0006f) * window_size + force_ * 0.5f;
-	apply_force(accel_, force_, false);
-	
+{	
 	update_forces();
 	drag_nodes();
 	update_gui();
@@ -34,7 +28,16 @@ void Mass::update()
 
 void Mass::update_forces()
 {
+	apply_force(accel_, get_fluid_force(), false);
 	add_forces(false);
+}
+
+ofVec2f Mass::get_fluid_force()
+{
+	const ofVec2f inv_window_size(1.0f / WORLD_WIDTH, 1.0f / WORLD_HEIGHT);
+	const ofVec2f window_size(WORLD_WIDTH, WORLD_HEIGHT);	
+	force_ = fluid_manager_->get_solver()->getVelocityAtPos(ofVec2f(pos_.x + HALF_WORLD_WIDTH, pos_.y + HALF_WORLD_HEIGHT) * inv_window_size) * ofMap(get_mass(), 0, 5000, 0.003f, 0.00006f) * window_size + force_ * 0.5f;
+	return force_;
 }
 
 void Mass::drag_nodes()
@@ -77,21 +80,13 @@ void Mass::update_gui()
 	{
 		if (gui_values_need_to_be_set_)
 		{
-			gui_manager_->update_mass_values(pos_, vel_, accel_, mass_, infinite_mass_, radius_);
+			gui_manager_->update_mass_values(pos_, vel_, accel_, mass_, radius_);
 			gui_values_need_to_be_set_ = false;
 		}
 		else {
-			gui_manager_->update_mass_values(pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_infinite_mass, gui_manager_->gui_node_radius);
-			if (infinite_mass_)
-			{
-				mass_ = 999999999999.0f;
-			}
-			else
-			{
-				mass_ = gui_manager_->gui_node_mass;
-			}
+			gui_manager_->update_mass_values(pos_, vel_, accel_, gui_manager_->gui_node_mass, gui_manager_->gui_node_radius);
 			radius_ = gui_manager_->gui_node_radius;
-			infinite_mass_ = gui_manager_->gui_node_infinite_mass;
+			mass_ = gui_manager_->gui_node_mass;
 		}
 	}
 }

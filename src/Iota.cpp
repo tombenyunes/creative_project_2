@@ -93,13 +93,8 @@ void Iota::draw()
 	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.draw();
 
 	cam.end();
-
-	if (entity_manager.get_selected_game_object() != nullptr && entity_manager.get_selected_game_object()->get_type() == "Spring") {
-		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string());
-	}
-	else {
-		gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string());
-	}
+	
+	gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string(), gamemode_manager.get_main_mode_started(), gamemode_manager.get_prev_gamemode());
 }
 
 void Iota::key_pressed(const int key)
