@@ -258,7 +258,7 @@ void Spring::ellipse_collider()
 
 void Spring::is_colliding(GameObject* other, const int node_index)
 {
-	audio_manager_->playRandomSample();
+	//audio_manager_->playRandomSample();
 
 	const ofVec2f force_vec = node_positions_[node_index] - other->get_position();
 	ofVec2f accel = force_vec / node_masses_[node_index];

@@ -29,8 +29,16 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	mouse_over_radius_mult_ = 2;
 
 	// incase a point is added in sandbox mode and is enabled by default
+	if (id_ == 0)
+	{
+		can_be_collected_ = true;
+	}
 	if (is_active_)
+	{
 		Collectable::points_collected_++;
+		last_id_collected_ = id_;
+		can_be_collected_ = false;
+	}		
 }
 
 Collectable::Collectable(const ofVec2f pos, const float mass, const float radius, const bool is_active)
@@ -71,14 +79,12 @@ int Collectable::points_collected_ = 0;
 
 void Collectable::update()
 {
+	check_if_active();
+	
 	if (can_emit())
 	{
 		random_forces();
 		pulse_radius();
-	}
-	else
-	{
-		check_if_active();
 	}
 	
 	update_forces();
@@ -197,15 +203,33 @@ void Collectable::pulse_radius()
 
 void Collectable::check_if_active()
 {
-	int next_id;
-	if (last_id_collected_ == collectable_count_ - 1)
-		next_id = 0;
-	else
-		next_id = last_id_collected_ + 1;
-
-	if (id_ == next_id)
+	if (!is_active_)
 	{
-		can_be_collected_ = true;
+		int next_id;
+		if (last_id_collected_ == collectable_count_ - 1)
+			next_id = 0;
+		else
+			next_id = last_id_collected_ + 1;
+
+		if (id_ == next_id)
+		{
+			can_be_collected_ = true;
+		}
+	}
+
+	// gui controls
+	if (gui_manager_->gui_world_activate_all_points)
+	{
+		is_active_ = true;
+		
+		if (id_ == Collectable::collectable_count_ - 1)
+			gui_manager_->gui_world_activate_all_points = false;
+	}
+	else if (gui_manager_->gui_world_deactivate_all_points)
+	{
+		is_active_ = false;
+		if (id_ == Collectable::collectable_count_ - 1)
+			gui_manager_->gui_world_deactivate_all_points = false;
 	}
 }
 
@@ -277,19 +301,22 @@ void Collectable::reset_forces()
 
 void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 {
-	if (other->get_type() == "PullRange")
+	if ((gamemode_manager_->get_current_mode_string() == "Sandbox" && gui_manager_->gui_world_enable_points_in_range) || gamemode_manager_->get_current_mode_string() != "Sandbox")
 	{
-		if (can_be_collected_ || Collectable::first_point())
+		if (other->get_type() == "PullRange")
 		{
-			first_point_ = false;
-			can_be_collected_ = false;
-			
-			make_active_on_next_emission_ = true;
-			alpha_ = 255;
-			Collectable::last_id_collected_ = id_;
-			Collectable::points_collected_++;
-			
-			audio_manager_->event_point_collected();
+			if (can_be_collected_/* || Collectable::first_point()*/)
+			{
+				first_point_ = false;
+				can_be_collected_ = false;
+
+				make_active_on_next_emission_ = true;
+				alpha_ = 255;
+				Collectable::last_id_collected_ = id_;
+				Collectable::points_collected_++;
+
+				audio_manager_->event_point_collected();
+			}
 		}
 	}
 	
@@ -380,43 +407,55 @@ void Collectable::mouse_released(const float x, const float y, const int button)
 
 void Collectable::draw()
 {
-	ofPushStyle();	
-
-	static int base_radius = get_radius();
+	ofPushStyle();
 	
-	// Draw inner fill
-	if (is_active_ || can_be_collected_)
+	draw_fill();
+	draw_outline();
+
+	ofPopStyle();
+}
+
+void Collectable::draw_fill()
+{
+	if (is_active_)
 	{
 		ofSetColor(ofColor(0, 0, 0, 50));
 		ofFill();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 	}
+}
 
+void Collectable::draw_outline()
+{
 	// Draw outline
-	if (is_active_ || can_be_collected_ || make_active_on_next_emission_)
+	if (gamemode_manager_->get_current_mode_string() == "Sandbox" || is_active_ || can_be_collected_ || make_active_on_next_emission_ || id_ == 0)
 	{
+		float r;
 		if (is_active_)
+		{
 			alpha_ = ofMap(radius_, starting_radius_, starting_radius_ * 2, 0, 255);
-		else if (can_be_collected_ || make_active_on_next_emission_)
+			r = radius_;
+		}
+		else
+		{
 			alpha_ = 100;
+			r = starting_radius_;
+		}
 
-		ofSetLineWidth(ofMap(radius_, starting_radius_, starting_radius_ * 2, 0.1f, 2.0f));
+		if (gamemode_manager_->get_current_mode_string() == "Sandbox" && !is_active_)
+		{
+			(can_be_collected_) ? ofSetColor(0, 255, 0) : ofSetColor(255, 0, 0);
+			ofSetLineWidth(0.05f);
+		}
+		else
+		{
+			get_color();
+			ofSetLineWidth(ofMap(radius_, starting_radius_, starting_radius_ * 2, 0.1f, 2.0f));
+		}
+
 		ofNoFill();
-		get_color();
-		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+		ofDrawEllipse(pos_.x, pos_.y, r, r);
 	}
-
-	if (gamemode_manager_->get_current_mode_string() == "Sandbox" && !is_active_ && !make_active_on_next_emission_)
-	{
-		ofPushStyle();
-		ofSetLineWidth(0.05);
-		ofNoFill();
-		(can_be_collected_) ? ofSetColor(0, 255, 0) : ofSetColor(255, 0, 0);
-		ofDrawEllipse(pos_.x, pos_.y, starting_radius_, starting_radius_);
-		ofPopStyle();
-	}
-
-	ofPopStyle();
 }
 
 void Collectable::get_color() const

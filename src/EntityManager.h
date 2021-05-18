@@ -33,7 +33,7 @@ public:
 
 	void create_entity() const;
 	void create_entity(string entity_type) const;
-	void create_entity(string entity_type, ofVec2f pos, bool created_by_player = false) const;
+	void create_entity(string entity_type, ofVec2f pos) const;
 
 	int get_point_count() const;
 	GameObject* get_player() const;

@@ -1523,17 +1523,14 @@ void AudioManager::keyPressed(int key) {
     //        }
     //    }
 
-
-
-
-    if (key == '0') {
-        patternSwitch++;
-        if (patternSwitch > 10) {
-            patternSwitch = 0;
-        }
+	if (key == '0')
+	{
+        set_pattern(patternSwitch + 1);
+	}
+    else if (key == '9')
+    {
+        set_pattern(patternSwitch - 1);
     }
-
-
 }
 
 //--------------------------------------------------------------
@@ -1593,11 +1590,7 @@ void AudioManager::event_new_level_loaded()
 
 
     //once level has finished change audio pattern
-    patternSwitch++;
-    if (patternSwitch > 16) {
-        patternSwitch = 0;
-    }
-    cout << "AudioManager: pattern: " << patternSwitch << endl;
+    increment_pattern();
 }
 
 void AudioManager::event_player_started_moving()
@@ -1607,6 +1600,21 @@ void AudioManager::event_player_started_moving()
 void AudioManager::event_player_stopped_moving()
 {
     noiseEnv.trigger = 0;
+}
+
+void AudioManager::set_pattern(const int pattern)
+{
+    patternSwitch = pattern;
+    cout << "AudioManager: pattern: " << patternSwitch << endl;
+}
+
+void AudioManager::increment_pattern()
+{
+    patternSwitch++;
+    if (patternSwitch > 16) {
+        patternSwitch = 0;
+    }
+    cout << "AudioManager: pattern: " << patternSwitch << endl;
 }
 
 // ==================================================================================== //

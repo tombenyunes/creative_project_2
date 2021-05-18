@@ -142,7 +142,7 @@ void FluidManager::render_fluid()
 			ofBackground(0);
 			ofClear(0);
 			glColor3f(1, 1, 1);
-			ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
+			//ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
 			fluid_drawer_.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 		}
 		fluid_blur_.end();

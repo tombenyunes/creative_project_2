@@ -34,20 +34,25 @@ GUIManager::GUIManager()
 
 	// Scene
 	panel_scene.setup("Scene", "", panel_pixel_buffer_, panel_pixel_buffer_);
-	panel_scene.add(gui_scene_new.setup("new scene"));
-	panel_scene.add(gui_scene_save.setup("save scene"));
-	panel_scene.add(gui_scene_quickload.setup("quickload scene"));
-	panel_scene.add(gui_scene_load.setup("load scene"));
+	panel_scene.add(gui_scene_new.setup("new scene (n)"));
+	panel_scene.add(gui_scene_save.setup("save scene (f5)"));
+	panel_scene.add(gui_scene_quickload.setup("quickload scene (f9)"));
+	panel_scene.add(gui_scene_load.setup("open scene (o)"));
 	
 	// World
-	panel_world.setup("World", "", panel_pixel_buffer_, panel_scene.getPosition().y + panel_scene.getHeight() + panel_pixel_buffer_);
+	panel_world.setup("Entities", "", panel_pixel_buffer_, panel_scene.getPosition().y + panel_scene.getHeight() + panel_pixel_buffer_);
 	panel_world.add(gui_world_delete_all.setup("delete all entities"));
 	//panel_world.add(gui_world_gravity.setup("global gravity", false));
 	//panel_world.add(gui_world_hard_collisions.setup("hard collisions", false));
 	panel_world.add(gui_world_calculate_entities.setup("render entities", true));
+	panel_world.add(gui_world_enable_points_upon_creation.setup("activate new points", true));
+	panel_world.add(gui_world_enable_points_in_range.setup("enable points in range", true));
+	panel_world.add(gui_world_activate_all_points.setup("activate all points", false));
+	panel_world.add(gui_world_deactivate_all_points.setup("deactivate all points", false));
+	panel_world.add(gui_world_point_force.setup("initial point force", 0.1f, 0.1f, 100));
 	
 	// Fluid
-	panel_fluid.setup("Fluid", "", panel_pixel_buffer_, panel_scene.getPosition().y + panel_scene.getHeight() + panel_pixel_buffer_);
+	panel_fluid.setup("Fluid", "", panel_pixel_buffer_, panel_world.getPosition().y + panel_world.getHeight() + panel_pixel_buffer_);
 	panel_fluid.add(gui_fluid_calculate_fluid.setup("calculate fluid", true));
 	panel_fluid.add(gui_fluid_calculate_particles.setup("calculate particles", true));	
 	//panel_fluid.add(gui_fluid_cells.setup("fluid cells", 100, 20, 400));
@@ -101,7 +106,7 @@ GUIManager::GUIManager()
 	panel_collectable.add(gui_collectable_pos.setup("pos", error_message));
 	panel_collectable.add(gui_collectable_radius.setup("radius", error_int, 10, 500));
 	panel_collectable.add(gui_collectable_emission_frequency.setup("emission Frequency", error_int, 15, 150));
-	panel_collectable.add(gui_collectable_emission_force.setup("emission Force", error_int, 0.1f, 20));
+	panel_collectable.add(gui_collectable_emission_force.setup("emission Force", error_int, 0.1f, 100));
 	panel_collectable.add(gui_collectable_is_active.setup("active", true));
 	panel_collectable.add(gui_collectable_id.setup("order in sequence", error_int));
 
@@ -489,8 +494,6 @@ void GUIManager::draw_menu(const bool main_mode_started, const string current_ga
 		potta_one_mini_.drawString("'tab' to toggle camera modes", w - potta_one_mini_.stringWidth("'tab' to toggle camera modes") / 2, h + (v_buf * 7.5f));
 		potta_one_mini_.drawString("'scrollwheel' to zoom/pan", w - potta_one_mini_.stringWidth("'scrollwheel' to zoom/pan") / 2, h + (v_buf * 8));
 		potta_one_mini_.drawString("'r' to reset zoom", w - potta_one_mini_.stringWidth("'r' to reset zoom") / 2, h + (v_buf * 8.5f));
-		potta_one_mini_.drawString("'f5' to quick-save", w - potta_one_mini_.stringWidth("'f5' to quick-save") / 2, h + (v_buf * 9));
-		potta_one_mini_.drawString("'f9' to quick-load", w - potta_one_mini_.stringWidth("'f9' to quick-load") / 2, h + (v_buf * 9.5f));
 	}
 	
 	ofPopMatrix();

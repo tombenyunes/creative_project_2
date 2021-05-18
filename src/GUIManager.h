@@ -76,6 +76,11 @@ public:
 	//ofxToggle gui_world_gravity;
 	//ofxToggle gui_world_hard_collisions;
 	ofxToggle gui_world_calculate_entities;
+	ofxToggle gui_world_enable_points_upon_creation;
+	ofxToggle gui_world_enable_points_in_range;
+	ofxToggle gui_world_activate_all_points;
+	ofxToggle gui_world_deactivate_all_points;
+	ofxFloatSlider gui_world_point_force;
 
 	// Scene
 	ofxButton gui_scene_new;

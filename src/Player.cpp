@@ -220,6 +220,9 @@ void Player::draw()
 		ofSetColor(color_);
 		ofFill();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
+
+		ofNoFill();
+		//ofDrawEllipse(pos_.x, pos_.y, 600, 600);	
 	}
 
 	ofPopStyle();

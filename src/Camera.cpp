@@ -136,22 +136,31 @@ void Camera::lerp_scale()
 
 void Camera::set_zoom_mode(const Cam_modes_ view)
 {
-	if (view_ == Cam_modes_::player_view)
+	if (view == Cam_modes_::map_view)
 	{
-		prev_player_view_scale_ = get_scale();
+		if (view_ == Cam_modes_::player_view)
+			prev_player_view_scale_ = get_scale();
 
 		scale_to_lerp_to_ = 2.9f;
 		lerping_scale_ = true;
 
 		follow_player_ = false;
+
+		cout << "SET TO MAP VIEW" << endl;
 	}
-	else
+	else if (view == Cam_modes_::player_view)
 	{
 		//scale_to_lerp_to_ = prev_player_view_scale_;
 		scale_to_lerp_to_ = 1.0f;
 		lerping_scale_ = true;
 
 		follow_player_ = true;
+
+		cout << "SET TO PLAYER VIEW" << endl;
+	}
+	else
+	{
+		cout << "CAMERA ERROR" << endl;
 	}
 
 	view_ = view;

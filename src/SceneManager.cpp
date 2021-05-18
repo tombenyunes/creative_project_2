@@ -30,12 +30,13 @@ void SceneManager::init(Controller* game_controller, GUIManager* gui_manager, Ca
 }
 
 void SceneManager::update()
-{	
+{
 	if (gamemode_manager_->get_request_for_main_mode()) {
 		// Start sequence from beginning
 		current_scene_ = -1;
 		load_next_scene_in_sequence();
 		gamemode_manager_->set_request_for_main_mode(false);
+		audio_manager_->set_pattern(0);
 	}
 	if (gamemode_manager_->get_request_for_procedural_scene()) {
 		load_procedural_scene();
@@ -85,6 +86,7 @@ void SceneManager::update()
 				if (gamemode_manager_->get_current_mode_string() == "Main")
 				{
 					load_next_scene_in_sequence();
+					audio_manager_->event_new_level_loaded();
 				}
 				else if (gamemode_manager_->get_current_mode_string() == "Procedural")
 				{
@@ -143,7 +145,7 @@ void SceneManager::save_scene(const string scene_name)
 		xml1_.pushTag("GameObject", i);
 		xml1_.addValue("type", (*entity_manager_->get_game_objects())[i]->get_type());
 		xml1_.addValue("pos.x", (*entity_manager_->get_game_objects())[i]->get_position().x);
-		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);		
+		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
 
 		// Mass properties
 		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Mass")
@@ -220,7 +222,23 @@ void SceneManager::load_scene(const string path)
 		const int fluid_count = xml_.getNumTags("Fluid");
 		for (int i = 0; i < fluid_count; i++) {
 			xml_.pushTag("Fluid", i);
-			reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode) = xml_.getValue("mode", -1);
+			
+			const int m = xml_.getValue("mode", -1);
+			reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode) = m;
+			gui_manager_->gui_fluid_draw_mode = m;
+
+			const float d = xml_.getValue("delta", 0.1f);
+			fluid_manager_->get_solver()->deltaT = d;
+			gui_manager_->gui_fluid_delta_t = d;
+
+			const float b = xml_.getValue("brightness", 1.0f);
+			fluid_manager_->get_drawer()->brightness = b;
+			gui_manager_->gui_fluid_brightness = b;
+			
+			bool w = xml_.getValue("wrap_edges", false);
+			fluid_manager_->get_solver()->setWrap(w, w);
+			gui_manager_->gui_fluid_wrap_edges = w;
+			
 			cout << "- Fluid Mode: " << xml_.getValue("mode", -1) << endl;
 			xml_.popTag();
 		}
@@ -304,21 +322,62 @@ void SceneManager::load_scene(const string path)
 void SceneManager::load_next_scene_in_sequence()
 {
 	current_scene_++;
-
+	cout << current_scene_ << endl;
 	switch (current_scene_)
 	{
 	case 0:
 		load_scene("Scenes/scene_0.xml");
 		break;
 	case 1:
-		load_scene("Scenes/scene_3.xml");
+		load_scene("Scenes/scene_1.xml");
 		break;
 	case 2:
 		load_scene("Scenes/scene_2.xml");
 		break;
 	case 3:
+		load_scene("Scenes/scene_3.xml");
+		break;
+	case 4:
+		load_scene("Scenes/scene_4.xml");
+		break;
+	case 5:
+		load_scene("Scenes/scene_5.xml");
+		break;
+	case 6:
+		load_scene("Scenes/scene_6.xml");
+		break;
+	case 7:
+		load_scene("Scenes/scene_7.xml");
+		break;
+	case 8:
+		load_scene("Scenes/scene_8.xml");
+		break;
+	case 9:
+		load_scene("Scenes/scene_9.xml");
+		break;
+	case 10:
+		load_scene("Scenes/scene_10.xml");
+		break;
+	case 11:
+		load_scene("Scenes/scene_11.xml");
+		break;
+	case 12:
+		load_scene("Scenes/scene_12.xml");
+		break;
+	case 13:
+		load_scene("Scenes/scene_13.xml");
+		break;
+	case 14:
+		load_scene("Scenes/scene_14.xml");
+		break;
+	case 15:
+		load_scene("Scenes/scene_15.xml");
+		break;
+	case 16:
 		// Return to menu after completion
 		gamemode_manager_->set_current_mode_id(2);
+		// reset audio pattern to zero
+		audio_manager_->set_pattern(0);
 		break;
 	default:
 		cout << "[ Error >> SceneManager::load_next_scene_in_sequence >> 'current_scene_' undefined ]" << endl;		
@@ -431,6 +490,10 @@ void SceneManager::key_pressed(const int key)
 	else if (key == 'o')
 	{
 		load_scene_dialogue();
+	}
+	else if (key == 'n')
+	{
+		load_blank_scene();
 	}
 }
 

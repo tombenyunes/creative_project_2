@@ -1,0 +1,33 @@
+<Scene>
+    <name>Scenes/scene_15</name>
+    <Fluid>
+        <mode>2</mode>
+        <brightness>0.25</brightness>
+        <wrap_edges>1</wrap_edges>
+    </Fluid>
+    <GameObject>
+        <type>Player</type>
+        <pos.x>0.000000000</pos.x>
+        <pos.y>0.000000000</pos.y>
+    </GameObject>
+    <GameObject>
+        <type>Collectable</type>
+        <pos.x>1016.000000000</pos.x>
+        <pos.y>0.000000000</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+        <emission_frequency>77.000000000</emission_frequency>
+        <emission_force>1.098999977</emission_force>
+        <is_active>1.000000000</is_active>
+    </GameObject>
+    <GameObject>
+        <type>Collectable</type>
+        <pos.x>1915.000000000</pos.x>
+        <pos.y>0.000000000</pos.y>
+        <mass>15.000000000</mass>
+        <radius>25.000000000</radius>
+        <emission_frequency>81.000000000</emission_frequency>
+        <emission_force>1.098999977</emission_force>
+        <is_active>0.000000000</is_active>
+    </GameObject>
+</Scene>

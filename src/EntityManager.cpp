@@ -164,8 +164,7 @@ void EntityManager::draw_game_objects() const
 
 void EntityManager::create_entity() const
 {
-	// if no args, get new node type
-	
+	// if no args, get new node type	
 	const int type_id = get_new_node_type();
 	if (type_id == 0)
 	{
@@ -183,12 +182,11 @@ void EntityManager::create_entity() const
 
 void EntityManager::create_entity(const string entity_type) const
 {
-	// if no pos, create at mouse pos
-	
-	create_entity(entity_type, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y), true);
+	// if no pos, create at mouse pos	
+	create_entity(entity_type, ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y));
 }
 
-void EntityManager::create_entity(const string entity_type, const ofVec2f pos, const bool created_by_player) const
+void EntityManager::create_entity(const string entity_type, const ofVec2f pos) const
 {	
 	if (entity_type == "Player") {
 		GameObject* player = new Player;
@@ -207,7 +205,7 @@ void EntityManager::create_entity(const string entity_type, const ofVec2f pos, c
 	}
 	else if (entity_type == "Collectable") {
 		// if collectable is created by player (e.g. sandbox mode) activate it by default
-		GameObject* point = new Collectable(pos, 15, 25, created_by_player);
+		GameObject* point = new Collectable(pos, 15, 25, static_cast<int>(ofRandom(75, 100)), gui_manager_->gui_world_point_force, (gamemode_manager_->get_current_mode_string() == "Sandbox") ? gui_manager_->gui_world_enable_points_upon_creation : false);
 		point->init(get_game_objects(), game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_, gamemode_manager_);
 		add_game_object(point);
 		gui_manager_->set_max_point_count(gui_manager_->get_max_point_count() + 1);

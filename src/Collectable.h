@@ -46,7 +46,9 @@ private:
 	
 	// Draw
 	void draw() override;
-	
+	void draw_fill();
+	void draw_outline();
+
 	void get_color() const;
 
 	// Events
