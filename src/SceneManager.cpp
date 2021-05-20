@@ -136,6 +136,11 @@ void SceneManager::save_scene(const string scene_name)
 	xml1_.addTag("Fluid");
 	xml1_.pushTag("Fluid", 0);
 	xml1_.addValue("mode", reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode));
+	xml1_.addValue("velocity_mult", gui_manager_->gui_fluid_velocity_mult);
+	xml1_.addValue("delta", fluid_manager_->get_solver()->deltaT);
+	xml1_.addValue("brightness", fluid_manager_->get_drawer()->brightness);
+	xml1_.addValue("wrap_edges", gui_manager_->gui_fluid_wrap_edges);
+	
 	xml1_.popTag();
 
 	for (int i = 0; i < entity_manager_->get_game_objects()->size(); i++)
@@ -144,8 +149,17 @@ void SceneManager::save_scene(const string scene_name)
 		xml1_.addTag("GameObject");
 		xml1_.pushTag("GameObject", i);
 		xml1_.addValue("type", (*entity_manager_->get_game_objects())[i]->get_type());
-		xml1_.addValue("pos.x", (*entity_manager_->get_game_objects())[i]->get_position().x);
-		xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
+
+		if ((*entity_manager_->get_game_objects())[i]->get_type() != "Player")
+		{
+			xml1_.addValue("pos.x", (*entity_manager_->get_game_objects())[i]->get_position().x);
+			xml1_.addValue("pos.y", (*entity_manager_->get_game_objects())[i]->get_position().y);
+		}
+		else
+		{
+			xml1_.addValue("pos.x", 0);
+			xml1_.addValue("pos.y", 0);
+		}
 
 		// Mass properties
 		if ((*entity_manager_->get_game_objects())[i]->get_type() == "Mass")
@@ -227,6 +241,10 @@ void SceneManager::load_scene(const string path)
 			reinterpret_cast<int&>(fluid_manager_->get_drawer()->drawMode) = m;
 			gui_manager_->gui_fluid_draw_mode = m;
 
+			const float v = xml_.getValue("velocity_mult", 7.0f);
+			fluid_manager_->set_velocity_mult(v);
+			gui_manager_->gui_fluid_velocity_mult = v;
+			
 			const float d = xml_.getValue("delta", 0.1f);
 			fluid_manager_->get_solver()->deltaT = d;
 			gui_manager_->gui_fluid_delta_t = d;
@@ -322,11 +340,12 @@ void SceneManager::load_scene(const string path)
 void SceneManager::load_next_scene_in_sequence()
 {
 	current_scene_++;
-	cout << current_scene_ << endl;
+	cout << "SceneManager: scene: " << current_scene_ << endl;
 	switch (current_scene_)
 	{
 	case 0:
 		load_scene("Scenes/scene_0.xml");
+		cam_->set_scale(1);
 		break;
 	case 1:
 		load_scene("Scenes/scene_1.xml");
@@ -381,6 +400,8 @@ void SceneManager::load_next_scene_in_sequence()
 		gamemode_manager_->set_current_mode_id(2);
 		// reset audio pattern to zero
 		audio_manager_->set_pattern(0);
+		entity_manager_->set_player_position(ofVec2f(0, 0));
+		cam_->set_scale(1);
 		break;
 	default:
 		cout << "[ Error >> SceneManager::load_next_scene_in_sequence >> 'current_scene_' undefined ]" << endl;		
@@ -400,10 +421,21 @@ void SceneManager::load_procedural_scene() const
 
 	entity_manager_->create_entity("Player");
 	
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++)
+	{
 		const ofVec2f pos = ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2));
 		entity_manager_->create_entity("Collectable", pos);
-	}	
+	}
+	for (int i = 0; i < ofRandom(1, 3); i++)
+	{
+		const ofVec2f pos = ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2));
+		entity_manager_->create_entity("Mass", pos);
+	}
+	for (int i = 0; i < ofRandom(1, 3); i++)
+	{
+		const ofVec2f pos = ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2));
+		entity_manager_->create_entity("Spring", pos);
+	}
 
 	cout << "------------SceneManager.cpp------------" << endl;
 	cout << " - New Procedural Level Loaded" << endl;

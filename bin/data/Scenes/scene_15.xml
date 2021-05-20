@@ -2,13 +2,15 @@
     <name>Scenes/scene_15</name>
     <Fluid>
         <mode>2</mode>
-        <brightness>0.25</brightness>
+        <velocity_mult>18.000000000</velocity_mult>
+        <delta>0.100000001</delta>
+        <brightness>0.689999998</brightness>
         <wrap_edges>1</wrap_edges>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>0.000000000</pos.x>
-        <pos.y>0.000000000</pos.y>
+        <pos.x>0</pos.x>
+        <pos.y>0</pos.y>
     </GameObject>
     <GameObject>
         <type>Collectable</type>

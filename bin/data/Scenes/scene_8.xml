@@ -1,12 +1,16 @@
 <Scene>
-    <name>Scenes/saved_scene</name>
+    <name>Scenes/scene_8</name>
     <Fluid>
         <mode>1</mode>
+        <velocity_mult>7.000000000</velocity_mult>
+        <delta>0.100000001</delta>
+        <brightness>1.000000000</brightness>
+        <wrap_edges>0</wrap_edges>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>1298.552734375</pos.x>
-        <pos.y>643.476623535</pos.y>
+        <pos.x>0</pos.x>
+        <pos.y>0</pos.y>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
@@ -179,8 +183,8 @@
     </GameObject>
     <GameObject>
         <type>Spring</type>
-        <pos.x>1084.154418945</pos.x>
-        <pos.y>-1314.536499023</pos.y>
+        <pos.x>1084.000000000</pos.x>
+        <pos.y>-1314.000000000</pos.y>
         <k>2.000000000</k>
         <damping>2.000000000</damping>
         <springmass>22.000000000</springmass>

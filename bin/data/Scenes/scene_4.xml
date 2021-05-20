@@ -1,17 +1,21 @@
 <Scene>
-    <name>Scenes/saved_scene</name>
+    <name>Scenes/scene_4</name>
     <Fluid>
         <mode>1</mode>
+        <velocity_mult>7.000000000</velocity_mult>
+        <delta>0.100000001</delta>
+        <brightness>1.000000000</brightness>
+        <wrap_edges>0</wrap_edges>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>0.000000000</pos.x>
-        <pos.y>0.000000000</pos.y>
+        <pos.x>0</pos.x>
+        <pos.y>0</pos.y>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-1639.377563477</pos.x>
-        <pos.y>-1185.067138672</pos.y>
+        <pos.x>-1639.000000000</pos.x>
+        <pos.y>-1185.000000000</pos.y>
         <mass>15.000000000</mass>
         <radius>55.000000000</radius>
         <emission_frequency>83.000000000</emission_frequency>

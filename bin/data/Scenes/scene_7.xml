@@ -2,11 +2,15 @@
     <name>Scenes/scene_7</name>
     <Fluid>
         <mode>1</mode>
+        <velocity_mult>7.000000000</velocity_mult>
+        <delta>0.100000001</delta>
+        <brightness>1.000000000</brightness>
+        <wrap_edges>0</wrap_edges>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>0.000000000</pos.x>
-        <pos.y>0.000000000</pos.y>
+        <pos.x>0</pos.x>
+        <pos.y>0</pos.y>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
@@ -130,36 +134,36 @@
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>1594.989135742</pos.x>
-        <pos.y>-1135.985717773</pos.y>
+        <pos.x>1594.000000000</pos.x>
+        <pos.y>-1135.000000000</pos.y>
         <mass>2342.000000000</mass>
         <radius>29.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>-1171.000244141</pos.x>
-        <pos.y>841.001342773</pos.y>
+        <pos.x>-1171.037597656</pos.x>
+        <pos.y>841.044799805</pos.y>
         <mass>979.000000000</mass>
         <radius>113.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>-1021.460021973</pos.x>
-        <pos.y>958.233703613</pos.y>
+        <pos.x>-1022.333679199</pos.x>
+        <pos.y>954.132873535</pos.y>
         <mass>913.000000000</mass>
         <radius>238.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>-1256.000000000</pos.x>
-        <pos.y>1012.000122070</pos.y>
+        <pos.x>-1256.001586914</pos.x>
+        <pos.y>1012.013977051</pos.y>
         <mass>2479.000000000</mass>
         <radius>136.000000000</radius>
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>1079.854614258</pos.x>
-        <pos.y>824.964721680</pos.y>
+        <pos.x>1079.000000000</pos.x>
+        <pos.y>824.000000000</pos.y>
         <mass>1579.000000000</mass>
         <radius>47.000000000</radius>
     </GameObject>
@@ -172,8 +176,8 @@
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>1085.863525391</pos.x>
-        <pos.y>771.983703613</pos.y>
+        <pos.x>1085.000000000</pos.x>
+        <pos.y>771.000000000</pos.y>
         <mass>2391.000000000</mass>
         <radius>44.000000000</radius>
     </GameObject>
@@ -186,8 +190,8 @@
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>1136.931884766</pos.x>
-        <pos.y>760.976257324</pos.y>
+        <pos.x>1136.000000000</pos.x>
+        <pos.y>760.000000000</pos.y>
         <mass>1903.000000000</mass>
         <radius>43.000000000</radius>
     </GameObject>
@@ -200,8 +204,8 @@
     </GameObject>
     <GameObject>
         <type>Mass</type>
-        <pos.x>590.009643555</pos.x>
-        <pos.y>-1253.880249023</pos.y>
+        <pos.x>590.000000000</pos.x>
+        <pos.y>-1253.000000000</pos.y>
         <mass>2467.000000000</mass>
         <radius>38.000000000</radius>
     </GameObject>

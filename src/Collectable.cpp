@@ -32,6 +32,7 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 	if (id_ == 0)
 	{
 		can_be_collected_ = true;
+		inc_alpha_ = true;
 	}
 	if (is_active_)
 	{
@@ -204,18 +205,29 @@ void Collectable::pulse_radius()
 }
 
 void Collectable::check_if_active()
-{
+{	
 	if (!is_active_)
 	{
-		int next_id;
-		if (last_id_collected_ == collectable_count_ - 1)
-			next_id = 0;
-		else
-			next_id = last_id_collected_ + 1;
-
-		if (id_ == next_id)
+		if (gamemode_manager_->get_current_mode_string() == "Procedural" && id_ == 0)
 		{
-			can_be_collected_ = true;
+			is_active_ = true;
+			last_id_collected_ = id_;
+			can_be_collected_ = false;
+			make_active_on_next_emission_ = false;
+		}
+		else
+		{
+			int next_id;
+			if (last_id_collected_ == collectable_count_ - 1)
+				next_id = 0;
+			else
+				next_id = last_id_collected_ + 1;
+
+			if (id_ == next_id)
+			{
+				can_be_collected_ = true;
+				inc_alpha_ = true;
+			}
 		}
 	}
 
@@ -438,7 +450,11 @@ void Collectable::draw_outline()
 		}
 		else
 		{
-			alpha_ = 100;
+			if (inc_alpha_ && alpha_ < 254)
+				alpha_+=2;
+			else
+				inc_alpha_ = false;
+
 			r = starting_radius_;
 		}
 
@@ -449,6 +465,7 @@ void Collectable::draw_outline()
 		}
 		else
 		{
+			(is_active_) ? set_color(ofColor(0, 255, 0)) : set_color(ofColor(255, 0, 0));
 			get_color();
 			ofSetLineWidth(ofMap(radius_, starting_radius_, starting_radius_ * 2, 0.1f, 2.0f));
 		}

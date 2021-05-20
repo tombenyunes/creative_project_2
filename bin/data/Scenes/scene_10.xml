@@ -2,12 +2,15 @@
     <name>Scenes/scene_10</name>
     <Fluid>
         <mode>3</mode>
-        <delta>0.5</delta>
+        <velocity_mult>2.000000000</velocity_mult>
+        <delta>0.500000000</delta>
+        <brightness>1.000000000</brightness>
+        <wrap_edges>0</wrap_edges>
     </Fluid>
     <GameObject>
         <type>Player</type>
-        <pos.x>0.000000000</pos.x>
-        <pos.y>0.000000000</pos.y>
+        <pos.x>0</pos.x>
+        <pos.y>0</pos.y>
     </GameObject>
     <GameObject>
         <type>Collectable</type>
@@ -21,12 +24,12 @@
     </GameObject>
     <GameObject>
         <type>Collectable</type>
-        <pos.x>-1451.000000000</pos.x>
-        <pos.y>-21.000000000</pos.y>
+        <pos.x>-534.000000000</pos.x>
+        <pos.y>3.000000000</pos.y>
         <mass>15.000000000</mass>
-        <radius>500.000000000</radius>
+        <radius>25.000000000</radius>
         <emission_frequency>150.000000000</emission_frequency>
         <emission_force>0.100000001</emission_force>
-        <is_active>0.000000000</is_active>
+        <is_active>1.000000000</is_active>
     </GameObject>
 </Scene>

@@ -98,6 +98,8 @@ private:
 	bool can_be_collected_;
 	static bool first_point_;
 
+	bool inc_alpha_;
+	
 	int id_{};
 	static int last_id_collected_;
 

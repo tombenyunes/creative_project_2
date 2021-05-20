@@ -18,19 +18,14 @@ void Iota::setup(ofBaseApp* app_ptr)
 	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
 	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
 	gui_manager.init(&game_controller, &audio_manager, &cam);
-
-	fluid_manager.init(&gui_manager);
-	
+	fluid_manager.init(&gui_manager);	
 	event_manager.init(&entity_manager, &gui_manager, &gamemode_manager);
 	event_manager.show_tutorial(false);
 	event_manager.setup();
-
 	audio_manager.setup(app_ptr);
-
 	gamemode_manager.init(&gui_manager);
 	
 	scene_manager.load_scene("Scenes/menu_scene.xml");
-	//scene_manager.load_procedural_scene();
 
 	menu_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
 }

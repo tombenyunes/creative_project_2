@@ -14,7 +14,7 @@ GamemodeManager::GamemodeManager(const int game_mode_id)
 {
 	log_current_mode();
 
-	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 16, true, true);
+	potta_one_main_.load("Fonts/PottaOne-Regular.ttf", 12, true, true);
 }
 
 void GamemodeManager::init(GUIManager* gui_manager)
@@ -38,7 +38,7 @@ void GamemodeManager::draw()
 		ofSetColor(255, 255, 255, text_alpha1_);
 		potta_one_main_.drawString("Click to propell yourself", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Click to propell yourself") / 2, HALF_WORLD_HEIGHT - potta_one_main_.stringHeight("Click to propell yourself"));
 		ofSetColor(255, 255, 255, text_alpha2_);
-		potta_one_main_.drawString("Follow the trail", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Follow the trail") / 2, HALF_WORLD_HEIGHT - potta_one_main_.stringHeight("Follow the trail") + 56);
+		potta_one_main_.drawString("Follow the trail", HALF_WORLD_WIDTH - potta_one_main_.stringWidth("Follow the trail") / 2, HALF_WORLD_HEIGHT - potta_one_main_.stringHeight("Follow the trail") + 40);
 		ofPopStyle();
 		ofPopMatrix();
 	}
@@ -169,7 +169,7 @@ void GamemodeManager::key_pressed(const int key)
 {
 	if (key == 32) // 'space' toggles between modes
 	{
-		if (get_current_mode_string() == "Sandbox")
+		/*if (get_current_mode_string() == "Sandbox")
 		{
 			set_current_mode_id(prev_mode_id_);
 		}
@@ -177,7 +177,7 @@ void GamemodeManager::key_pressed(const int key)
 		{
 			prev_mode_id_ = get_current_mode_id();
 			set_current_mode_id(0);
-		}
+		}*/
 	}
 	else if (key == 27) // 'escape'
 	{
@@ -211,7 +211,7 @@ void GamemodeManager::mouse_pressed(const int x, const int y, const int button)
 			set_current_mode_id(3);
 			set_request_for_main_mode(true);
 			
-			//transition_scene();
+			transition_scene();
 		}
 		else if (button == 0 && gui_manager_->procedural_mode_bounds.intersects(ofRectangle(x, y, 0, 0)))
 		{
