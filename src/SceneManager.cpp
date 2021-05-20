@@ -374,6 +374,9 @@ void SceneManager::load_next_scene_in_sequence()
 		load_scene("Scenes/scene_15.xml");
 		break;
 	case 16:
+		load_scene("Scenes/scene_16.xml");
+		break;
+	case 17:
 		// Return to menu after completion
 		gamemode_manager_->set_current_mode_id(2);
 		// reset audio pattern to zero

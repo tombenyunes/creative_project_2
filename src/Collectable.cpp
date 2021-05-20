@@ -151,6 +151,8 @@ void Collectable::random_forces()
 			make_active_on_next_emission_ = false;
 
 			gui_values_need_to_be_set_ = true;
+
+			audio_manager_->event_point_collected();
 		}
 
 		// if collectable is within screen bounds increment brightness
@@ -313,9 +315,7 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 				make_active_on_next_emission_ = true;
 				alpha_ = 255;
 				Collectable::last_id_collected_ = id_;
-				Collectable::points_collected_++;
-
-				audio_manager_->event_point_collected();
+				Collectable::points_collected_++;				
 			}
 		}
 	}
