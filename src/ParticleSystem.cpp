@@ -21,7 +21,6 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 	glEnable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
     glBlendFunc(GL_ONE,GL_ONE);
-//	glEnable(GL_LINE_SMOOTH);
     ofSetLineWidth(1);
 	
 	for(int i=0; i<MAX_PARTICLES; i++) {
@@ -33,11 +32,6 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 
 	vel = a_solver.getVelocityAtPos(pos * inv_window_size) * (1 * 0.6f) * window_size + player->get_velocity() * 0.5f;
 	pos += vel;
-	
-	//ofDrawEllipse(pos, 100, 100);
-	//player->set_position(ofVec2f(pos.x - 2000, pos.y - 1500));
-	//player->apply_force(player->get_accel(), vel * 100, true);
-	//player->add_forces(false);
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, pos_array_);
@@ -56,7 +50,6 @@ void ParticleSystem::update_and_draw(const msa::fluid::Solver &a_solver, const o
 
 void ParticleSystem::add_particles(const ofVec2f &pos, const int count){
 	for(int i=0; i<count; i++)
-		//add_particle(pos + msa::Rand::randVec2f() * 4);
 		add_particle(pos);
 }
 

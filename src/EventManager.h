@@ -10,14 +10,8 @@ public:
 	EventManager();
 
 	void init(EntityManager* entity_manager, GUIManager* gui_manager, GamemodeManager* gamemode_manager);
-
-	void setup();
+	
 	void update();
-	void draw_tutorial();
-
-	void key_pressed(int key);
-
-	void show_tutorial(bool value);
 
 	bool is_event_allowed(string event, int button = -1) const;
 
@@ -34,8 +28,7 @@ private:
 	int current_index_;
 	ofTrueTypeFont potta_one_main_;
 	ofTrueTypeFont potta_one_context_;
-
-	bool tutorial_enabled_;
+	
 	bool can_lmb_;
 	bool can_select_;
 	bool can_drag_;

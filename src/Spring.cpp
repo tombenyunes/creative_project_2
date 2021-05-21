@@ -140,7 +140,7 @@ void Spring::drag_nodes()
 				started_dragging_ = true;		
 			}
 			
-			const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y)/* + mouse_offset_from_center_*/;
+			const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 
 			ofVec2f new_pos; 
 			new_pos.x = ofLerp(node_positions_[mouse_over_index_].x, prev_pos2.x, 0.1f);
@@ -258,8 +258,6 @@ void Spring::ellipse_collider()
 
 void Spring::is_colliding(GameObject* other, const int node_index)
 {
-	//audio_manager_->playRandomSample();
-
 	const ofVec2f force_vec = node_positions_[node_index] - other->get_position();
 	ofVec2f accel = force_vec / node_masses_[node_index];
 	accel *= collision_mult_;
@@ -288,11 +286,6 @@ void Spring::mouse_pressed(const float x, const float y, const int button)
 			selected_node_index_ = mouse_over_index_; // index of selected node
 
 			gui_values_need_to_be_set_ = true;
-		}
-		else
-		{
-			// deselect object
-			//set_request_to_be_deselected(true);
 		}
 	}
 }
@@ -346,7 +339,6 @@ void Spring::draw()
 	}
 	
 	ofNoFill();
-	//ofSetColor(color_);
 	get_node_color(-2);
 
 	// lines connecting nodes
@@ -459,8 +451,6 @@ ofVec2f Spring::get_point_on_circle(const ofVec2f center, const float radians, c
 
 	const float x = center.x;
 	const float y = center.y;
-
-	//radians = radians - Math.toRadians(90.0); // 0 becomes the top
 
 	const float x_pos = round(static_cast<float>(x + cos(radians) * radius));
 	const float y_pos = round(static_cast<float>(y + sin(radians) * radius));

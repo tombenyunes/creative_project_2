@@ -26,11 +26,9 @@ void PlayerTrail::update()
 
 	pos_ = new_pos;
 
-	if (radius_ > 0) {
+	if (radius_ > 0)
+	{
 		radius_ -= 0.05f;
-	}
-	else {
-		//set_request_to_be_deleted(true);
 	}
 }
 

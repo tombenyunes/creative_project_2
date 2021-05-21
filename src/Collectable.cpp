@@ -14,7 +14,6 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 {
 	set_type("Collectable");
 	set_position(pos);
-	//set_color(ofColor(passive_color_));
 	set_color(ofColor(passive_color_.r, passive_color_.g, passive_color_.b, 100));
 	set_mass(mass);
 	set_radius(radius);
@@ -84,7 +83,7 @@ void Collectable::update()
 	
 	if (can_emit())
 	{
-		random_forces();
+		emit_forces();
 		pulse_radius();
 	}
 	
@@ -104,7 +103,7 @@ bool Collectable::can_emit() const
 }
 
 // collectables randomly emit 'shock waves' which in effect causes 'streams' of particles to form (this could help the player to locate collectables)
-void Collectable::random_forces()
+void Collectable::emit_forces()
 {
 	if (ofGetFrameNum() % static_cast<int>(emission_frequency_) == 0)
 	{
@@ -129,7 +128,6 @@ void Collectable::random_forces()
 					i2 = i + 1;
 
 				vel = (point_positions[i2] - point_positions[i]);
-				//vel = (point_positions[0] - point_positions[i])/* / 1000*/;
 				vel.normalize();
 			}
 		}		
@@ -142,7 +140,6 @@ void Collectable::random_forces()
 			
 			fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_ * 0.01f, true, true, 1);
 		}
-		//fluid_manager_->add_to_fluid(mapped_pos, vel * emission_force_, true, true, 100);
 
 		needs_to_pulse_radius_ = true;		
 
@@ -155,36 +152,6 @@ void Collectable::random_forces()
 
 			audio_manager_->event_point_collected();
 		}
-
-		// if collectable is within screen bounds increment brightness
-		/*for (auto& game_object : *game_objects_)
-		{
-			if (game_object->get_type() == "Player")
-			{
-				if (game_object->get_position().x < get_position().x + 1000 && game_object->get_position().x > get_position().x - 1000 &&
-					game_object->get_position().y < get_position().y + 500 && game_object->get_position().y > get_position().y - 500)
-				{
-					//fluid_manager_->increment_brightness();
-					player_within_bounds_ = true;
-				}
-				else
-				{
-					player_within_bounds_ = false;
-				}
-			}
-		}*/
-
-		/*const float pi = 3.14159f;
-		const float radius = 0.01f;
-		for (double angle = 0; angle <= 2 * pi; angle += 0.1)
-		{
-			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
-			//ofVec2f vel = ofVec2f(-0.0001, 0.0001);
-			const ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01f, 0.01f, -0.001f, 0.001f),
-										ofMap(radius * sin(angle), -0.01f, 0.01f, -0.001f, 0.001f));
-			//cout << vel << endl;
-			add_to_fluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
-		}*/
 	}
 }
 
@@ -193,7 +160,6 @@ void Collectable::pulse_radius()
 	if (needs_to_pulse_radius_)
 	{
 		set_radius(starting_radius_ * 2);
-		draw_particle_burst();
 		needs_to_pulse_radius_ = false;
 
 		audio_manager_->event_point_pulsed(get_position());
@@ -332,36 +298,6 @@ void Collectable::is_colliding(GameObject* other, ofVec2f node_pos)
 			}
 		}
 	}
-	
-	/*if (other->get_type() == "PullRange")
-	{
-		const ofVec2f direction_to_player = other->get_position() - pos_;
-		apply_force(accel_, direction_to_player, true, 2.75f);
-		other->set_request_to_be_deleted(true);
-	}
-	if (other->get_type() == "Player")
-	{
-		fluid_manager_->increment_brightness();
-		set_request_to_be_deleted_event("Collected");
-		set_request_to_be_deleted(true);
-	}*/
-}
-
-void Collectable::draw_particle_burst() const
-{
-	if (player_within_bounds_)
-	{
-		for (int i = 0; i < 1; i++)
-		{
-			//PlayerTrail* particle = nullptr;
-			//particle = new PlayerTrail(get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1)), ofRandom(1, 4), ofColor(255), 255);
-			//particles_->push_back(particle);
-
-			//GameObject* particle = new Mass(get_position() + ofVec2f(ofRandom(-get_radius() / 3, get_radius() / 3), ofRandom(-get_radius() / 3, get_radius() / 3)), 5, 5);
-			//particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
-			//game_objects_->push_back(particle);
-		}
-	}
 }
 
 
@@ -377,11 +313,6 @@ void Collectable::mouse_pressed(const float x, const float y, const int button)
 			set_request_to_be_selected(true);
 			
 			gui_values_need_to_be_set_ = true;
-		}
-		else
-		{
-			// deselect object
-			//set_request_to_be_deselected(true);
 		}
 	}
 }

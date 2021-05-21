@@ -67,8 +67,6 @@ private:
 	ofVec2f position_;
 	float scale_;
 	
-	bool ctrl_down_ = false;
-	
 	bool follow_player_;
 	float prev_player_view_scale_;
 	

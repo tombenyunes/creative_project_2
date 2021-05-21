@@ -42,8 +42,6 @@ GUIManager::GUIManager()
 	// World
 	panel_world.setup("Entities", "", panel_pixel_buffer_, panel_scene.getPosition().y + panel_scene.getHeight() + panel_pixel_buffer_);
 	panel_world.add(gui_world_delete_all.setup("delete all entities"));
-	//panel_world.add(gui_world_gravity.setup("global gravity", false));
-	//panel_world.add(gui_world_hard_collisions.setup("hard collisions", false));
 	panel_world.add(gui_world_calculate_entities.setup("render entities", true));
 	panel_world.add(gui_world_enable_points_upon_creation.setup("activate new points", true));
 	panel_world.add(gui_world_enable_points_in_range.setup("enable points in range", true));
@@ -55,27 +53,13 @@ GUIManager::GUIManager()
 	panel_fluid.setup("Fluid", "", panel_pixel_buffer_, panel_world.getPosition().y + panel_world.getHeight() + panel_pixel_buffer_);
 	panel_fluid.add(gui_fluid_calculate_fluid.setup("calculate fluid", true));
 	panel_fluid.add(gui_fluid_calculate_particles.setup("calculate particles", true));	
-	//panel_fluid.add(gui_fluid_cells.setup("fluid cells", 100, 20, 400));
-	//panel_fluid.add(gui_fluid_resize_fluid.setup("resize"));
-	//panel_fluid.add(gui_fluid_color_mult.setup("color mult", 100.0f, 0.0f, 100.0f));
 	panel_fluid.add(gui_fluid_velocity_mult.setup("velocity mult", 7.0f, 0.0f, 100.0f));
 	panel_fluid.add(gui_fluid_viscocity.setup("viscocity", 0.00015f, 0.0f, 0.004f));
-	//panel_fluid.add(gui_fluid_color_diffusion.setup("color diffusion", 0.0f, 0.0f, 0.0003f));
-	//panel_fluid.add(gui_fluid_fade_speed.setup("fade speed", 0.002f, 0.0f, 0.1f));
-	//panel_fluid.add(gui_fluid_solver_iterations.setup("solver interations", 10, 0 /*1*/, 50));
 	panel_fluid.add(gui_fluid_delta_t.setup("delta t", 0.1f, 0.1f, 1.0f));
 	panel_fluid.add(gui_fluid_draw_mode.setup("draw mode", 1, 1, 3));
-	//panel_fluid.add(gui_fluid_do_rgb.setup("rgb", true));
 	panel_fluid.add(gui_fluid_do_vorticity_confinement.setup("vorticity confinement", false));
-	//panel_fluid.add(gui_fluid_draw_fluid.setup("draw fluid", true));
-	//panel_fluid.add(gui_fluid_draw_particles.setup("draw particles", true));
-	//panel_fluid.add(gui_fluid_vel_draw_mult.setup("vel draw mult", 1.0f, 0.0f, 20.0f));
-	//panel_fluid.add(gui_fluid_vel_draw_threshold.setup("vel draw threshold", 0.0f, 0.0f, 1.0f));
 	panel_fluid.add(gui_fluid_brightness.setup("brightness", 1.0f, 0.0f, 2.0f));
-	//panel_fluid.add(gui_fluid_use_additive_blending.setup("additive blending", false));
 	panel_fluid.add(gui_fluid_wrap_edges.setup("wrap edges", false));
-	//panel_fluid.add(gui_fluid_tuio_x_scaler.setup("tuio x scaler", 1.0f, 0.0f, 2.0f));
-	//panel_fluid.add(gui_fluid_tuio_y_scaler.setup("tuio y scaler", 1.0f, 0.0f, 2.0f));
 	panel_fluid.add(gui_fluid_reset_fluid.setup("reset settings"));
 
 	// Metrics
@@ -98,7 +82,6 @@ GUIManager::GUIManager()
 	panel_node.add(gui_node_vel.setup("vel", error_message));
 	panel_node.add(gui_node_accel.setup("acceleration", error_message));
 	panel_node.add(gui_node_mass.setup("mass", error_int, MINIMUM_MASS, MAXIMUM_MASS));
-	//panel_node.add(gui_node_infinite_mass.setup("infinite mass", false));
 	panel_node.add(gui_node_radius.setup("radius", error_int, RADIUS_MINIMUM, RADIUS_MAXIMUM));
 
 	// Collectable
@@ -150,9 +133,6 @@ void GUIManager::update()
 
 void GUIManager::update_world()
 {
-	//game_controller_->set_gravity(gui_world_gravity);
-	//game_controller_->set_use_hard_collisions(gui_world_hard_collisions);
-	
 	gui_perf_fps = ofToString(ofGetFrameRate());
 	gui_perf_frametime = ofToString(ofGetLastFrameTime());
 }
@@ -360,7 +340,7 @@ void GUIManager::draw_required_gui(GameObject* selected_object, const int new_no
 
 		
 
-		if (get_gui_visible() /*|| Event_Manager->playerGUIVisible*/)
+		if (get_gui_visible())
 		{	
 			if (selected_object != nullptr)
 			{
@@ -432,9 +412,6 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 			potta_one_mini_.drawString("Or 'Tab' to continue playing", (ofGetWidth() / 2) - potta_one_sub_.stringWidth("Or 'Tab' to continue playing") / 2, ofGetHeight() - 100);
 		}
 	}
-	
-	//ofDrawBitmapString("GameMode: " + current_gamemode, glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 100));
-	//ofDrawBitmapString("Collectables Found: " + to_string(points_collected_) + " / " + to_string(max_point_count_), glm::vec2((ofGetWidth() / 2) - 100, ofGetHeight() - 50));
 }
 
 void GUIManager::draw_border() const

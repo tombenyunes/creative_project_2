@@ -2,33 +2,24 @@
 
 void Iota::setup(ofBaseApp* app_ptr)
 {
-	//ofSetWindowPosition(3849, 649);
-	//ofSetWindowShape(1920, 1080);
-	//ofSetWindowShape(1920, 1019);
-	//ofSetWindowPosition((ofGetScreenWidth() - ofGetWindowWidth()) / 2, (ofGetScreenHeight() - ofGetWindowHeight()) / 2);
 	ofSetWindowTitle("iota");
-	//ofSetFullscreen(true);
 	ofSetCircleResolution(176);
 	ofBackground(0);
 	ofSetVerticalSync(true);
-	window_resized(ofGetWidth(), ofGetHeight());
 	ofEnableAlphaBlending();
 	ofSetBackgroundAuto(true);
 	ofSetEscapeQuitsApp(false);
+	window_resized(ofGetWidth(), ofGetHeight());
 
-	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
-	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
-	gui_manager.init(&game_controller, &audio_manager, &cam);
-	fluid_manager.init(&gui_manager);	
 	event_manager.init(&entity_manager, &gui_manager, &gamemode_manager);
-	event_manager.show_tutorial(false);
-	event_manager.setup();
-	audio_manager.setup(app_ptr);
 	gamemode_manager.init(&gui_manager);
+	scene_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &entity_manager, &gamemode_manager);
+	entity_manager.init(&game_controller, &gui_manager, &cam, &fluid_manager, &audio_manager, &gamemode_manager);
+	fluid_manager.init(&gui_manager);	
+	audio_manager.setup(app_ptr);
+	gui_manager.init(&game_controller, &audio_manager, &cam);
 	
 	scene_manager.load_scene("Scenes/menu_scene.xml");
-
-	menu_blur_.setup(WORLD_WIDTH, WORLD_HEIGHT, 32, 0.2f, 2);
 }
 
 void Iota::audio_out(float* output, const int buffer_size, const int n_channels)
@@ -38,58 +29,35 @@ void Iota::audio_out(float* output, const int buffer_size, const int n_channels)
 
 void Iota::update()
 {
-	cam.update(entity_manager.get_player_position());
-	entity_manager.update();
-	gui_manager.update();
 	event_manager.update();
+	gamemode_manager.update();
+	scene_manager.update();
+	entity_manager.update();
 	fluid_manager.update();
 	audio_manager.update(entity_manager.get_player()->get_position());
-	scene_manager.update();
-	gamemode_manager.update();
-
-	//menu_blur_.setScale(ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 10));
-	//menu_blur_.setRotation(ofMap(ofGetMouseY(), 0, ofGetHeight(), -PI, PI));
+	gui_manager.update();
+	cam.update(entity_manager.get_player_position());
 }
 
 void Iota::draw()
 {	
 	cam.begin();
 
-	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.begin();
-	
+	// draw fluid and particle systemS
 	fluid_manager.draw(entity_manager.get_player());
-
-	/*ofPushMatrix();
-	ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT);
-		for (int i = 0; i < entity_manager.get_game_objects()->size(); i++)
-		{
-			if ((*entity_manager.get_game_objects())[i]->get_type() == "Collectable")
-			{
-				ofVec2f pos = (*entity_manager.get_game_objects())[i]->get_position();
-				audio_manager.draw(ofVec2f(pos.x, pos.y));
-			}
-		}
-	ofPopMatrix();*/
-
 	
-	//audio_manager.draw();			// draw the audio waveform
-
-	
+	// draw all entities
 	ofPushMatrix();
-
 	ofTranslate(HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT);
 	entity_manager.draw_game_objects();
-	event_manager.draw_tutorial();
-
 	ofPopMatrix();
-	
+
+	// gamemode menu + transitions
 	gamemode_manager.draw();
 
-	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.end();
-	//if (gamemode_manager.get_current_mode_id() == 2) menu_blur_.draw();
-
 	cam.end();
-	
+
+	// gui
 	gui_manager.draw_required_gui(entity_manager.get_selected_game_object(), entity_manager.get_new_node_type(), gamemode_manager.get_current_mode_string(), gamemode_manager.get_main_mode_started(), gamemode_manager.get_prev_gamemode());
 }
 
@@ -102,13 +70,12 @@ void Iota::key_pressed(const int key)
 		audio_manager.keyPressed(key);
 		cam.key_pressed(key);
 		fluid_manager.key_pressed(key);
-		event_manager.key_pressed(key);
 		scene_manager.key_pressed(key);		
 		fluid_manager.key_pressed(key);
 		gui_manager.key_pressed(key);
 	}
 	
-	if (key == 57354) //f11
+	if (key == 57354) // f11
 	{
 		ofToggleFullscreen();
 	}

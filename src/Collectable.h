@@ -59,10 +59,9 @@ private:
 	// Collisions (pull range)
 	void is_colliding(GameObject* other, ofVec2f node_pos = { 0, 0 }) override;
 
-	void random_forces();
+	void emit_forces();
 	void pulse_radius();
 	void check_if_active();
-	void draw_particle_burst() const;
 
 	float get_attribute_by_name(const string name) const override
 	{

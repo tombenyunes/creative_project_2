@@ -389,13 +389,6 @@ void GameObject::add_forces(const bool interp_pos)
 			pos_ += vel_;
 		}
 	}
-	else
-	{
-		/*for (int i = 0; i < nodePositions.size(); i++) {
-			nodeVelocities[i] += nodeAccelerations[i];
-			nodePositions[i] += nodeVelocities[i] * 0.28;
-		}*/
-	}
 }
 
 ofVec2f GameObject::get_interpolated_position()

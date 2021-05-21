@@ -73,8 +73,6 @@ public:
 
 	// World
 	ofxButton gui_world_delete_all;
-	//ofxToggle gui_world_gravity;
-	//ofxToggle gui_world_hard_collisions;
 	ofxToggle gui_world_calculate_entities;
 	ofxToggle gui_world_enable_points_upon_creation;
 	ofxToggle gui_world_enable_points_in_range;
@@ -90,28 +88,14 @@ public:
 
 	// Fluid
 	ofxToggle gui_fluid_calculate_fluid;
-	ofxToggle gui_fluid_calculate_particles;	
-	//ofxIntSlider gui_fluid_cells;
-	//ofxButton gui_fluid_resize_fluid;
-	//ofxFloatSlider gui_fluid_color_mult;
+	ofxToggle gui_fluid_calculate_particles;
 	ofxFloatSlider gui_fluid_velocity_mult;
 	ofxFloatSlider gui_fluid_viscocity;
-	//ofxFloatSlider gui_fluid_color_diffusion;
-	//ofxFloatSlider gui_fluid_fade_speed;
-	//ofxIntSlider gui_fluid_solver_iterations;
 	ofxFloatSlider gui_fluid_delta_t;
 	ofxIntSlider gui_fluid_draw_mode;
-	//ofxToggle gui_fluid_do_rgb;
 	ofxToggle gui_fluid_do_vorticity_confinement;
-	//ofxToggle gui_fluid_draw_fluid;
-	//ofxToggle gui_fluid_draw_particles;
-	//ofxFloatSlider gui_fluid_vel_draw_mult;
-	//ofxFloatSlider gui_fluid_vel_draw_threshold;
 	ofxFloatSlider gui_fluid_brightness;
-	//ofxToggle gui_fluid_use_additive_blending;
 	ofxToggle gui_fluid_wrap_edges;
-	//ofxFloatSlider gui_fluid_tuio_x_scaler;
-	//ofxFloatSlider gui_fluid_tuio_y_scaler;
 	ofxButton gui_fluid_reset_fluid;
 
 	// Performance
@@ -131,7 +115,6 @@ public:
 	ofxLabel gui_node_vel;
 	ofxLabel gui_node_accel;
 	ofxFloatSlider gui_node_mass;
-	//ofxToggle gui_node_infinite_mass;
 	ofxFloatSlider gui_node_radius;
 
 	// Collectable

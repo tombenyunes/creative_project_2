@@ -94,36 +94,17 @@ void FluidManager::update()
 			velocity_mult_ = prev_velocity_;
 		}
 	}
-
-	random_forces();
-
-	//fluid_blur.setScale(ofMap(mouseX, 0, ofGetWidth(), 0, 10));
-	//fluid_blur.setRotation(ofMap(mouseY, 0, ofGetHeight(), -PI, PI));
 }
 
 void FluidManager::update_from_gui()
 {
-	//fluid_cells_x_ = gui_manager_->gui_fluid_cells;
-	//resize_fluid_ = gui_manager_->gui_fluid_resize_fluid;
-	//color_mult_ = gui_manager_->gui_fluid_color_mult;
 	velocity_mult_ = gui_manager_->gui_fluid_velocity_mult;
 	fluid_solver_.viscocity = gui_manager_->gui_fluid_viscocity;
-	//fluid_solver_.colorDiffusion = gui_manager_->gui_fluid_color_diffusion;
-	//fluid_solver_.fadeSpeed = gui_manager_->gui_fluid_fade_speed;
-	//fluid_solver_.solverIterations = gui_manager_->gui_fluid_solver_iterations;
 	fluid_solver_.deltaT = gui_manager_->gui_fluid_delta_t;
 	reinterpret_cast<int&>(fluid_drawer_.drawMode) = gui_manager_->gui_fluid_draw_mode;
-	//fluid_solver_.doRGB = gui_manager_->gui_fluid_do_rgb;
 	fluid_solver_.doVorticityConfinement = gui_manager_->gui_fluid_do_vorticity_confinement;
-	//draw_fluid_ = gui_manager_->gui_fluid_draw_fluid;
-	//draw_particles_ = gui_manager_->gui_fluid_draw_particles;
-	//fluid_drawer_.velDrawMult = gui_manager_->gui_fluid_vel_draw_mult;
-	//fluid_drawer_.velDrawThreshold = gui_manager_->gui_fluid_vel_draw_threshold;
 	fluid_drawer_.brightness = gui_manager_->gui_fluid_brightness;
-	//fluid_drawer_.useAdditiveBlending = gui_manager_->gui_fluid_use_additive_blending;
 	fluid_solver_.wrap_x = fluid_solver_.wrap_y = gui_manager_->gui_fluid_wrap_edges;
-	//tuio_x_scaler_ = gui_manager_->gui_fluid_tuio_x_scaler;
-	//tuio_y_scaler_ = gui_manager_->gui_fluid_tuio_y_scaler;
 }
 
 void FluidManager::draw(GameObject* player)
@@ -142,7 +123,6 @@ void FluidManager::render_fluid()
 			ofBackground(0);
 			ofClear(0);
 			glColor3f(1, 1, 1);
-			//ofDrawBox(ofGetWidth() / 2 - 100, ofGetHeight() / 2 - 100, -100, 100);
 			fluid_drawer_.draw(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 		}
 		fluid_blur_.end();
@@ -163,7 +143,6 @@ void FluidManager::render_particles(GameObject* player)
 
 void FluidManager::add_to_fluid(ofVec2f pos, const ofVec2f vel, const bool add_color, const bool add_force, const int count)
 {
-	//vel /= 2;
 	const float speed = vel.x * vel.x + vel.y * vel.y * msa::getWindowAspectRatio() * msa::getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
 	if (speed > 0)
 	{
@@ -174,7 +153,6 @@ void FluidManager::add_to_fluid(ofVec2f pos, const ofVec2f vel, const bool add_c
 
 		if (add_color)
 		{
-			//			Color drawColor(CM_HSV, (getElapsedFrames() % 360) / 360.0f, 1, 1);
 			ofColor draw_color;
 			draw_color.setHsb(ofGetFrameNum() % 255, 255, 255);
 
@@ -205,45 +183,6 @@ void FluidManager::increment_brightness()
 	if (!do_increment_brightness_) prev_brightness_ = fluid_drawer_.brightness;
 	fluid_drawer_.brightness = 6;
 	do_increment_brightness_ = true;
-
-	//if (!doIncrementDeltaT) prevDeltaT = fluidSolver.deltaT;
-	//fluidSolver.deltaT = 0;
-	//doIncrementDeltaT = true;
-
-	//if (!doIncrementViscocity) prevViscocity = fluidSolver.viscocity;
-	//fluidSolver.viscocity = 0;
-	//doIncrementViscocity = true;
-
-	/*if (!do_increment_velocity_) prev_velocity_ = velocity_mult_;
-	velocity_mult_ = 100;
-	do_increment_velocity_ = true;*/
-}
-
-void FluidManager::random_forces()
-{
-	if (ofGetFrameNum() % static_cast<int>(ofRandom(25, 100)) == 0)
-	{
-		const ofVec2f pos = ofVec2f(ofRandom(0.25, 0.75), ofRandom(0.25, 0.75));
-		/*for (int i = 0; i < 100; i++) {
-			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
-			ofVec2f vel = ofVec2f(ofMap(i, 0, 99, -0.001, 0.001), ofMap(i, 0, 99, -0.001, 0.001));
-			addToFluid(pos, vel, true, true, 1);
-		}*/
-		/*const ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.1), ofRandom(-0.001, 0.1));
-		add_to_fluid(pos + 0.01, vel, false,  true, 1);*/
-
-		/*const float pi = 3.14159f;
-		const float radius = 0.01f;
-		for (double angle = 0; angle <= 2 * pi; angle += 0.1)
-		{
-			//ofVec2f vel = ofVec2f(ofRandom(-0.001, 0.001), ofRandom(-0.001, 0.001));
-			//ofVec2f vel = ofVec2f(-0.0001, 0.0001);
-			const ofVec2f vel = ofVec2f(ofMap(radius * cos(angle), -0.01f, 0.01f, -0.001f, 0.001f),
-			                            ofMap(radius * sin(angle), -0.01f, 0.01f, -0.001f, 0.001f));
-			//cout << vel << endl;
-			add_to_fluid(ofVec2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle)), vel, false, true);
-		}*/
-	}
 }
 
 void FluidManager::reset_fluid()

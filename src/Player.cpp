@@ -12,7 +12,6 @@ Player::Player(const ofVec2f pos, const ofColor color, const float radius)
 	set_position(pos);
 	set_color(color);
 	set_velocity(ofVec2f(0));
-	//set_accel(0);
 	set_radius(radius);
 	set_mass(500);
 	
@@ -148,11 +147,6 @@ void Player::mouse_pressed(const float x, const float y, const int button)
 
 			gui_values_need_to_be_set_ = true;
 		}
-		else
-		{
-			// deselect object
-			//set_request_to_be_deselected(true);
-		}
 	}
 }
 
@@ -215,14 +209,12 @@ void Player::draw()
 		}
 
 		if (aiming_boost_) draw_boost_direction();
-		draw_particle_trail();
 
 		ofSetColor(color_);
 		ofFill();
 		ofDrawEllipse(pos_.x, pos_.y, radius_, radius_);
 
 		ofNoFill();
-		//ofDrawEllipse(pos_.x, pos_.y, 600, 600);	
 	}
 
 	ofPopStyle();
@@ -255,37 +247,15 @@ void Player::draw_fluid_trail() const
 // draws particle trail following the player when moving
 {
 	if (mouse_down_ && mouse_button_ == 0)
-	{
-		// draw new particles
-		//float posX = ofMap(pos.x, -ofGetWidth()/2, ofGetWidth()/2, 0, 1);
-		//float posY = ofMap(pos.y, -ofGetHeight() / 2, ofGetHeight() / 2, 0, 1);
-		//ofVec2f mouseNorm = ofVec2f(eventPos) / ofGetWindowSize();
-		//ofVec2f mouseVel = ofVec2f(eventPos - pMouse) / ofGetWindowSize();
-		//addToFluid(ofVec2f(posX, posY), vel / 100 * -1, true, true, 1);
-		
+	{		
 		ofVec2f new_pos;
 		new_pos.x = ofMap(pos_.x + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
 		new_pos.y = ofMap(pos_.y + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
 		
 		ofVec2f new_vel;
-		//newVel.x = ((vel.x + ofRandom(-1, 1)) / 600) * -1;
-		//newVel.y = ((vel.y + ofRandom(-1, 1)) / 600) * -1;
 		new_vel.x = ((get_movement_vector().x + ofRandom(-1, 1)) / 6400) * -1;
 		new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 
 		fluid_manager_->add_to_fluid(new_pos, new_vel, true, true);
-	}
-}
-
-void Player::draw_particle_trail() const
-{
-	if (mouse_down_ && mouse_button_ == 0)
-	{
-		for (int i = 0; i < 1; i++)
-		{
-			//GameObject* particle = new PlayerTrail{ get_position() + ofRandom(-get_radius() / 3, get_radius() / 3), get_movement_vector() * -1, ofRandom(1, 4), ofColor(255), 255 };
-			//particle->init(game_objects_, game_controller_, gui_manager_, cam_, fluid_manager_, audio_manager_);
-			//game_objects_->push_back(particle);
-		}
 	}
 }

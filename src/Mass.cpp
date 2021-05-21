@@ -52,7 +52,7 @@ void Mass::drag_nodes()
 			started_dragging_ = true;
 		}
 		
-		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y)/* + mouse_offset_from_center_*/;
+		const ofVec2f prev_pos2 = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 
 		ofVec2f new_pos;
 		new_pos.x = ofLerp(pos_.x, prev_pos2.x, 0.1f);
@@ -110,11 +110,6 @@ void Mass::mouse_pressed(const float x, const float y, const int button)
 			set_request_to_be_selected(true);
 			
 			gui_values_need_to_be_set_ = true;
-		}
-		else
-		{
-			// deselect object
-			//set_request_to_be_deselected(true);
 		}
 	}
 }

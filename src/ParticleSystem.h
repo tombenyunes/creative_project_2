@@ -2,11 +2,7 @@
 
 #include "Particle.h"
 
-//#define MAX_PARTICLES		12000
-//#define MAX_PARTICLES		24000
-//#define MAX_PARTICLES		36000
 #define MAX_PARTICLES		48000
-//#define MAX_PARTICLES		96000
 
 class ParticleSystem
 {

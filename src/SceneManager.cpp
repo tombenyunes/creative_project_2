@@ -396,9 +396,6 @@ void SceneManager::load_next_scene_in_sequence()
 		load_scene("Scenes/scene_16.xml");
 		break;
 	case 17:
-		//entity_manager_->set_player_position(ofVec2f(0, 0));
-		//cam_->set_zoom_mode(Camera::map_view);
-		//cam_->set_scale(1);
 		load_scene("Scenes/menu_scene.xml");
 		// Return to menu after completion
 		gamemode_manager_->set_current_mode_id(2);
@@ -464,46 +461,7 @@ void SceneManager::reset_fluid() const
 }
 
 void SceneManager::key_pressed(const int key)
-{
-	/*if (gamemode_manager_->get_current_mode_string() == "Sandbox") {
-		if (key == '1')
-		{
-			// load scene 1
-			load_scene("Scenes/Scene1.xml");
-			fluid_manager_->explosion(500);
-		}
-		else if (key == '2')
-		{
-			// load scene 2
-			load_scene("Scenes/Scene2.xml");
-			fluid_manager_->explosion(500);
-		}
-		else if (key == '3')
-		{
-			// load scene 2
-			load_scene("Scenes/Scene3.xml");
-			fluid_manager_->explosion(500);
-		}
-		else if (key == '4')
-		{
-			// load scene 2
-			load_scene("Scenes/blank_scene.xml");
-			fluid_manager_->explosion(500);
-		}
-		else if (key == '4')
-		{
-			// load scene 2
-			load_scene("Scenes/Scene4.xml");
-			fluid_manager_->explosion(500);
-		}
-		else if (key == '5')
-		{
-			// load scene 2
-			load_scene("Scenes/circle_scene.xml");
-			fluid_manager_->explosion(500);
-		}
-	}*/
-	
+{	
 	if (key == 13) //enter
 	{
 		enter_pressed_ = true;
@@ -517,13 +475,7 @@ void SceneManager::key_pressed(const int key)
 	{
 		// load quick-saved scene
 		load_scene("Scenes/saved_scene.xml");
-	}
-	
-	else if (key == 'p')
-	{
-		//load_procedural_scene();
-		load_next_scene_in_sequence();
-	}
+	}	
 	else if (key == 'o')
 	{
 		load_scene_dialogue();

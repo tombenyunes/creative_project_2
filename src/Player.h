@@ -36,7 +36,6 @@ private:
 	void draw_boost_direction() const;
 	ofVec3f draw_vel_path() const;
 	void draw_fluid_trail() const;
-	void draw_particle_trail() const;
 
 	// Events
 	void mouse_pressed(float x, float y, int button) override;

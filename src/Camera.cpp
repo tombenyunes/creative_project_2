@@ -200,10 +200,6 @@ void Camera::key_pressed(const int key)
 		scale_to_lerp_to_ = 1;
 		lerping_scale_ = true;
 	}
-	else if (key == 3682) // ctrl
-	{		
-		ctrl_down_ = true;
-	}
 	else if (key == 9) // tab
 	{		
 		toggle_zoom_mode();
@@ -220,10 +216,6 @@ void Camera::key_released(const int key)
 	{
 		zooming_in_ = false;
 	}
-	else if (key == 3682) // ctrl
-	{		
-		ctrl_down_ = false;
-	}	
 }
 
 void Camera::mouse_dragged(const int x, const int y, const int button)
@@ -248,28 +240,23 @@ void Camera::mouse_pressed(const int x, const int y, const int button)
 
 void Camera::mouse_scrolled(int x, int y, const float scroll_x, const float scroll_y)
 {
-	//if (ctrl_down_)
+	// if within bounds
+	if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_lower_bound_ && get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_upper_bound_)
 	{
-		// if within bounds
-		if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_lower_bound_ && get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_upper_bound_)
+		scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
+		lerping_scale_ = true;
+	}
+	else
+	{
+		if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_lower_bound_)
 		{
-			scale_to_lerp_to_ = get_scale() - scroll_y / scrollwheel_zooming_intervals_;
+			scale_to_lerp_to_ = zoom_scale_lower_bound_;
 			lerping_scale_ = true;
-
-			//cout << "Zoom level: " << scale_to_lerp_to_ << endl;
 		}
-		else
+		else if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_upper_bound_)
 		{
-			if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ < zoom_scale_lower_bound_)
-			{
-				scale_to_lerp_to_ = zoom_scale_lower_bound_;
-				lerping_scale_ = true;
-			}
-			else if (get_scale() - scroll_y / scrollwheel_zooming_intervals_ > zoom_scale_upper_bound_)
-			{
-				scale_to_lerp_to_ = zoom_scale_upper_bound_;
-				lerping_scale_ = true;
-			}
+			scale_to_lerp_to_ = zoom_scale_upper_bound_;
+			lerping_scale_ = true;
 		}
 	}
 }

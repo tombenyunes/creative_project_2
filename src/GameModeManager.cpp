@@ -167,19 +167,7 @@ void GamemodeManager::transition_scene()
 
 void GamemodeManager::key_pressed(const int key)
 {
-	if (key == 32) // 'space' toggles between modes
-	{
-		/*if (get_current_mode_string() == "Sandbox")
-		{
-			set_current_mode_id(prev_mode_id_);
-		}
-		else if (get_current_mode_string() == "Procedural" || get_current_mode_string() == "Main")
-		{
-			prev_mode_id_ = get_current_mode_id();
-			set_current_mode_id(0);
-		}*/
-	}
-	else if (key == 27) // 'escape'
+	if (key == 27) // 'escape'
 	{
 		// enter menu
 		if (get_current_mode_id() != 2)
@@ -213,15 +201,11 @@ void GamemodeManager::mouse_pressed(const int x, const int y, const int button)
 		{
 			set_current_mode_id(1);
 			set_request_for_procedural_scene(true);
-
-			//transition_scene();
 		}
 		else if (button == 0 && gui_manager_->sandbox_mode_bounds.intersects(ofRectangle(x, y, 0, 0)))
 		{
 			set_current_mode_id(0);
 			set_request_for_blank_scene(true);
-
-			//transition_scene();
 		}
 	}
 }

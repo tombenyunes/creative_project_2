@@ -27,8 +27,6 @@ public:
 	void increment_brightness();
 
 	void set_velocity_mult(const float vel) { velocity_mult_ = vel; }
-	
-	void random_forces();
 
 	void reset_fluid();
 
