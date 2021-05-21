@@ -429,6 +429,7 @@ void GUIManager::draw_text(const int new_node_id, const string current_gamemode)
 		if (points_collected_ == max_point_count_)
 		{
 			potta_one_sub_.drawString("Press 'Enter' to move to next level", (ofGetWidth() / 2) - potta_one_sub_.stringWidth("Press 'Enter' to move to next level") / 2, ofGetHeight() - 150);
+			potta_one_mini_.drawString("Or 'Tab' to continue playing", (ofGetWidth() / 2) - potta_one_sub_.stringWidth("Or 'Tab' to continue playing") / 2, ofGetHeight() - 100);
 		}
 	}
 	
@@ -494,6 +495,7 @@ void GUIManager::draw_menu(const bool main_mode_started, const string current_ga
 		potta_one_mini_.drawString("'tab' to toggle camera modes", w - potta_one_mini_.stringWidth("'tab' to toggle camera modes") / 2, h + (v_buf * 7.5f));
 		potta_one_mini_.drawString("'scrollwheel' to zoom/pan", w - potta_one_mini_.stringWidth("'scrollwheel' to zoom/pan") / 2, h + (v_buf * 8));
 		potta_one_mini_.drawString("'r' to reset zoom", w - potta_one_mini_.stringWidth("'r' to reset zoom") / 2, h + (v_buf * 8.5f));
+		potta_one_mini_.drawString("'f' to 'shuffle' fluid", w - potta_one_mini_.stringWidth("'f' to 'shuffle' fluid") / 2, h + (v_buf * 9.0f));
 	}
 	
 	ofPopMatrix();

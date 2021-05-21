@@ -27,13 +27,13 @@ Collectable::Collectable(const ofVec2f pos, const float mass, const float radius
 
 	pixel_buffer_before_drag_ = 2;
 	mouse_over_radius_mult_ = 2;
-
-	// incase a point is added in sandbox mode and is enabled by default
+	
 	if (id_ == 0)
 	{
 		can_be_collected_ = true;
 		inc_alpha_ = true;
 	}
+	// incase a point is added in sandbox mode and is enabled by default
 	if (is_active_)
 	{
 		Collectable::points_collected_++;
@@ -210,6 +210,7 @@ void Collectable::check_if_active()
 	{
 		if (gamemode_manager_->get_current_mode_string() == "Procedural" && id_ == 0)
 		{
+			Collectable::points_collected_++;
 			is_active_ = true;
 			last_id_collected_ = id_;
 			can_be_collected_ = false;

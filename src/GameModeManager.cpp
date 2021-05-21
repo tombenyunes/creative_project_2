@@ -188,15 +188,11 @@ void GamemodeManager::key_pressed(const int key)
 			set_current_mode_id(2);
 		}
 		// exit menu
-		else
+		else if (get_current_mode_id() == 2)
 		{				
 			if (game_started_)
 			{
 				set_current_mode_id(prev_mode_id_);
-			}
-			else
-			{
-				set_current_mode_id(0);
 			}
 		}
 	}

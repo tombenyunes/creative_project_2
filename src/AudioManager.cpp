@@ -50,43 +50,35 @@ void AudioManager::setup(ofBaseApp* appPtr) {
 void AudioManager::guiSetup() {
     gui.setup();
 
-    //animation variables
-    gui.add(cellSpeed.set("cell Speed", 21.6, 0, 60));
-    gui.add(cellRadius.set("cell radius", 50, 0, 200));
-    //------------------------------------------------//
+
 
     //audio mix
-    gui.add(masterGain.set("master gain", 1, 0, 3));
+    gui.add(masterGain.set("master gain", 0.5, 0, 3));
     //------------------------------------------------//
-    gui.add(metGain.set("metronome gain", 0.02, 0, 1.0));
+    gui.add(metGain.set("metronome gain", 0.1, 0, 1.0));
     //------------------------------------------------//
-    gui.add(sampleHitGain.set("sample Hit Gain", 1.8, 0.0, 4.0));
+    gui.add(sampleHitGain.set("sample Hit Gain", 1.95, 0.0, 4.0));
     gui.add(atmosGain.set("atmos gain", 2.0, 0, 7.0));
     //------------------------------------------------//
-    gui.add(keyLoopGain.set("key loop gain", 0.0, 0, 4.0));
-    gui.add(keyLoopPan.set("key loop Pan", 0.78, 0, 1.0));
+
+
+
     //------------------------------------------------//
-    gui.add(keyHiGain.set("keys Hi gain", 0.00, 0, 3.0));
-    gui.add(keyHiPan.set("keys Hi Pan", 1.0, 0, 1.0));
-    //------------------------------------------------//
-    gui.add(keyLowGain.set("keys Low gain", 0., 0, 3.5));
-    gui.add(keyLowPan.set("keys Low Pan", 0.1, 0, 1.0));
-    //------------------------------------------------//
-    gui.add(synthLineGain.set("synth line gain", 0.8, 0, 2.0));
+    gui.add(synthLineGain.set("synth line gain", 0.7, 0, 2.0));
     gui.add(synthLinePan.set("synth line Pan", 0.05, 0, 1.0));
 
     gui.add(subBassGain.set("sub Bass Gain", 0.2, 0.0, 1.0));
-    gui.add(polySynthGain.set("poly Synth Gain", 0.26, 0.0, 1.0));
+    gui.add(polySynthGain.set("poly Synth Gain", 0.5, 0.0, 1.0));
     gui.add(polySynthPan.set("poly Synth Pan", 0.215, 0.0, 1.0));
 
     gui.add(noiseAttack.set("Character Noise Attack", 1500, 0.0, 20000));
     gui.add(noiseLevel.set("Noise Level", 0.009, 0.0, 0.05));
 
-    gui.add(squareBassGain.set("square Bass Gain", 0.03, 0.0, 1.0));
+    gui.add(squareBassGain.set("square Bass Gain", 0.1, 0.0, 1.0));
 
-    gui.add(sawSynthGain.set("saw Synth Gain", 0.195, 0.0, 1.0));
+    gui.add(sawSynthGain.set("saw Synth Gain", 0.4, 0.0, 1.0));
 
-    gui.add(stringsSynthGain.set("strings Synth Gain ", 0.3, 0.0, 1.0));
+    gui.add(stringsSynthGain.set("strings Synth Gain ", 0.4, 0.0, 1.0));
     gui.add(stringsSynthPan.set("strings Synth Pan", 0.215, 0.0, 1.0));
 
 
@@ -108,8 +100,6 @@ void AudioManager::guiSetup() {
     gui.add(reverbFeedback.set("reverb feedback", 0.95, 0, 0.99));
     //------------------------------------------------//
 
-    gui.add(flangeEffect.setup("flange effect",
-        ofVec4f(436, 0.1, 0.01, 0.0), ofVec4f(0, 0, 0.001, 0.0), ofVec4f(800, 1, 10, 1)));
 }
 
 //--------------------------------------------------------------
@@ -135,9 +125,6 @@ void AudioManager::loadSamples() {
     //=====================LOAD-LOOPS=======================//
     atmos.load(ofToDataPath("./audio/loops/atmosphere.wav"));
 
-    keyArpLoop.load(ofToDataPath("./audio/loops/keyArploop.wav"));
-    keyHi.load(ofToDataPath("./audio/loops/keysLoopHi.wav"));
-    keyLow.load(ofToDataPath("./audio/loops/keysLoopLow.wav"));
 
 }
 
@@ -199,10 +186,7 @@ void AudioManager::envelopeSetup() {
     hitSubEnv.setRelease(15000);
 
 
-
     //SYNTHESIS ENVELOPES
-
-
     sq_BassEnv.setAttack(10000);
     sq_BassEnv.setDecay(5);
     sq_BassEnv.setSustain(5);
@@ -223,18 +207,13 @@ void AudioManager::envelopeSetup() {
     strings_OscEnv.setSustain(500);
     strings_OscEnv.setRelease(10000);
 
-
-
-
-
 }
 
 //--------------------------------------------------------------
-double AudioManager::playMetronome() {
+void AudioManager::playMetronome() {
 
     //---------SETUP-METRONOME-&-SEQUENCE-TRIGGER---------//
     met_out = metronome.playOnce(metSpeed);
-
     met_envOut = metEnv.ar(met_out, 0.1, 1.9, 1, metTrigger) * metGain;
 
     if (metTrigger == 1) {
@@ -242,62 +221,10 @@ double AudioManager::playMetronome() {
         metronome.trigger();
     }
 
-    return met_envOut;
-
+    //return met_envOut;
+    metStereo.stereo(met_envOut, metMix, 0.1);
 }
 
-//--------------------------------------------------------------
-void AudioManager::playKeyLoop() {
-
-    //---------SETUP-KEY-LOOP-&-SEQUENCE-TRIGGER-------//
-    keyArp_out = keyArpLoop.playOnce();
-
-    keyArp_envOut = keyArpEnv.ar(keyArp_out, 0.1, 1.0, 1, keyArpTrigger) * keyLoopGain;
-    //    if (keyArpSwitch == 0) {
-    if (keyArpTrigger == 1) {
-        //This sets the playback position to the start of a sample
-        keyArpLoop.trigger();
-    }
-    //    }
-
-
-        //send to stereo mix
-    keyArpStereo.stereo(keyArp_envOut, keyArpMix, keyLoopPan);
-}
-
-//--------------------------------------------------------------
-void AudioManager::playKeyLoopHi() {
-
-    //---------SETUP-KEY-LOOP-Hi-&-SEQUENCE-TRIGGER-------//
-    keyHi_out = keyHi.playOnce();
-
-    keyHi_envOut = keyHiEnv.ar(keyHi_out, 0.1, 1.0, 1, keyHiTrigger) * keyHiGain;
-
-    if (keyHiTrigger == 1) {
-        //This sets the playback position to the start of a sample
-        keyHi.trigger();
-    }
-
-    //send to stereo mix
-    keyHiStereo.stereo(keyHi_envOut, keyHiMix, keyHiPan);
-}
-
-//--------------------------------------------------------------
-void AudioManager::playKeyLoopLow() {
-
-    //---------SETUP-KEY-LOOP-LOW-&-SEQUENCE-TRIGGER-------//
-    keyLow_out = keyLow.playOnce();
-
-    keyLow_envOut = keyLowEnv.ar(keyLow_out, 0.1, 1.0, 1, keyLowTrigger) * keyLowGain;
-
-    if (keyLowTrigger == 1) {
-        //This sets the playback position to the start of a sample
-        keyLow.trigger();
-    }
-
-    //send to stereo mix
-    keyLowStereo.stereo(keyLow_envOut, keyLowMix, keyLowPan);
-}
 
 //--------------------------------------------------------------
 void AudioManager::sampleHits() {
@@ -310,7 +237,7 @@ void AudioManager::sampleHits() {
     //===================================//
     //---------SAMPLE-HITS---------------//
     //===================================//
-    hit1_out = hit1.playOnce() * (1.8 * sampleHitGain);                       //play & gain
+    hit1_out = hit1.playOnce() * (1.8 * sampleHitGain);     //play & gain
     hit1_envOut = hit1Env.adsr(hit1_out, hit1Env.trigger);  //envelope
     hit1Stereo.stereo(hit1_envOut, hit1Mix, 0.1);           //stereo mix
     //---------------------------------//
@@ -382,7 +309,6 @@ void AudioManager::charNoise() {
     noise_envOut = noiseEnv.adsr(1., noiseEnv.trigger);
     noise_out = (noiseOsc.noise() * noise_envOut) * noiseLevel;
     noiseFilter_out = noiseFilter.lores(noise_out, 200 + noise_envOut * 1000, 5);
-    //noiseDelay_out = noiseDelay.dl(noiseFilter_out, 44100 * 0.9, 0.4);
 
     noiseStereo.stereo(noiseFilter_out, noiseMix,
         (noisePanner.sinewave(0.25 * noise_envOut) + 2) / 5);
@@ -390,18 +316,20 @@ void AudioManager::charNoise() {
 
 //-----------------------------------//
 void AudioManager::synthLine() {
+
     //synth arp sound
-    //sBass_envOut = sBassEnv.ar(sBass.sinewave(sBassPitch), 0.05, 0.99, 5000, sBassTrigger) * synthLineGain;
-    if (synthPattern == 5) {
-        sBassDynamicVolume = -0.7;
+    if (synthPattern == 1) {
+        sBassDynamicVolume = -0.5;
+    }
+    else if (synthPattern == 5) {
+        sBassDynamicVolume = -0.4;
     }
     else {
-        sBassDynamicVolume = 0;
+        sBassDynamicVolume = 0.0;
     }
 
     sBass_envOut = sBassEnv.adsr(1, sBassTrigger);
     sBassOut = (sBass.sinewave(sBassPitch) * sBass_envOut) * (synthLineGain + sBassDynamicVolume);
-
 
     synthDelay_out = synthDelay.dl(sBassOut, 44100 * 0.9, 0.4);
     sBassStereo.stereo(synthDelay_out, sBassMix, synthLinePan);
@@ -410,24 +338,39 @@ void AudioManager::synthLine() {
 
 //-----------------------------------//
 void AudioManager::polySynth() {
+
     //--------------//
     //--POLY-SYNTH--//
     //--------------//
+
+    if (polyPattern == 4) {
+        playerDynamicPolyVolume = -0.3;
+        playerDynamicPolyFilter = 0;
+        playerDynamicPolyFilter = 200;
+    }
+    else if (polyPattern == 1) {
+        playerDynamicPolyVolume = 0.01;
+        playerDynamicPolyFilter = 400;
+    }
+    else if (polyPattern == 6) {
+        playerDynamicPolyVolume = 0.01;
+        playerDynamicPolyFilter = 600;
+    }
+    else {
+        playerDynamicPolyVolume = 0;
+        playerDynamicPolyFilter = 500;
+    }
+
+
     poly_Osc_envOut = poly_OscEnv.adsr(1., poly_OscTrigger);
-
     poly_LFO_Out = poly_LFO.sinebuf(0.2);
-
     poly_Osc1Out = poly_Osc1.pulse(poly_Osc1Pitch, 0.2);
 
-    //poly_Osc2Out = poly_Osc2.pulse(poly_Osc2Pitch, 0.8);
+    poly_OscOut = ((poly_Osc.pulse(poly_OscPitch, 0.6) + poly_Osc1Out) * poly_Osc_envOut) * (polySynthGain + playerDynamicPolyVolume);
 
-    poly_OscOut = ((poly_Osc.pulse(poly_OscPitch, 0.6) + poly_Osc1Out) * poly_Osc_envOut) * polySynthGain;
-
-    poly_OscFilter_out = poly_OscFilter.lores(poly_OscOut, 500 + poly_Osc_envOut + (poly_LFO_Out * 200), poly_Osc_envOut * 2);
+    poly_OscFilter_out = poly_OscFilter.lores(poly_OscOut, playerDynamicPolyFilter + poly_Osc_envOut + (poly_LFO_Out * 200), poly_Osc_envOut * 2);
 
     poly_OscDelay_out = poly_Delay.dl(poly_OscFilter_out, 44100 * 0.9, 0.4);//?
-
-//    poly_OscDelay_out = flange.flange(poly_OscFilter_out, flangeEffect->x, flangeEffect->y, flangeEffect->z,flangeEffect->w);//?
 
     poly_OscStereo.stereo(poly_OscDelay_out, poly_OscMix, polySynthPan);
     //---------------//
@@ -481,6 +424,42 @@ void AudioManager::subBass() {
 }
 
 
+//-----------------------------------//
+void AudioManager::stringsSynth() {
+    //--------------//
+    //SAWTOOTH-SYNTH//
+    //--------------//
+
+    if (stringsPattern == 3) {
+        stringsDynamicVolume = -0.01;
+        stringsDynamicFilterFreq = 500;
+    }
+    else {
+        stringsDynamicVolume = 0;
+        stringsDynamicFilterFreq = 1000;
+    }
+    strings_Osc_envOut = strings_OscEnv.adsr(1., strings_OscTrigger);
+
+    strings_LFO_Out = strings_LFO.sinewave(strings_Osc_envOut);
+
+    strings_OscOut = (strings_Osc.saw(strings_OscPitch + strings_LFO_Out) * strings_Osc_envOut) * 0.08;
+    strings_Osc1Out = (strings_Osc1.saw(strings_Osc1Pitch + strings_LFO_Out * 2) * strings_Osc_envOut) * 0.08;
+    strings_Osc2Out = (strings_Osc2.saw(strings_Osc2Pitch + strings_LFO_Out * 4) * strings_Osc_envOut) * 0.08;
+
+    strings_OscDelay_out = strings_Delay.dl(strings_OscOut, 44100 * 0.9, 0.2);//?
+
+
+    strings_OscFilter_out = strings_OscFilter.hires(strings_OscOut, 500 + strings_Osc_envOut * 10, 0);
+    strings_OscFilter_out1 = strings_OscFilter1.hires(strings_Osc1Out, 500 + strings_Osc_envOut * 10, 0);
+
+    strings_OscOutMix = (strings_OscOut + strings_Osc1Out + strings_Osc2Out) * (stringsSynthGain + stringsDynamicVolume);
+    strings_OscFilter_out2 = strings_OscFilter.lores(strings_OscOutMix, stringsDynamicFilterFreq - strings_Osc_envOut * 1000, 2);
+
+
+    strings_OscStereo.stereo(strings_OscOutMix, strings_OscMix, stringsSynthPan);
+    //---------------//
+}
+
 //--------------------------------------------------------------
 void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
@@ -518,17 +497,13 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         if (clock.tick) {   //iterate through sequences
 
             //use to trigger patterns at the beginning of every 4 bars
+            //this ensures chord progresions are synchronised
             pattern_trigger = pattern_triggerLine[playHead % 64];
-
             pattern_triggerB = pattern_triggerLineB[playHead % 16];
 
-            //-----------loop-triggers------------//
-            keyArpTrigger = keyArpSeq[playHead % 32];
-            keyHiTrigger = keyHiSeq[playHead % 64];
-            keyLowTrigger = keyLowSeq[playHead % 128];
 
-            //            subHitTrigger = subHitSeq[playHead % 256];
-            //
+
+            //TRIGGER SUB HIT SAMPLE
             if (subHitTrigger == 1) {
                 hitSub.trigger();
             }
@@ -547,7 +522,7 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                 kickTrigger = kickSeq3[playHead % 32];
             }
 
-
+            //TRIGGER KICK DRUM
             if (kickTrigger == 1) {
                 kick.trigger();
             }
@@ -571,7 +546,7 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                 hiHatTrigger = hiHatSeq5[playHead % 32];
             }
 
-            //hiHatTrigger = hiHatSeq[playHead%32];
+
             if (hiHatTrigger == 1) {
                 hiHat.trigger();
                 //change hi hat release value
@@ -603,10 +578,15 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
 
 
-            //-----------side stick-----------------//
-            if (drumPattern == 5) {
+            //-----------SIDE STICK SAMPLE--------------//
+            metSpeed = metSpeedSeq[playHead % 16];
+
+            if (drumPattern == 2) {
+                metTrigger = metSeq3[playHead % 16];
+            }
+            else if (drumPattern == 5) {
                 metTrigger = metSeq2[playHead % 16];
-                metSpeed = metSpeedSeq[playHead % 16];
+
             }
 
 
@@ -716,16 +696,11 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                 saw_OscPitch = mtof.mtof(saw_OscLinePitch[sequenceNote]);
                 saw_Osc1Pitch = mtof.mtof(saw_OscLinePitch2[sequenceNote]);
                 saw_Osc2Pitch = mtof.mtof(saw_OscLinePitch3[sequenceNote]);
-
-                //                saw_OscNote++; //increment the pitch line
-                //                if (saw_OscNote > 3) {
-                //                    saw_OscNote = 0;
-                //                }
             }
             //=============================================================//
 
 
-            //strings sound
+            //--------------------STRINGS-SOUND-----------------------------//
             if (stringsPattern == 1 || stringsPattern == 2) {
                 strings_OscTrigger = strings_OscLineTrigger[playHead % 64];
             }
@@ -742,11 +717,6 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                     strings_Osc1Pitch = mtof.mtof(strings_OscLinePitch2[sequenceNote]);
                     strings_Osc2Pitch = mtof.mtof(strings_OscLinePitch3[sequenceNote]);
 
-                    //                saw_OscNote++; //increment the pitch line
-                    //                if (saw_OscNote > 3) {
-                    //                    saw_OscNote = 0;
-                    //                }
-
                 }
                 else if (stringsPattern == 2) {
                     strings_OscPitch = mtof.mtof(strings_OscLinePitchB[sequenceNote]);
@@ -758,9 +728,10 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
                     strings_Osc1Pitch = mtof.mtof(strings_OscLinePitch2C[sequenceNoteB]);
                     strings_Osc2Pitch = mtof.mtof(strings_OscLinePitch3C[sequenceNoteB]);
                 }
-
-
             }
+            //===================================//
+
+
 
             //--------------------SUB-BASS---------------------------------//
             if (sub_BassPattern == 1) {
@@ -779,6 +750,8 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             }
 
             //=============================================================//
+
+
 
             //--------------------POLY-SYNTH--------------------------//
             if (polyPattern == 1) {
@@ -861,65 +834,17 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
             playHead++;//iterate the playhead
 
         } //end of clock
+        //===================//
+        //===================//
 
-
-
-
-
-       // std::cout<<poly_OscLinePitch4<<std::endl;
-        //--------------//
-        //SAWTOOTH-SYNTH//
-        //--------------//
-
-        if (stringsPattern == 3) {
-            stringsDynamicVolume = -0.18;
-            stringsDynamicFilterFreq = 500;
-        }
-        else {
-            stringsDynamicVolume = 0;
-            stringsDynamicFilterFreq = 1000;
-        }
-        strings_Osc_envOut = strings_OscEnv.adsr(1., strings_OscTrigger);
-
-        strings_LFO_Out = strings_LFO.sinewave(strings_Osc_envOut);
-
-        strings_OscOut = (strings_Osc.saw(strings_OscPitch + strings_LFO_Out) * strings_Osc_envOut) * 0.08;
-        strings_Osc1Out = (strings_Osc1.saw(strings_Osc1Pitch + strings_LFO_Out * 2) * strings_Osc_envOut) * 0.08;
-        strings_Osc2Out = (strings_Osc2.saw(strings_Osc2Pitch + strings_LFO_Out * 4) * strings_Osc_envOut) * 0.08;
-
-        strings_OscDelay_out = strings_Delay.dl(strings_OscOut, 44100 * 0.9, 0.2);//?
-
-
-        strings_OscFilter_out = strings_OscFilter.hires(strings_OscOut, 500 + strings_Osc_envOut * 10, 0);
-        strings_OscFilter_out1 = strings_OscFilter1.hires(strings_Osc1Out, 500 + strings_Osc_envOut * 10, 0);
-
-        strings_OscOutMix = (strings_OscOut + strings_Osc1Out + strings_Osc2Out) * (stringsSynthGain + stringsDynamicVolume);
-        strings_OscFilter_out2 = strings_OscFilter.lores(strings_OscOutMix, stringsDynamicFilterFreq - strings_Osc_envOut * 1000, 2);
-
-
-        strings_OscStereo.stereo(strings_OscOutMix, strings_OscMix, stringsSynthPan);
-        //---------------//
-
-
-        //========================================//
-        //========================================//
-        //cell animation sin
-        cellSinOut = cellSin.sinewave(cellSpeed);
-        //========================================//
-        //interactive sound
-        sq_out = sq.square(100) * (mapGain);
-        sq_FilterOut = sq_Filter.lores(sq_out,
-            (300 * (filterMod.sinewave(mapMod) + 1) / 2), 5);
-
-        sqStereo.stereo(sq_FilterOut, sqMix, mousePan);
-        //============================================//
 
 
         //--------------------Beat-Stereo-Mix-------------------------/
         //beat pre mix
+        playMetronome();
         beats();
-        beatMix[0] = (kickMix[0] + hiHatMix[0] + snareMix[0] + playMetronome()) * beatGain;
-        beatMix[1] = (kickMix[1] + hiHatMix[1] + snareMix[1] + playMetronome()) * beatGain;
+        beatMix[0] = (kickMix[0] + hiHatMix[0] + snareMix[0] + metMix[0]) * beatGain;
+        beatMix[1] = (kickMix[1] + hiHatMix[1] + snareMix[1] + metMix[1]) * beatGain;
 
         //===============SAMPLE-HIT-MIX=============================//
         sampleHits(); //load samples and pass through mix
@@ -933,20 +858,17 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
 
         //======================LOOP-MIX=&=OUTPUTS====================//
+        stringsSynth();
         subBass();
         sawSqSynth();
         polySynth();
-        charNoise();//output from character movement sound
-        synthLine();        //arp synth line
+        charNoise();   //output from character movement sound
+        synthLine();   //arp synth line
 
-        //samples
-        playKeyLoop();    //arpeggiated keyboard loop
-        playKeyLoopHi();  //right hand of key board loop
-        playKeyLoopLow(); //left hand of keyboard loop
 
         //=============================MIX==========================//
-        stereoMix[0] = keyArpMix[0] + keyHiMix[0] + keyLowMix[0] + sBassMix[0] + beatMix[0] + sq_BassMix[0] + saw_OscMix[0] + poly_OscMix[0] + sub_BassMix[0] + strings_OscMix[0];
-        stereoMix[1] = keyArpMix[1] + keyHiMix[1] + keyLowMix[1] + sBassMix[1] + beatMix[1] + sq_BassMix[1] + saw_OscMix[1] + poly_OscMix[1] + sub_BassMix[1] + strings_OscMix[1];
+        stereoMix[0] = sBassMix[0] + beatMix[0] + sq_BassMix[0] + saw_OscMix[0] + poly_OscMix[0] + sub_BassMix[0] + strings_OscMix[0];
+        stereoMix[1] = sBassMix[1] + beatMix[1] + sq_BassMix[1] + saw_OscMix[1] + poly_OscMix[1] + sub_BassMix[1] + strings_OscMix[1];
         //==========================================================//
 
 
@@ -1011,13 +933,6 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
 
 
         //==========RESET-SEQUENCER=TRIGGERS=TO=RETRIGGER==========//
-        metTrigger = 0;
-
-        keyArpTrigger = 0;
-        keyHiTrigger = 0;
-        keyLowTrigger = 0;
-        subHitTrigger = 0;
-
         poly_OscTrigger = 0;
         saw_OscTrigger = 0;
         sub_BassTrigger = 0;
@@ -1028,61 +943,40 @@ void AudioManager::audioOut(float* output, int bufferSize, int nChannels) {
         snareTrigger = 0;
         kickTrigger = 0;
         hiHatTrigger = 0;
+        metTrigger = 0;
+        subHitTrigger = 0;
 
+
+        hit1Env.trigger = 0;
+        hit2Env.trigger = 0;
+        hit3Env.trigger = 0;
+        hit4Env.trigger = 0;
+        hit5Env.trigger = 0;
+        hit6Env.trigger = 0;
+        hit7Env.trigger = 0;
+        hit8Env.trigger = 0;
         //--------------------------------------//
-        //pass sound ouput to array fo animation
-        soundBuffer[i] = cellSinOut + (sq_FilterOut * 5);
-    }
-
-}
-
-
-//--------------------------------------------------------------
-void AudioManager::drawWaveform() {
-
-    //------------//
-    ofPushMatrix();
-    //ofTranslate(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, -1000);
-    ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
-
-    ofSetColor(255);
-    ofNoFill();
-    ofDrawCircle(0, 0, radius);
-
-    for (int i = 0; i < 255; i++) {
-
-        ofColor c = ofColor(0);
-        float col = ofMap(soundBuffer[i], -0.8, 0.8, 100, 255);
-        c.setHsb(col, i * 10, 200);
-        ofFill();
-        ofSetColor(c);
-
-        float x = (soundBuffer[i] + (10 * soundBufMix[i])) * cos(float(i)) * cellRadius;
-        float y = (soundBuffer[i] + (10 * soundBufMix[i])) * sin(float(i)) * cellRadius;
-
-        ofDrawCircle(x, y, 1);
 
     }
-    ofPopMatrix();
-    //==========//
 }
+
 
 //--------------------------------------------------------------
 void AudioManager::update(const ofVec2f player_position) {
 
     player_pos = player_position;
 
+    //MAP-PLAYER-POSITION-TO-SOUND-EFFECTS-AND-ENVELOPES
+    //-------------------------------------//
     //set low pass filter to player y pos, top of map all frequencies pass bottom of map apply filter effect
     double partWorldHeight = HALF_WORLD_HEIGHT / 3;
-
     if (player_pos.y > partWorldHeight) {
         playerFilter = ofMap(player_pos.y, partWorldHeight, HALF_WORLD_HEIGHT, 4000, 20);
     }
     else {
         playerFilter = 4000;
     }
-
-    //playerFilter = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 50, 3000);
+    //-------------------------------------//
 
     playerDelayFeedback = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 0.1, 0.8);
     playerDelayMix = ofMap(player_pos.y, HALF_WORLD_HEIGHT, -HALF_WORLD_HEIGHT, 0.9, 0.1);
@@ -1098,7 +992,7 @@ void AudioManager::update(const ofVec2f player_position) {
         playerFilterHires = 0;
     }
 
-
+    //-------------------------------------//
     //synth line attack and release are afected when player is in the left and right segments of WORLD WIDTH
     double partWorldWidth = HALF_WORLD_WIDTH / 3;
     if (player_pos.x > partWorldWidth) {
@@ -1113,63 +1007,11 @@ void AudioManager::update(const ofVec2f player_position) {
         playerSynthLineAttack = 3;
         playerSynthLineRelease = 600;
     }
+    //-------------------------------------//
 
 
-
-    //std::cout<<playerSynthLineAttack<<std::endl;
-
-
-    if (randomSampleTriggered) {
-        if (ofGetFrameNum() % 30 == 0) {
-            randomSampleTriggered = false;
-        }
-    }
-
-
-    //==============================================//
-    //the following is used to control gain and pan of an objects sound
-    //control gain, will need to use vectors to calculate the distance
-//    if (ofGetMouseX() < ofGetWidth()/2) {
-//        gainPanX = ofMap(ofGetMouseX(), 0, ofGetWidth()/2, 0, 0.01, false);
-//    } else if (ofGetMouseX() > ofGetWidth()/2) {
-//        gainPanX = ofMap(ofGetMouseX(), ofGetWidth()/2, ofGetWidth(), 0.01, 0, false);
-//    }
-//
-//    if (ofGetMouseY() < ofGetHeight()/2) {
-//        gainPanY = ofMap(ofGetMouseY(), 0, ofGetHeight()/2, 0, 0.01, false);
-//    } else if (ofGetMouseY() > ofGetHeight()/2) {
-//        gainPanY = ofMap(ofGetMouseY(), ofGetHeight()/2, ofGetHeight(), 0.01, 0, false);
-//    }
-
-
-    //calculate distance between mouse and object
-    ofVec2f p1(ofGetMouseX(), ofGetMouseY());
-    ofVec2f p2(ofGetWidth() / 2, ofGetHeight() / 2);
-
-    //mapping the gain to an object
-    double distance = p1.distance(p2);
-    mapGain = ofMap(distance, 0, radius * 2.0, 0.01, 0.0);
-
-    if (distance > radius * 1.5) {
-        mapGain = 0;
-    }
-
-    //std::cout<<mapGain<<std::endl;
-
-    //this is simple but works!! control pan
-    if (ofGetMouseX() < ofGetWidth() / 2) {
-        mousePan = ofMap(ofGetMouseX(), 0, ofGetWidth() / 2, 1, 0.5, false);
-    }
-    else if (ofGetMouseX() > ofGetWidth() / 2) {
-        mousePan = ofMap(ofGetMouseX(), ofGetWidth() / 2, ofGetWidth(), 0.5, 0, false);
-    }
-
-
-    //mapping the modulation to an object
-    double sDistance = p1.distance(p2);
-    mapMod = ofMap(sDistance, 0, radius, 3.0, 0.01);
-    //==============================================//
-
+    //--UPDATE ENVELOPES--//
+    //use to apply modulation and player positioning
     poly_OscEnv.setAttack(0 + ((poly_LFO_Out + 1) / 2) * 100);
     poly_OscEnv.setDecay(200 + ((poly_LFO_Out + 1) / 2) * 1000);
     poly_OscEnv.setSustain(0.2);
@@ -1184,10 +1026,23 @@ void AudioManager::update(const ofVec2f player_position) {
     sBassEnv.setDecay(2);
     sBassEnv.setSustain(2);
     sBassEnv.setRelease(playerSynthLineRelease);
+    //--------------------------------------------------//
 
-    //std::cout<<patternSwitch<<std::endl;
 
-    //---Pattern-Switch-Selection--//
+
+    //-------------------------------------//
+    //USED TO SELECT RANDOM HIT SAMPLE
+    if (randomSampleTriggered) {
+        if (ofGetFrameNum() % 30 == 0) {
+            randomSampleTriggered = false;
+        }
+    }
+    //==============================================//
+
+
+
+
+    //---PATTERN-SWITCH-SELECTION-LOGIC-//
     if (patternSwitch == 0) {
         drumPattern = 0;
         polyPattern = 0;
@@ -1342,14 +1197,10 @@ void AudioManager::update(const ofVec2f player_position) {
     }
 
 
-
-
 }
 
 //--------------------------------------------------------------
 void AudioManager::draw() {
-
-    drawWaveform();
 
 }
 
@@ -1370,9 +1221,6 @@ void AudioManager::playRandomSample() {
         case 0:
             hit1.trigger(); //resets sample position to 0
             hit1Env.trigger = 1; //sample is triggered if = 1
-
-//            hitSub.trigger(); //resets sample position to 0
-//            hitSubEnv.trigger = 1; //sample is triggered if = 1
             break;
         case 1:
             hit2.trigger(); //resets sample position to 0
@@ -1428,9 +1276,6 @@ void AudioManager::keyPressed(int key) {
             hit1.trigger(); //resets sample position to 0
             hit1Env.trigger = 1; //sample is triggered if = 1
 
-//            hitSub.trigger(); //resets sample position to 0
-//            hitSubEnv.trigger = 1; //sample is triggered if = 1
-
         }
         else if (hitSelect == 2) {
             hit2.trigger(); //resets sample position to 0
@@ -1470,67 +1315,20 @@ void AudioManager::keyPressed(int key) {
 
     }
 
+    //------------------------------------------------------//
 
-    //    //trigger test for character movement
-    //    if (key == '2') {
-    //        noiseEnv.trigger = 1;
-    //    }
+    //move up or down through the patterns
 
-
-
-
-    //    //switch drum patterns
-    //    if (key == '3') {
-    //        drumPattern++;
-    //        if (drumPattern > 4){
-    //            drumPattern = 0;
-    //        }
-    //    }
-    //
-    //
-    //
-    //    //switch poly synth patterns
-    //    if (key == '4') {
-    //        polyPattern++;
-    //        if (polyPattern > 5){
-    //            polyPattern = 0;
-    //        }
-    //    }
-    //
-    //
-    //
-    //    //switch synth bass arp pattern
-    //    if (key == '5') {
-    //        synthPattern++;
-    //        if (synthPattern  > 4){
-    //            synthPattern = 0;
-    //        }
-    //    }
-    //
-    //    //switch synth bass arp pattern
-    //    if (key == '6') {
-    //        squarePattern++;
-    //        if (squarePattern  > 1){
-    //            squarePattern = 0;
-    //        }
-    //    }
-    //
-    //
-    //    if (key == '7') {
-    //        sub_BassPattern++;
-    //        if (sub_BassPattern  > 1){
-    //            sub_BassPattern = 0;
-    //        }
-    //    }
-
-	if (key == '0')
-	{
+    if (key == '0')
+    {
         set_pattern(patternSwitch + 1);
-	}
+    }
     else if (key == '9')
     {
         set_pattern(patternSwitch - 1);
     }
+
+
 }
 
 //--------------------------------------------------------------
@@ -1545,17 +1343,13 @@ void AudioManager::keyReleased(int key) {
     hit7Env.trigger = 0;
     hit8Env.trigger = 0;
 
-
     hitSubEnv.trigger = 0;
     noiseEnv.trigger = 0;
-
-
-    //    sq_BassEnv.trigger = 0;
 }
 
 
 
-// ==============================> EVENT FUNCTIONS <============================== //
+// ==========================> EVENT FUNCTIONS <============================== //
 
 // triggered every time a point is collected/triggered
 void AudioManager::event_point_collected()
@@ -1588,7 +1382,6 @@ void AudioManager::event_new_level_loaded()
 {
     //cout << "NEW LEVEL LOADED" << endl;
 
-
     //once level has finished change audio pattern
     increment_pattern();
 }
@@ -1605,7 +1398,7 @@ void AudioManager::event_player_stopped_moving()
 void AudioManager::set_pattern(const int pattern)
 {
     patternSwitch = pattern;
-    cout << "AudioManager: pattern: " << patternSwitch << endl;
+    //cout << "AudioManager: pattern: " << patternSwitch << endl;
 }
 
 void AudioManager::increment_pattern()
@@ -1614,10 +1407,10 @@ void AudioManager::increment_pattern()
     if (patternSwitch > 16) {
         patternSwitch = 0;
     }
-    cout << "AudioManager: pattern: " << patternSwitch << endl;
+    //cout << "AudioManager: pattern: " << patternSwitch << endl;
 }
 
-// ==================================================================================== //
+//========================================================================= //
 
 
 
@@ -1633,12 +1426,12 @@ void AudioManager::mouseDragged(int x, int y, int button) {
 
 //--------------------------------------------------------------
 void AudioManager::mousePressed(int x, int y, int button) {
-    
+
 }
 
 //--------------------------------------------------------------
 void AudioManager::mouseReleased(int x, int y, int button) {
-    
+
 }
 
 //--------------------------------------------------------------

@@ -396,12 +396,14 @@ void SceneManager::load_next_scene_in_sequence()
 		load_scene("Scenes/scene_16.xml");
 		break;
 	case 17:
+		//entity_manager_->set_player_position(ofVec2f(0, 0));
+		//cam_->set_zoom_mode(Camera::map_view);
+		//cam_->set_scale(1);
+		load_scene("Scenes/menu_scene.xml");
 		// Return to menu after completion
 		gamemode_manager_->set_current_mode_id(2);
 		// reset audio pattern to zero
 		audio_manager_->set_pattern(0);
-		entity_manager_->set_player_position(ofVec2f(0, 0));
-		cam_->set_scale(1);
 		break;
 	default:
 		cout << "[ Error >> SceneManager::load_next_scene_in_sequence >> 'current_scene_' undefined ]" << endl;		
@@ -421,7 +423,7 @@ void SceneManager::load_procedural_scene() const
 
 	entity_manager_->create_entity("Player");
 	
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < ofRandom(3, 7); i++)
 	{
 		const ofVec2f pos = ofVec2f(ofRandom(static_cast<float>(-WORLD_WIDTH) / 2, static_cast<float>(WORLD_WIDTH) / 2), ofRandom(static_cast<float>(-WORLD_HEIGHT) / 2, static_cast<float>(WORLD_HEIGHT) / 2));
 		entity_manager_->create_entity("Collectable", pos);

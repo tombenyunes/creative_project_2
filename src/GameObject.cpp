@@ -60,7 +60,7 @@ void GameObject::root_update()
 {
 	if (delete_key_down_)
 	{
-		if (mouse_over_)
+		if (mouse_over_ && get_type() != "Player")
 		{
 			set_request_to_be_deleted(true);
 			set_request_to_be_deleted_event("User");

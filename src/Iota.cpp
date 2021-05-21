@@ -4,9 +4,10 @@ void Iota::setup(ofBaseApp* app_ptr)
 {
 	//ofSetWindowPosition(3849, 649);
 	//ofSetWindowShape(1920, 1080);
-	ofSetWindowShape(1920, 1019);
-	ofSetWindowPosition((ofGetScreenWidth() - ofGetWindowWidth()) / 2, (ofGetScreenHeight() - ofGetWindowHeight()) / 2);
+	//ofSetWindowShape(1920, 1019);
+	//ofSetWindowPosition((ofGetScreenWidth() - ofGetWindowWidth()) / 2, (ofGetScreenHeight() - ofGetWindowHeight()) / 2);
 	ofSetWindowTitle("iota");
+	//ofSetFullscreen(true);
 	ofSetCircleResolution(176);
 	ofBackground(0);
 	ofSetVerticalSync(true);

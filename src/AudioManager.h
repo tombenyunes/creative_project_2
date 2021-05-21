@@ -15,7 +15,7 @@ public:
     void update(ofVec2f player_position);
     void draw();
     void drawGUI(bool enable);
-    void drawWaveform();
+
 
     //--------------SETUPS-----------------//
     void envelopeSetup();                  //set up envelopes
@@ -26,10 +26,7 @@ public:
 
 
     //==============SOUNDS================//
-    double playMetronome();
-    void playKeyLoop();
-    void playKeyLoopHi();
-    void playKeyLoopLow();
+    void playMetronome();
     void sampleHits();
     void beats();
     void charNoise();
@@ -37,6 +34,7 @@ public:
     void polySynth();
     void sawSqSynth();
     void subBass();
+    void stringsSynth();
     //------------------------------------//
 
     //used to trigger random samples when
@@ -84,8 +82,6 @@ public:
     float soundBuffer[512];
     float soundBufMix[512];
 
-    maxiOsc cellSin;  //  animation for cell pattern
-    double cellSinOut;
 
     //===================//
 
@@ -128,26 +124,6 @@ public:
     double flangeOut;
 
 
-    //====interactive-object-sound==//
-    maxiOsc sq, filterMod;
-    double sq_out;
-    maxiEnv sqEnv;
-    double sq_envOut;
-    maxiFilter sq_Filter;
-    double sq_FilterOut;
-    double sqMix[2];
-    maxiMix sqStereo;
-
-
-    //experiment with panning object sound
-    double gainPanX;
-    double gainPanY;
-    double mousePan;
-    double modPan;
-
-    double mapGain;
-    double mapMod;
-    double radius = 300;
 
 
     //---NOISE-BURST-CHARACTER-SOUND--//
@@ -157,9 +133,8 @@ public:
     //int noiseTrigger=0;
     maxiFilter noiseFilter;
     double noiseFilter_out;
-    maxiDelayline noiseDelay;
-    double noiseDelay_out;
-    //double noiseMix;
+
+
     maxiMix noiseStereo;
     double noiseMix[2];
     maxiOsc noisePanner;
@@ -194,7 +169,7 @@ public:
                          0,1,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0 };
 
-    int kickSeq2[32] = { 0,0,1,0, 0,0,0,0,
+    int kickSeq2[32] = { 1,0,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0,
                          0,1,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0 };
@@ -204,12 +179,10 @@ public:
                          0,0,0,0, 0,0,0,0,
                          0,0,0,0, 0,0,0,0 };
 
-
-
-
     double kickMix[2];
     maxiMix kickStereo;
-    //-----------------------------------------//
+
+    //--------------HIT-HAT----------------------//
     maxiHats hiHat;
     double hiHat_out;
     int hiHatTrigger;
@@ -261,7 +234,7 @@ public:
 
     int snareSeq2[32] = { 0,0,0,0, 1,0,0,0,
                           0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,1,0,0,
+                          0,0,0,0, 1,0,0,0,
                           0,0,0,0, 0,0,0,1 };
 
     int snareSeq3[32] = { 0,0,0,0, 1,0,0,0,
@@ -288,6 +261,9 @@ public:
     maxiSample metronome;
     double met_out;
     //-------------//
+    maxiMix metStereo;
+    double metMix[2];
+    //-------------//
     maxiEnv metEnv;
     double met_envOut;
     //-------------//
@@ -297,6 +273,9 @@ public:
 
     int metSeq2[16] = { 0,0,0,0, 1,1,0,0,
                         0,0,0,0, 0,0,1,0 };
+
+    int metSeq3[16] = { 0,0,1,0, 0,1,0,0,
+                        0,0,0,0, 0,1,1,0 };
     //-------------//
     double metSpeed;
     double metSpeedSeq[16] = { 1.5,1,1,1.8, 1.5,1,1,1.8,
@@ -307,78 +286,6 @@ public:
     // [128] = 8 bar loop
 
 
-    //---KEY-ARP-LOOP---//
-    //int keyArpSwitch = 0;
-    maxiSample keyArpLoop;
-    double keyArp_out;
-
-    maxiEnv keyArpEnv;
-    double keyArp_envOut;
-
-    int keyArpTrigger;
-    int keyArpSeq[32] = { 1,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0 };
-
-
-    maxiMix keyArpStereo;
-    double keyArpMix[2];
-    //==================//
-
-
-    //---KEY-LOOP-HI---//
-    maxiSample keyHi;
-    double keyHi_out;
-
-    maxiEnv keyHiEnv;
-    double keyHi_envOut;
-
-    int keyHiTrigger;
-    int keyHiSeq[64] = { 1,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0,
-                         0,0,0,0, 0,0,0,0 };
-
-    maxiMix keyHiStereo;
-    double keyHiMix[2];
-    //=================//
-
-
-    //--KEY-LOOP-LOW-BASS-//
-    maxiSample keyLow;
-    double keyLow_out;
-
-    maxiEnv keyLowEnv;
-    double keyLow_envOut;
-
-    int keyLowTrigger;
-
-    //4 BAR LOOP
-    int keyLowSeq[128] = { 1,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0,
-                          0,0,0,0, 0,0,0,0 };
-
-    maxiMix keyLowStereo;
-    double keyLowMix[2];
-    //==================//
 
 
     //----ATMOSPHERE-LOOP----//
@@ -451,40 +358,9 @@ public:
     double hitSubMix[2];
     maxiMix hitSubStereo;
 
-    //may not need this anymore??
+
     int subHitTrigger;
-    int subHitSeq[256] = { 1,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0,
-                              0,0,0,0, 0,0,0,0 };
+
     //========================================//
     //========================================//
 
@@ -547,9 +423,11 @@ public:
 
     //====POLY-SYNTH========//
     int polyPattern;
+    double playerDynamicPolyVolume;
+    double playerDynamicPolyFilter;
     //OSCILLATORS
-    maxiOsc poly_Osc, poly_Osc1, poly_Osc2;
-    double poly_OscOut, poly_Osc1Out, poly_Osc2Out;
+    maxiOsc poly_Osc, poly_Osc1;
+    double poly_OscOut, poly_Osc1Out;
 
     //LFO
     maxiOsc poly_LFO;
@@ -573,15 +451,12 @@ public:
 
     //TRIGGER LINE
     int poly_OscTrigger;
-    //    int poly_OscLineTrigger[64] =  { 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
-    //                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-    //                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-    //                                     0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
 
     int poly_OscLineTrigger[16] = { 1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0 };
     int poly_OscLineTrigger2[16] = { 0,1,0,1, 1,0,1,0, 0,0,0,0, 0,0,0,1 };
     int poly_OscLineTrigger3[16] = { 1,1,1,1, 1,0,1,0, 1,1,1,1, 1,0,1,0 };
     int poly_OscLineTrigger4[16] = { 1,1,1,1, 1,0,1,1, 1,1,1,0, 0,0,0,0 };
+
     //PITCH LINE
     float poly_OscPitch, poly_Osc1Pitch, poly_Osc2Pitch;
     int poly_OscLinePitch[5] = { 27, 64, 61, 63, 70 };
@@ -595,53 +470,10 @@ public:
     int poly_OscLinePitch5[4] = { 23, 30, 27, 20 };
     int poly_OscLinePitch5b[4] = { 58, 61, 66, 65 };
 
-    //    27, 32, 30, 25
     int poly_OscNote;
 
     //========================================//
     //========================================//
-
-//    //=====STRINGS-SYNTH======//
-//    int stringsPattern;
-//    //OSCILLATORS
-//    maxiOsc strings_Osc, strings_Osc1, strings_Osc2;
-//    double strings_OscOut, strings_Osc1Out, strings_Osc2Out;
-//
-//    //LFO
-//    maxiOsc strings_LFO;
-//    double strings_LFO_Out;
-//
-//    //ENVELOPE
-//    maxiEnv strings_OscEnv;
-//    double  strings_Osc_envOut;
-//
-//    //STEREO MIX
-//    maxiMix strings_OscStereo;
-//    double strings_OscMix[2];
-//
-//    //DELAY
-//    maxiDelayline strings_Delay;
-//    double strings_OscDelay_out;
-//
-//    //FILTER
-//    maxiFilter strings_OscFilter;
-//    double strings_OscFilter_out;
-//
-//    //TRIGGER LINE
-//    int strings_OscTrigger;
-//    int strings_OscLineTrigger[64] =  { 1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-//                                        0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-//                                        0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
-//                                        0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-//
-//    //PITCH LINE
-//    float strings_OscPitch, strings_Osc1Pitch, strings_Osc2Pitch;
-//    int strings_OscLinePitch[4] = { 63, 61, 66, 61};
-//    int strings_OscLinePitch2[4] = { 68, 63, 68, 68};
-//    int strings_OscLinePitch3[4] = { 70, 68, 73, 72};
-//    int strings_OscNote;
-//    //========================================//
-//    //========================================//
 
 
 
@@ -736,6 +568,9 @@ public:
     //========================================//
     //========================================//
 
+
+
+
     //====SUB-BASS========//
     int sub_BassPattern;
     //OSCILLATORS
@@ -817,7 +652,7 @@ public:
                                 65, 75, 70, 78 };
 
     int sBassLinePitch2[6] = { 51, 56, 63,
-                              51, 54, 63 };
+                               51, 54, 63 };
 
     int sBassLinePitch3[6] = { 39, 46, 51,
                                56, 58, 63 };
@@ -825,8 +660,7 @@ public:
     int sBassLinePitch4[12] = { 66, 68, 63,
                                 66, 70, 63,
                                 68, 70, 63,
-                                68, 70, 61
-    };
+                                68, 70, 61 };
 
     int sBassLinePitch5[16] = { 58, 61, 63, 65,
                                 68, 70, 73, 75,
@@ -850,8 +684,7 @@ public:
 
     //-----------GUI-SETUP---------//
     ofxPanel gui;
-    ofParameter<float> cellSpeed;
-    ofParameter<float> cellRadius;
+
 
     ofParameter<float> masterGain;
     ofParameter<float> metGain;
@@ -859,15 +692,6 @@ public:
     ofParameter<float> sampleHitGain;
 
     ofParameter<float> atmosGain;
-
-    ofParameter<float> keyLoopGain;
-    ofParameter<float> keyLoopPan;
-
-    ofParameter<float> keyHiGain;
-    ofParameter<float> keyHiPan;
-
-    ofParameter<float> keyLowGain;
-    ofParameter<float> keyLowPan;
 
     ofParameter<float> synthLineGain;
     ofParameter<float> synthLinePan;
@@ -898,6 +722,5 @@ public:
     ofParameter<float> noiseAttack;
     ofParameter<float> noiseLevel;
 
-    ofxVec4Slider flangeEffect;
     //==============================//
 };
