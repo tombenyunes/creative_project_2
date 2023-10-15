@@ -20,25 +20,29 @@ void Particle::update(const msa::fluid::Solver& solver, const ofVec2f& window_si
 	vel_ = solver.getVelocityAtPos(pos_ * inv_window_size) * (mass_ * FLUID_FORCE) * window_size + vel_ * MOMENTUM;
 	pos_ += vel_;
 
-	// bounce of edges
+	// reposition 'out of bounds' particles at random positions
 	if (pos_.x < 0)
 	{
-		pos_.x = 0;
+		pos_.x = ofRandom(0, window_size.x);
+		pos_.y = ofRandom(0, window_size.y);
 		vel_.set(0);
 	}
 	else if (pos_.x > window_size.x)
 	{
-		pos_.x = window_size.x;
+		pos_.x = ofRandom(0, window_size.x);
+		pos_.y = ofRandom(0, window_size.y);
 		vel_.set(0);
 	}
 	else if (pos_.y < 0)
 	{
-		pos_.y = 0;
+		pos_.x = ofRandom(0, window_size.x);
+		pos_.y = ofRandom(0, window_size.y);
 		vel_.set(0);
 	}
 	else if (pos_.y > window_size.y)
 	{
-		pos_.y = window_size.y;
+		pos_.x = ofRandom(0, window_size.x);
+		pos_.y = ofRandom(0, window_size.y);
 		vel_.set(0);
 	}
 	
