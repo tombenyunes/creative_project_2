@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(const ofVec2f pos, const ofColor color, const float radius)
-	:	movement_speed(0.10f)
+	:	movement_speed(0.20f)
 	,	mouse_down_(false)
 	,	mouse_button_(-1)
 	,	mouse_pos_(0)
@@ -249,10 +249,14 @@ void Player::draw_fluid_trail() const
 	if (mouse_down_ && mouse_button_ == 0)
 	{		
 		ofVec2f new_pos;
-		new_pos.x = ofMap(pos_.x + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
-		new_pos.y = ofMap(pos_.y + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
-		
+		//new_pos.x = ofMap(pos_.x + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+		//new_pos.y = ofMap(pos_.y + ofRandom(-get_radius() / 4, get_radius() / 4), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
+		new_pos.x = ofMap(pos_.x + ofRandom(-get_radius() / 2, get_radius() / 2), -HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0, 1);
+		new_pos.y = ofMap(pos_.y + ofRandom(-get_radius() / 2, get_radius() / 2), -HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0, 1);
+
 		ofVec2f new_vel;
+		//new_vel.x = ((get_movement_vector().x + ofRandom(-1, 1)) / 6400) * -1;
+		//new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 		new_vel.x = ((get_movement_vector().x + ofRandom(-1, 1)) / 6400) * -1;
 		new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 
