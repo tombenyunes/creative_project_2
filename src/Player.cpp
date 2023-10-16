@@ -49,6 +49,7 @@ void Player::apply_all_forces()
 {
 	if (player_can_move())
 	{
+		mouse_pos_ = ofVec2f(cam_->get_world_mouse_pos().x, cam_->get_world_mouse_pos().y);
 		apply_force(accel_, get_movement_vector(), true, movement_speed);
 		audio_manager_->event_player_started_moving();
 	}
