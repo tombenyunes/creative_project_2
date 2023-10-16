@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "GameObject.h"
 #include "PlayerTrail.h"
+#include "PlayerParticle.h"
 
 class Player : public GameObject {
 
@@ -35,7 +36,15 @@ private:
 	
 	void draw_boost_direction() const;
 	ofVec3f draw_vel_path() const;
+
+	// Global particle effects
 	void draw_fluid_trail() const;
+
+	// Local particle effects
+	void player_particles();
+	void create_particle_effects();
+	void update_particle_effects();
+	void draw_local_particle_effects();
 
 	// Events
 	void mouse_pressed(float x, float y, int button) override;
@@ -45,7 +54,7 @@ private:
 	void key_pressed(int key) override;
 	void key_released(int key) override;
 
-
+	vector<PlayerParticle> player_particles_;
 
 	float movement_speed;
 	

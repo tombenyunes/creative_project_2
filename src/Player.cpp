@@ -26,10 +26,17 @@ void Player::update()
 {
 	follow_mouse();
 	pull_points();
-	draw_fluid_trail();
-	update_forces();
+	player_particles(); // local player particles
+	draw_fluid_trail(); // global particle physics
+	update_forces(); // movement physics
 	update_gui();
 	reset_forces();
+}
+
+void Player::player_particles()
+{
+	create_particle_effects();
+	update_particle_effects();
 }
 
 void Player::update_forces()
@@ -197,6 +204,8 @@ void Player::draw()
 {
 	ofPushStyle();
 	
+	draw_local_particle_effects();
+
 	if (gamemode_manager_->get_current_mode_string() != "Menu")
 	{		
 		if ((gamemode_manager_->get_current_mode_string() == "Sandbox") && ((get_is_selected() == true) || (mouse_over_ || mouse_drag_)))
@@ -261,5 +270,35 @@ void Player::draw_fluid_trail() const
 		new_vel.y = ((get_movement_vector().y + ofRandom(-1, 1)) / 6400) * -1;
 
 		fluid_manager_->add_to_fluid(new_pos, new_vel, true, true);
+	}
+}
+
+void Player::create_particle_effects()
+{
+	if (mouse_down_ && mouse_button_ == 0)
+	{
+		ofVec2f movement_vec = pos_ - mouse_pos_;
+		movement_vec.scale(10);
+		float spawn_area = get_radius() / 4;
+		PlayerParticle particle(get_position() + ofVec2f(ofRandom(-spawn_area, spawn_area), ofRandom(-spawn_area, spawn_area)), movement_vec * -1 * 0.5, get_radius() * ofRandom(0.6, 0.8), ofColor(255, 255), ofRandom(25, 100));
+		player_particles_.push_back(particle);
+	}
+}
+
+void Player::update_particle_effects()
+{
+	for (int i = 0; i < player_particles_.size(); i++)
+	{
+		if (player_particles_[i].needs_to_be_deleted)
+			player_particles_.erase(player_particles_.begin() + i);
+		player_particles_[i].update();
+	}
+}
+
+void Player::draw_local_particle_effects()
+{
+	for (auto& i : player_particles_)
+	{
+		i.draw();
 	}
 }
